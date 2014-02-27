@@ -1,0 +1,92 @@
+# Copyright 2006 by Sean Luke and George Mason University
+# Licensed under the Academic Free License version 3.0
+# See the file "LICENSE" for more information
+
+parent.0 = koza.params
+
+
+# Stolen from koza/params -- overwriting just
+# a little for readability
+# You need to create at least one function set, 
+# called "f0", which your first tree will use.  
+
+gp.fs.size = 1
+gp.fs.0.name = f0
+# O default é 10, mas como não queremos ERC, colocamos 9 operadores
+gp.fs.0.size = 12
+gp.fs.0.func.0 = ec.partialSolutions.func.X01
+gp.fs.0.func.0.nc = nc0
+gp.fs.0.func.1 = ec.partialSolutions.func.X02
+gp.fs.0.func.1.nc = nc0
+gp.fs.0.func.2 = ec.partialSolutions.func.X03
+gp.fs.0.func.2.nc = nc0
+gp.fs.0.func.3 = ec.partialSolutions.func.X04
+gp.fs.0.func.3.nc = nc0
+gp.fs.0.func.4 = ec.partialSolutions.func.X05
+gp.fs.0.func.4.nc = nc0
+gp.fs.0.func.5 = ec.partialSolutions.func.X06
+gp.fs.0.func.5.nc = nc0
+gp.fs.0.func.6 = ec.partialSolutions.func.X07
+gp.fs.0.func.6.nc = nc0
+gp.fs.0.func.7 = ec.partialSolutions.func.X08
+gp.fs.0.func.7.nc = nc0
+gp.fs.0.func.8 = ec.partialSolutions.func.Add
+gp.fs.0.func.8.nc = nc2
+gp.fs.0.func.9 = ec.partialSolutions.func.Mul
+gp.fs.0.func.9.nc = nc2
+gp.fs.0.func.10 = ec.partialSolutions.func.Sub
+gp.fs.0.func.10.nc = nc2
+gp.fs.0.func.11 = ec.partialSolutions.func.Div
+gp.fs.0.func.11.nc = nc2
+gp.fs.0.func.11 = ec.partialSolutions.func.RegERC
+gp.fs.0.func.11.nc = nc0
+
+#gp.fs.0.func.6 = ec.app.regression.func.Exp
+#gp.fs.0.func.6.nc = nc1
+
+#gp.fs.0.func.4.nc = nc2
+#gp.fs.0.func.5 = ec.app.regression.func.Sin
+#gp.fs.0.func.5.nc = nc1
+#gp.fs.0.func.6 = ec.app.regression.func.Cos
+#gp.fs.0.func.6.nc = nc1
+#gp.fs.0.func.8 = ec.app.regression.func.Log
+#gp.fs.0.func.8.nc = nc1
+# placed here at the bottom so noerc.params can skip it
+#gp.fs.0.func.9 = ec.app.regression.func.RegERC
+#gp.fs.0.func.9.nc = nc0
+
+pop.subpop.0.species.pipe.num-sources = 2
+pop.subpop.0.species.pipe.source.0 = ec.gp.koza.CrossoverPipeline
+pop.subpop.0.species.pipe.source.0.prob = 0.9
+#pop.subpop.0.species.pipe.source.1 = ec.breed.ReproductionPipeline
+#pop.subpop.0.species.pipe.source.1.prob = 0.1
+pop.subpop.0.species.pipe.source.1 = ec.gp.koza.MutationPipeline
+pop.subpop.0.species.pipe.source.1.prob = 0.1
+
+#
+# We specify our problem here
+#
+eval.problem.data = ec.app.regression.RegressionData
+
+gp.tree.print-style = c
+#Para imprimir em .dot para visualizar no GraphViz
+#gp.tree.print-style = dot
+
+stat.gather-full = true
+
+# Default = 1024
+pop.subpop.0.size =                     150
+
+generations =							50
+
+# Default = 7 
+# 1024/7, 500/5
+select.tournament.size =                4
+
+eval.problem = 							ec.gesec.problems.Regression
+
+### Don't show best individual information on screen
+stat.do-message = 						true
+
+# Elitism size = 1
+breed.elite.0 =							1
