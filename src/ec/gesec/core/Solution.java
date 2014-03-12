@@ -40,11 +40,10 @@ public class Solution implements Function{
 
     @Override
     public double eval(double[] val) {
-        if(tr == 1){
+        if(t2 == null){
             return t1.eval(val);
         }
         return tr*t1.eval(val) + (1-tr)*t2.eval(val);
-//        return tr*t1.eval(val) + (1-tr)*t2.eval(val);
     }
 
     public void test(Dataset training, Dataset test, StatisticsHandler stats) {

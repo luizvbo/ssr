@@ -20,20 +20,23 @@ public class StatisticsHandler {
     private double train[][][];
     private double test[][][];
         
-    private int numGenerations[];
+//    private int numGenerations[];
     private int currentExecution;
+    private double trainingError[][];
 
     public StatisticsHandler(int numExecutions) {  
         train = new double[numExecutions][][];
         test = new double[numExecutions][][];
+        trainingError = new double[numExecutions][];
        
         // First dimension of size two (fisrt for ecjCovered and second for treeCovered)
-        numGenerations = new int[numExecutions];
+//        numGenerations = new int[numExecutions];
         currentExecution = 0;
     }
     
-    public void updateOnNewFunction(int ecjCoveredPoints, int numGenerations){
-        this.numGenerations[currentExecution] += numGenerations;
+    public void updateIterativeErrors(double[] errors){
+//        this.numGenerations[currentExecution] += numGenerations;
+        trainingError[currentExecution] = errors;        
     }
     
     public void finishExecution(){
@@ -57,8 +60,8 @@ public class StatisticsHandler {
         double[] mse = new double[data.length];
         double[] hits = new double[data.length];
         for(int exec = 0; exec < data.length; exec ++){            
-            bw.write("Execution " + (exec+1) + "\n");
-            bw.write("input,output,evaluated,error\n");
+//            bw.write("Execution " + (exec+1) + "\n");
+//            bw.write("input,output,evaluated,error\n");
             for(int j = 0; j < data[exec].length; j++){
                 int inputSize = data[exec][j].length;
                 double error = Math.abs(data[exec][j][inputSize-1]-data[exec][j][inputSize-2]);
@@ -68,15 +71,14 @@ public class StatisticsHandler {
                 for(int k = 0; k < inputSize - 2; k++){
                     inputAux.append(data[exec][j][k]).append(",");
                 }
-                bw.write(inputAux.toString() + data[exec][j][inputSize-2] + "," + 
-                         data[exec][j][inputSize-1] + "," + error);
-                bw.write("\n");
+//                bw.write(inputAux.toString() + data[exec][j][inputSize-2] + "," + data[exec][j][inputSize-1] + "," + error);
+//                bw.write("\n");
                 transposeError[j][exec]= error;
                                 
                 if(error <= hitLevel)
                     hits[exec]++;
             }
-            bw.write("Error:," + totalError[exec] + ",Hits:," + hits[exec] + "\n\n");
+//            bw.write("Error:," + totalError[exec] + ",Hits:," + hits[exec] + "\n\n");
         }
         bw.write("Point, error mean, DP\n");
         for(int i = 0; i < transposeError.length; i++){
@@ -85,13 +87,20 @@ public class StatisticsHandler {
             bw.write((i+1) + "," + mean + "," + sd + "\n");
         }
         DecimalFormat formatter = new DecimalFormat("#.###", new DecimalFormatSymbols(Locale.ENGLISH));
+        bw.write("\nError during iterations\n");
+        for(int i = 0; i < trainingError.length; i++){
+            for(int j = 0; j < trainingError[i].length; j++){
+                bw.write(formatter.format(trainingError[i][j]) + ",");
+            }
+            bw.write("\n");
+        }
         double rmse[] = new double[data.length];
         double mae[] = new double[data.length];
         for(int i = 0; i < data.length; i++){
             mse[i] /= data[i].length;
             rmse[i] = Math.sqrt(mse[i]);
             mae[i] = totalError[i] / data[i].length;
-        }
+        }        
         double rmseMedian = getMedian(rmse);
         double iqr = getIQR(rmse, rmseMedian);
         double mTotalError = getMean(totalError);

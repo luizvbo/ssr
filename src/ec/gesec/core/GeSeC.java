@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import ec.gesec.problems.Regression;
+import java.util.Arrays;
 
 
 
@@ -200,8 +201,11 @@ public class GeSeC{
                 // Solution reset
                 solution = null;
                 currentSolution = null;
+                // Array that stores the error of each iteration
+                double[] iterativeErrors = new double[maxIterations];
                 int currentIteration = 0;
                 boolean canStop = false;
+                // The original expected output
                 double output[] = getFirstRunOutput(data[0]);
                 while(!canStop){
                     System.out.println("\n======= Execution " + ((execution-1)*maxIterations + currentIteration)  + " of " + totalNumberGPExecs + " =======");
@@ -227,10 +231,11 @@ public class GeSeC{
                         addFunctionToSolution(bestSoFar, tr);
                         output = getNewOutput(data[0], output, tr);
                     }
-                    stats.updateOnNewFunction(fitness.hits, mainState.generation+1);
-                    currentIteration ++;
+                    iterativeErrors[currentIteration] = getTotalError(solution, data[0]);
+                    currentIteration++;
                     mainState.output.close();
                 }
+                stats.updateIterativeErrors(iterativeErrors);
                 // Test
                 solution.test(data[0], data[1], stats);
                 stats.finishExecution();
@@ -286,5 +291,20 @@ public class GeSeC{
             output[i++] = instance.output;
         }
         return output;
+    }
+
+    /**
+     * Calculate the total absolute error, given a solution object and a datase
+     * @param solution Solution objetc
+     * @param dataset Dataset used to calculate the error
+     * @return Total error
+     */
+    private double getTotalError(Solution solution, Dataset dataset) {
+        double totalError = 0;
+        for(Instance instance : dataset.data){
+            double evaluated = solution.eval(instance.input);
+            totalError += Math.abs(evaluated - instance.output);
+        }
+        return totalError;
     }
 }
