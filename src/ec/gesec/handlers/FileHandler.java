@@ -154,6 +154,18 @@ public class FileHandler {
         stats.writeTrainingErrorToFile(bw, hitLevel);
         bw.close();
     }
+    
+    public static void writeSolution(String outputPath,
+                                     String outputPrefix,
+                                     String stringSolution) throws Exception{
+        File outputDir = getOutputDir(outputPath);
+        
+        // Object to write results on file
+        BufferedWriter bw;
+        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + outputPrefix + "solution.txt"));
+        bw.write(stringSolution);
+        bw.close();
+    }
 
     /**
      * Selects the path to save output data.

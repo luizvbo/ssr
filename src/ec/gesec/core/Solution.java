@@ -12,8 +12,8 @@ import ec.gesec.handlers.StatisticsHandler;
  * Copyright (C) 20014, Federal University of Minas Gerais, Belo Horizonte, Brazil
  */
 public class Solution implements Function{
-    private Function t1;
-    private Function t2;
+    protected Function t1;
+    protected Function t2;
     private double tr;
     
     public Solution(Function t1, double tr) {
@@ -35,7 +35,7 @@ public class Solution implements Function{
     
     @Override
     public String print() {
-        return "(" + tr + "*" + t1.print() + "+" + "(1-" + tr + ")*" + t2.print() + ")";
+        return "(" + tr + "*" + t1.print() + "+(1-" + tr + ")*" + t2.print() + ")";
     }
 
     @Override

@@ -30,8 +30,8 @@ import ec.gesec.problems.Regression;
  * @author luiz
  */
 public class GeSeC{          
-    private Solution currentSolution;
-    private Solution solution;
+    protected Solution currentSolution;
+    protected Solution solution;
     
     protected String parameterFilePath;
     protected String inputDataFilePath; 
@@ -44,7 +44,7 @@ public class GeSeC{
     
     protected StatisticsHandler stats;
     protected EvolutionState mainState;
-    private DataProducer dataProducer;
+    protected DataProducer dataProducer;
     
     
       
@@ -197,6 +197,9 @@ public class GeSeC{
             // Run the algorithm for a defined number of repetitions
             for(int execution = 1; execution <= numExecutions; execution++){
                 Dataset[] data = dataProducer.getTrainintTestData();
+                // Solution reset
+                solution = null;
+                currentSolution = null;
                 int currentIteration = 0;
                 boolean canStop = false;
                 double output[] = getFirstRunOutput(data[0]);
@@ -220,12 +223,13 @@ public class GeSeC{
                         canStop = true;
                     }
                     else{
-                        double tr = mainState.random[0].nextDouble(true,true);
+                        double tr = mainState.random[0].nextDouble();
                         addFunctionToSolution(bestSoFar, tr);
                         output = getNewOutput(data[0], output, tr);
                     }
                     stats.updateOnNewFunction(fitness.hits, mainState.generation+1);
                     currentIteration ++;
+                    mainState.output.close();
                 }
                 // Test
                 solution.test(data[0], data[1], stats);
@@ -234,6 +238,7 @@ public class GeSeC{
             }
             // Write statistics on a file
             FileHandler.writeResults(outputPath, outputPrefix, stats, hitLevel);
+            FileHandler.writeSolution(outputPath, outputPrefix, solution.print());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -244,7 +249,7 @@ public class GeSeC{
         ps.execute();
     }
 
-    private void addFunctionToSolution(GPIndividual generatedFunction, double tr) {
+    protected void addFunctionToSolution(GPIndividual generatedFunction, double tr) {
         if(solution == null){
             solution = new Solution((Function)generatedFunction.trees[0].child, tr);
             currentSolution = solution;
@@ -255,7 +260,7 @@ public class GeSeC{
         }
     }
     
-    private void addLastFunctionToSolution(GPIndividual generatedFunction){
+    protected void addLastFunctionToSolution(GPIndividual generatedFunction){
         if(solution == null){
             solution = new Solution((Function)generatedFunction.trees[0].child, 1);
         }
@@ -264,7 +269,7 @@ public class GeSeC{
         }
     }
 
-    private double[] getNewOutput(Dataset dataset, double[] oldOutput, double tr){
+    protected double[] getNewOutput(Dataset dataset, double[] oldOutput, double tr){
         double[] newOutput = new double[dataset.size()];
         for(int i = 0; i < dataset.size(); i++){
             Instance instance = dataset.get(i);
@@ -274,7 +279,7 @@ public class GeSeC{
         return newOutput;
     }
     
-    private double[] getFirstRunOutput(Dataset dataset) {
+    protected double[] getFirstRunOutput(Dataset dataset) {
         double[] output = new double[dataset.size()];
         int i = 0;
         for(Instance instance : dataset.data){
