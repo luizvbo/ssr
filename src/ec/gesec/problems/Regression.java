@@ -98,8 +98,10 @@ public class Regression extends GPProblem implements SimpleProblemForm{
             RegressionData regressionData = (RegressionData)(this.input);
             
             int hits = 0;
-            double errorSum = 0.0;
+            // Total squared error
+            double TSE = 0.0;
             double error;
+            double squaredError;
             for (int i = 0; i < dataset.size(); i++){
                 currentValue = dataset.get(i).input;
                 ((GPIndividual)ind).trees[0].child.eval(
@@ -113,35 +115,81 @@ public class Regression extends GPProblem implements SimpleProblemForm{
                 // my knowledge.
 
                 
-                final double PROBABLY_ZERO = 1.11E-15;
-                final double BIG_NUMBER = 1.0e15;  // the same as lilgp uses
+                final double PROBABLY_ZERO = 4.0e-320;
+                final double BIG_NUMBER = 1.0e300;  // the same as lilgp uses
+//                final double PROBABLY_ZERO = 1.11E-15;
+//                final double BIG_NUMBER = 1.0e15;  // the same as lilgp uses
 
                 error = Math.abs(output[i] - regressionData.x);
-
-                if (! (error < BIG_NUMBER ) )   // *NOT* (input.x >= BIG_NUMBER)
+                
+                if (! (error < BIG_NUMBER ) ){   // *NOT* (input.x >= BIG_NUMBER)
                     error = BIG_NUMBER;
-
+                    squaredError = error;
+                }
                 // very slight math errors can creep in when evaluating
                 // two equivalent by differently-ordered functions, like
                 // x * (x*x*x + x*x)  vs. x*x*x*x + x*x
-
-                else if (error<PROBABLY_ZERO)  // slightly off
+                else if (error < PROBABLY_ZERO){  // slightly off
                     error = 0.0;
+                    squaredError = 0.0;
+                }
+                else{
+                    squaredError = error * error;
+//                    squaredError = error;
+                }
                     
                 if (error <= hitLevel) hits++;  // whatever!
 
-                errorSum += error;
-                
+                TSE += error;
+//                TSE += error;
             }
                 
             // the fitness better be KozaFitness!
-            KozaFitness f = ((KozaFitness)ind.fitness);
-            float fitness = (float)errorSum;
+            KozaFitness f = ((KozaFitness)ind.fitness);            
             
-            
-            f.setStandardizedFitness(state,fitness);
+//            f.setDoubleFitness(TSE);
+//            f.setStandardizedFitness(state, TSE);
+            f.setStandardizedFitness(state, TSE);
             f.hits = hits;
             ind.evaluated = true;            
         }
     }
+
+    /**
+     * During this step, double fitness are normalized to [0,1] and stored as a float
+     */
+//    @Override
+//    public void finishEvaluating(EvolutionState state, int threadnum) {
+////        double smallestFitness = Double.POSITIVE_INFINITY;
+//        double biggestFitness = Double.NEGATIVE_INFINITY;
+//        for(Individual ind : state.population.subpops[0].individuals){
+//            ind.evaluated = false;
+////            if(((DoubleKozaFitness)ind.fitness).getDoubleFitness() < smallestFitness){
+////                smallestFitness = ((DoubleKozaFitness)ind.fitness).getDoubleFitness();
+////            }
+//            if(((DoubleKozaFitness)ind.fitness).getDoubleFitness() > biggestFitness){
+//                biggestFitness = ((DoubleKozaFitness)ind.fitness).getDoubleFitness();
+//            }
+//        }  
+//        
+////        double middleTerm = (biggestFitness + smallestFitness)/2;
+//        
+//        biggestFitness+=1;
+//        
+//        // Normalize the error and calculate the finess of each individual
+//        for(Individual ind : state.population.subpops[0].individuals){
+//            double d_fitness = ((DoubleKozaFitness)ind.fitness).getDoubleFitness();
+//            
+//            float normalizedFitness = (float)(d_fitness/biggestFitness);
+//            
+//            float _f = normalizedFitness;
+//            if(_f < 0.0f || _f == Float.POSITIVE_INFINITY || Float.isNaN(_f)){
+//                int x = 0;
+//            }
+//                
+////            float normalizedFitness = (float)(d_fitness/biggestFitness);
+//            ((DoubleKozaFitness)ind.fitness).setStandardizedFitness(state, normalizedFitness);
+//            
+//        }      
+//    }
 }

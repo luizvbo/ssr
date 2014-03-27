@@ -21,7 +21,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import ec.gesec.problems.Regression;
-import java.util.Arrays;
 
 
 
@@ -195,6 +194,7 @@ public class GeSeC{
     public void execute(){
         try {
             final int totalNumberGPExecs = numExecutions*maxIterations;
+            StringBuilder s_solution = new StringBuilder();
             // Run the algorithm for a defined number of repetitions
             for(int execution = 1; execution <= numExecutions; execution++){
                 Dataset[] data = dataProducer.getTrainintTestData();
@@ -208,7 +208,7 @@ public class GeSeC{
                 // The original expected output
                 double output[] = getFirstRunOutput(data[0]);
                 while(!canStop){
-                    System.out.println("\n======= Execution " + ((execution-1)*maxIterations + currentIteration)  + " of " + totalNumberGPExecs + " =======");
+                    System.out.println("\n======= Execution " + ((execution)*maxIterations + currentIteration)  + " of " + totalNumberGPExecs + " =======");
                     mainState.startFresh();
                     // Load new inputs on the proble Object
                     ((Regression)mainState.evaluator.p_problem).setDataset(data[0]);
@@ -232,6 +232,9 @@ public class GeSeC{
                         output = getNewOutput(data[0], output, tr);
                     }
                     iterativeErrors[currentIteration] = getTotalError(solution, data[0]);
+                    
+                    System.out.println(iterativeErrors[currentIteration]);
+                    
                     currentIteration++;
                     mainState.output.close();
                 }
@@ -239,11 +242,11 @@ public class GeSeC{
                 // Test
                 solution.test(data[0], data[1], stats);
                 stats.finishExecution();
-//                FileHandler.writeInducedFunction(outputPath, outputPrefix, solution.toString());
+                s_solution.append(solution.print()).append("\n\n");
             }
             // Write statistics on a file
             FileHandler.writeResults(outputPath, outputPrefix, stats, hitLevel);
-            FileHandler.writeSolution(outputPath, outputPrefix, solution.print());
+            FileHandler.writeSolution(outputPath, outputPrefix, s_solution.toString());
         } catch (Exception ex) {
             ex.printStackTrace();
         }

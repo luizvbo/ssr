@@ -74,15 +74,15 @@ gp.tree.print-style = 					c
 stat.gather-full = true
 
 # Default = 1024
-generations =							100
+generations =							50
 
-pop.subpop.0.size =                     500
+pop.subpop.0.size =                     150
 
 # Default = 7 
 # 1024/7, 500/5
-select.tournament.size =                5
+select.tournament.size =                3
 
-eval.problem = 				ec.gesec.problems.Regression
+eval.problem = 							ec.gesec.problems.Regression
 
 # Overwrite fitness option
 # pop.subpop.0.species.fitness = 			ec.gesec.problems.fitness.DoubleKozaFitness

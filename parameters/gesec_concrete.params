@@ -40,9 +40,8 @@ gp.fs.0.func.11 = ec.gesec.functions.Div
 gp.fs.0.func.11.nc = nc2
 gp.fs.0.func.12 = ec.gesec.functions.RegERC
 gp.fs.0.func.12.nc = nc0
-
-#gp.fs.0.func.6 = ec.app.regression.func.Exp
-#gp.fs.0.func.6.nc = nc1
+#gp.fs.0.func.13 = ec.gesec.functions.Exp
+#gp.fs.0.func.13.nc = nc1
 
 #gp.fs.0.func.4.nc = nc2
 #gp.fs.0.func.5 = ec.app.regression.func.Sin
@@ -85,6 +84,9 @@ select.tournament.size =                5
 
 
 eval.problem = 							ec.gesec.problems.Regression
+
+# Overwrite fitness option
+# pop.subpop.0.species.fitness = 			ec.gesec.problems.fitness.DoubleKozaFitness
 
 ### Don't show best individual information on screen
 stat.do-message = 						true

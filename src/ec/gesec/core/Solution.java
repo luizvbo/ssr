@@ -35,7 +35,11 @@ public class Solution implements Function{
     
     @Override
     public String print() {
-        return "(" + tr + "*" + t1.print() + "+(1-" + tr + ")*" + t2.print() + ")";
+        if(t2 != null)
+            return tr + "," + t1.print() + "\n" + t2.print();
+        return tr + "," + t1.print();
+        
+//        return "(" + tr + "*" + t1.print() + "+(1-" + tr + ")*" + t2.print() + ")";
     }
 
     @Override

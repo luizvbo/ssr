@@ -13,7 +13,7 @@ parent.0 = koza.params
 gp.fs.size = 1
 gp.fs.0.name = f0
 # O default é 10, mas como não queremos ERC, colocamos 9 operadores
-gp.fs.0.size = 12
+gp.fs.0.size = 19
 gp.fs.0.func.0 = ec.gesec.functions.X01
 gp.fs.0.func.0.nc = nc0
 gp.fs.0.func.1 = ec.gesec.functions.X02
@@ -24,35 +24,34 @@ gp.fs.0.func.3 = ec.gesec.functions.X04
 gp.fs.0.func.3.nc = nc0
 gp.fs.0.func.4 = ec.gesec.functions.X05
 gp.fs.0.func.4.nc = nc0
-gp.fs.0.func.5 = ec.gesec.functions.X06
-gp.fs.0.func.5.nc = nc0
-gp.fs.0.func.6 = ec.gesec.functions.X07
-gp.fs.0.func.6.nc = nc0
-gp.fs.0.func.7 = ec.gesec.functions.X08
-gp.fs.0.func.7.nc = nc0
-gp.fs.0.func.8 = ec.gesec.functions.Add
+gp.fs.0.func.5 = ec.gesec.functions.Add
+gp.fs.0.func.5.nc = nc2
+gp.fs.0.func.6 = ec.gesec.functions.Sub
+gp.fs.0.func.6.nc = nc2
+gp.fs.0.func.7 = ec.gesec.functions.Mul
+gp.fs.0.func.7.nc = nc2
+gp.fs.0.func.8 = ec.gesec.functions.Div
 gp.fs.0.func.8.nc = nc2
-gp.fs.0.func.9 = ec.gesec.functions.Mul
-gp.fs.0.func.9.nc = nc2
-gp.fs.0.func.10 = ec.gesec.functions.Sub
-gp.fs.0.func.10.nc = nc2
-gp.fs.0.func.11 = ec.gesec.functions.Div
-gp.fs.0.func.11.nc = nc2
-gp.fs.0.func.11 = ec.gesec.functions.RegERC
-gp.fs.0.func.11.nc = nc0
-#gp.fs.0.func.12 = ec.gesec.functions.Exp
-#gp.fs.0.func.12.nc = nc1
-
-#gp.fs.0.func.4.nc = nc2
-#gp.fs.0.func.5 = ec.app.regression.func.Sin
-#gp.fs.0.func.5.nc = nc1
-#gp.fs.0.func.6 = ec.app.regression.func.Cos
-#gp.fs.0.func.6.nc = nc1
-#gp.fs.0.func.8 = ec.app.regression.func.Log
-#gp.fs.0.func.8.nc = nc1
-# placed here at the bottom so noerc.params can skip it
-#gp.fs.0.func.9 = ec.app.regression.func.RegERC
-#gp.fs.0.func.9.nc = nc0
+gp.fs.0.func.9 = ec.gesec.functions.Sin
+gp.fs.0.func.9.nc = nc1
+gp.fs.0.func.10 = ec.gesec.functions.Cos
+gp.fs.0.func.10.nc = nc1
+gp.fs.0.func.11 = ec.gesec.functions.Exp
+gp.fs.0.func.11.nc = nc1
+gp.fs.0.func.12 = ec.gesec.functions.Log
+gp.fs.0.func.12.nc = nc1
+gp.fs.0.func.13 = ec.gesec.functions.Square
+gp.fs.0.func.13.nc = nc1
+gp.fs.0.func.14 = ec.gesec.functions.Cube
+gp.fs.0.func.14.nc = nc1
+gp.fs.0.func.15 = ec.gesec.functions.Sqrt
+gp.fs.0.func.15.nc = nc1
+gp.fs.0.func.16 = ec.gesec.functions.Tan
+gp.fs.0.func.16.nc = nc1
+gp.fs.0.func.17 = ec.gesec.functions.Tanh
+gp.fs.0.func.17.nc = nc1
+gp.fs.0.func.18 = ec.gesec.functions.KornsERC
+gp.fs.0.func.18.nc = nc0
 
 pop.subpop.0.species.pipe.num-sources = 2
 pop.subpop.0.species.pipe.source.0 = ec.gp.koza.CrossoverPipeline
@@ -76,13 +75,13 @@ stat.gather-full = true
 # Default = 1024
 generations =							100
 
-pop.subpop.0.size =                     500
+pop.subpop.0.size =                     1000
 
 # Default = 7 
 # 1024/7, 500/5
-select.tournament.size =                5
+select.tournament.size =                7
 
-eval.problem = 				ec.gesec.problems.Regression
+eval.problem = 							ec.gesec.problems.Regression
 
 # Overwrite fitness option
 # pop.subpop.0.species.fitness = 			ec.gesec.problems.fitness.DoubleKozaFitness

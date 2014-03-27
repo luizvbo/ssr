@@ -46,22 +46,22 @@ public class StatisticsHandler {
         
     public void writeTestErrorToFile(BufferedWriter bw, double hitLevel) throws IOException{
         if(test[0].length > 0)
-            writeErrorToFile(bw, hitLevel, test);
+            writeErrorToFile(bw, hitLevel, test, false);
     }
     
     public void writeTrainingErrorToFile(BufferedWriter bw, double hitLevel) throws IOException{
-        writeErrorToFile(bw, hitLevel, train);
+        writeErrorToFile(bw, hitLevel, train, true);
     }
     
-    public void writeErrorToFile(BufferedWriter bw, double hitLevel, double[][][] data) throws IOException{
+    public void writeErrorToFile(BufferedWriter bw, double hitLevel, double[][][] data, boolean isTraining) throws IOException{
         // Transpose the matrix to calculate the mean and sd
         double[][] transposeError = new double[data[0].length+1][data.length];
         double[] totalError = new double[data.length];
         double[] mse = new double[data.length];
         double[] hits = new double[data.length];
         for(int exec = 0; exec < data.length; exec ++){            
-//            bw.write("Execution " + (exec+1) + "\n");
-//            bw.write("input,output,evaluated,error\n");
+            bw.write("Execution " + (exec+1) + "\n");
+            bw.write("input,output,evaluated,error\n");
             for(int j = 0; j < data[exec].length; j++){
                 int inputSize = data[exec][j].length;
                 double error = Math.abs(data[exec][j][inputSize-1]-data[exec][j][inputSize-2]);
@@ -71,28 +71,30 @@ public class StatisticsHandler {
                 for(int k = 0; k < inputSize - 2; k++){
                     inputAux.append(data[exec][j][k]).append(",");
                 }
-//                bw.write(inputAux.toString() + data[exec][j][inputSize-2] + "," + data[exec][j][inputSize-1] + "," + error);
-//                bw.write("\n");
+                bw.write(inputAux.toString() + data[exec][j][inputSize-2] + "," + data[exec][j][inputSize-1] + "," + error);
+                bw.write("\n");
                 transposeError[j][exec]= error;
                                 
                 if(error <= hitLevel)
                     hits[exec]++;
             }
-//            bw.write("Error:," + totalError[exec] + ",Hits:," + hits[exec] + "\n\n");
+            bw.write("Error:," + totalError[exec] + ",Hits:," + hits[exec] + "\n\n");
         }
-        bw.write("Point, error mean, DP\n");
-        for(int i = 0; i < transposeError.length; i++){
-            double mean = getMean(transposeError[i]);
-            double sd = getSD(transposeError[i], mean);
-            bw.write((i+1) + "," + mean + "," + sd + "\n");
-        }
+//        bw.write("Point, error mean, DP\n");
+//        for(int i = 0; i < transposeError.length; i++){
+//            double mean = getMean(transposeError[i]);
+//            double sd = getSD(transposeError[i], mean);
+//            bw.write((i+1) + "," + mean + "," + sd + "\n");
+//        }
         DecimalFormat formatter = new DecimalFormat("#.###", new DecimalFormatSymbols(Locale.ENGLISH));
-        bw.write("\nError during iterations\n");
-        for(int i = 0; i < trainingError.length; i++){
-            for(int j = 0; j < trainingError[i].length; j++){
-                bw.write(formatter.format(trainingError[i][j]) + ",");
+        if(isTraining){
+            bw.write("\nError during iterations\n");
+            for(int i = 0; i < trainingError.length; i++){
+                for(int j = 0; j < trainingError[i].length; j++){
+                    bw.write(formatter.format(trainingError[i][j]) + ",");
+                }
+                bw.write("\n");
             }
-            bw.write("\n");
         }
         double rmse[] = new double[data.length];
         double mae[] = new double[data.length];
@@ -111,8 +113,8 @@ public class StatisticsHandler {
         double sdMse = getSD(mse, mMse);
         double mHits = getMean(hits);
         double sdHits = getSD(hits, mHits);
-        String out = "RMSE (median)," + formatter.format(rmseMedian) + ",IQR," + formatter.format(iqr) + "\n"
-                + "MAE," + formatter.format(mMae) + "," + formatter.format(sdMae) + "\n"
+        String out = "MAE," + formatter.format(mMae) + "," + formatter.format(sdMae) + "\n"
+                //+ "RMSE (median)," + formatter.format(rmseMedian) + ",IQR," + formatter.format(iqr) + "\n" 
                 + "MSE," + formatter.format(mMse) + "," + formatter.format(sdMse) + "\n" 
                 + "Total Error," + formatter.format(mTotalError) + "," + formatter.format(sdTotalError) + "\n"
                 + "Hits," + formatter.format(mHits) + ","+ formatter.format(sdHits);
@@ -233,7 +235,7 @@ public class StatisticsHandler {
     }
     
     public static double[] getValuesGreaterThan(double[] values, double limit, boolean orEqualTo) {
-        ArrayList modValues = new ArrayList();
+        ArrayList<Double> modValues = new ArrayList<Double>();
 
         for (double value : values)
             if (value > limit || (value == limit && orEqualTo))
@@ -247,7 +249,7 @@ public class StatisticsHandler {
     }
 
     public static double[] getValuesLessThan(double[] values, double limit, boolean orEqualTo) {
-        ArrayList modValues = new ArrayList();
+        ArrayList<Double> modValues = new ArrayList<Double>();
 
         for (double value : values)
             if (value < limit || (value == limit && orEqualTo))
