@@ -21,7 +21,7 @@ public class FileHandler {
      * @return A dataset object
      * @throws Exception Error while reading the file
      */
-    public static Dataset readInputDataFile(String filePath){
+    public static Dataset readInputDataFile(String filePath) throws Exception{
         BufferedReader br = null;
         String currentLine;
         Dataset data = new Dataset();
@@ -46,16 +46,16 @@ public class FileHandler {
             }
         } 
         catch (NumberFormatException e){
-            System.out.print("Some tokens in the input file were not numbers.");
+            throw new GesecException("Some tokens in the input file were not numbers.");
         }
         catch(ArrayIndexOutOfBoundsException e){
-            System.out.print("Not enough data points in file.");
+            throw new GesecException("Not enough data points in file.");
         }
         catch(FileNotFoundException e){
-            System.out.print("Input file not found.");
+            throw new GesecException("Input file not found.");
         }
         catch(IOException e){
-            System.out.print("IO Error reading input file.");
+            throw new GesecException("IO Error reading input file.");
         }
         finally {
             try {

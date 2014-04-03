@@ -23,6 +23,8 @@ public class StatisticsHandler {
 //    private int numGenerations[];
     private int currentExecution;
     private double trainingError[][];
+    private double pontualError[][];
+    private Double bestOfGenError[][];
 
     public StatisticsHandler(int numExecutions) {  
         train = new double[numExecutions][][];
@@ -37,6 +39,14 @@ public class StatisticsHandler {
     public void updateIterativeErrors(double[] errors){
 //        this.numGenerations[currentExecution] += numGenerations;
         trainingError[currentExecution] = errors;        
+    }
+    
+    public void updateBestOfGenErrors(Double[][] errors){
+        bestOfGenError = errors;        
+    }
+    
+    public void updatePontualError(double[][] pontualError) {
+        this.pontualError = pontualError;
     }
     
     public void finishExecution(){
@@ -87,11 +97,26 @@ public class StatisticsHandler {
 //            bw.write((i+1) + "," + mean + "," + sd + "\n");
 //        }
         DecimalFormat formatter = new DecimalFormat("#.###", new DecimalFormatSymbols(Locale.ENGLISH));
+        // Write this data only for training
         if(isTraining){
-            bw.write("\nError during iterations\n");
+            bw.write("\nError during iterations (execution x iteration)\n");
             for(int i = 0; i < trainingError.length; i++){
                 for(int j = 0; j < trainingError[i].length; j++){
                     bw.write(formatter.format(trainingError[i][j]) + ",");
+                }
+                bw.write("\n");
+            }
+            bw.write("\nBest of Generation Error (iteration x generation) \n");
+            for(int i = 0; i < bestOfGenError.length; i++){
+                for(int j = 0; j < bestOfGenError[i].length; j++){
+                    bw.write(formatter.format(bestOfGenError[i][j]) + ",");
+                }
+                bw.write("\n");
+            }
+            bw.write("\nPontual Error per Iteration (iteration x point) \n");
+            for(int i = 0; i < pontualError.length; i++){
+                for(int j = 0; j < pontualError[i].length; j++){
+                    bw.write(formatter.format(pontualError[i][j]) + ",");
                 }
                 bw.write("\n");
             }
@@ -102,12 +127,17 @@ public class StatisticsHandler {
             mse[i] /= data[i].length;
             rmse[i] = Math.sqrt(mse[i]);
             mae[i] = totalError[i] / data[i].length;
-        }        
-        double rmseMedian = getMedian(rmse);
-        double iqr = getIQR(rmse, rmseMedian);
+        }
+//        double rmseMedian = getMedian(rmse);
+//        double iqr = getIQR(rmse, rmseMedian);
         double mTotalError = getMean(totalError);
         double sdTotalError = getSD(totalError, mTotalError);
         double mMae = getMean(mae);
+        
+//        if(Double.isNaN(mMae) || Double.isInfinite(mMae)){
+//            int x=1;
+//        }
+        
         double sdMae = getSD(mae, mMae);
         double mMse = getMean(mse);
         double sdMse = getSD(mse, mMse);
@@ -260,5 +290,14 @@ public class StatisticsHandler {
             ret[i] = (double)modValues.get(i);
         }        
         return ret;
+    }
+    
+    public static double[] sumDoubleArray(double[] a, double[] b){
+        double[] c = new double[Math.max(a.length, b.length)];
+        int maxIteration = Math.min(a.length, b.length);
+        for(int i = 0; i < maxIteration; i++){
+            c[i] = a[i] + b[i];
+        }
+        return c;
     }
 }

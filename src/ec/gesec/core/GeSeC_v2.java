@@ -6,7 +6,6 @@ package ec.gesec.core;
 
 import ec.EvolutionState;
 import ec.Evolve;
-import ec.Individual;
 import ec.gp.GPIndividual;
 import ec.gp.koza.KozaFitness;
 import ec.simple.SimpleStatistics;
@@ -23,7 +22,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import ec.gesec.problems.Regression;
-import java.util.ArrayList;
 
 
 
@@ -32,7 +30,7 @@ import java.util.ArrayList;
  *
  * @author luiz
  */
-public class GeSeC{          
+public class GeSeC_v2{          
     protected Solution currentSolution;
     protected Solution solution;
     
@@ -51,7 +49,7 @@ public class GeSeC{
     
     
       
-    public GeSeC(String[] args){
+    public GeSeC_v2(String[] args){
         initialize(args);
         stats = new StatisticsHandler(numExecutions);
     }
@@ -203,43 +201,33 @@ public class GeSeC{
     
     public void execute(){
         try {
-            final double[] possibleR1 = {0.1, 0.2, 0.3, 0.4, 0.5};
-            
+//            final double[] possibleR1 = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9};
+            final double[] possibleR1 = {0.3, 0.4, 0.5, 0.6, 0.7};
             final int totalNumberGPExecs = numExecutions*maxIterations;
             StringBuilder s_solution = new StringBuilder();
             // Run the algorithm for a defined number of repetitions
-            for(int execution = 0; execution < numExecutions; execution++){
+            for(int execution = 1; execution <= numExecutions; execution++){
                 Dataset[] data = dataProducer.getTrainintTestData();
                 // Solution reset
                 solution = null;
                 currentSolution = null;
                 // Array that stores the error of each iteration
                 double[] iterativeErrors = new double[maxIterations];
-                // Matrix to store best fitness during iterations
-                Double[][] bestFitness = new Double[maxIterations][];
-                double [][] pontualError = new double[maxIterations][data[0].size()];
                 int currentIteration = 0;
                 boolean canStop = false;
                 // The original expected output
                 double output[] = getFirstRunOutput(data[0]);
                 while(!canStop){
-                    System.out.println("\n======= Execution " + (execution*maxIterations + currentIteration+1)  + " of " + totalNumberGPExecs + " =======");
+                    System.out.println("\n======= Execution " + ((execution-1)*maxIterations + currentIteration+1)  + " of " + totalNumberGPExecs + " =======");
                     mainState.startFresh();
                     // Load new inputs on the proble Object
                     ((Regression)mainState.evaluator.p_problem).setDataset(data[0]);
                     ((Regression)mainState.evaluator.p_problem).setHitLevel(hitLevel);
                     ((Regression)mainState.evaluator.p_problem).setOutput(output);
                     int result = EvolutionState.R_NOTDONE;
-                    
-                    ArrayList<Double> bestFitnessList = bestFitnessList= new ArrayList<Double>();
-                    
                     // Generations
-                    while(result == EvolutionState.R_NOTDONE ){
+                    while( result == EvolutionState.R_NOTDONE ){
                         result = mainState.evolve();
-                        // Store the best fitness of generation
-                        if(execution == numExecutions-1){
-                            bestFitnessList.add(getGenerationBestFitness(mainState));
-                        }
                     }                                                        
                     GPIndividual bestSoFar = (GPIndividual)((SimpleStatistics)mainState.statistics).getBestSoFar()[0];
                     KozaFitness fitness = (KozaFitness)bestSoFar.fitness;
@@ -250,19 +238,10 @@ public class GeSeC{
                     }
                     else{
                         double tr = possibleR1[mainState.random[0].nextInt(possibleR1.length)];
-//                        double tr = mainState.random[0].nextDouble();
                         addFunctionToSolution(bestSoFar, tr);
                         output = getNewOutput(data[0], output, tr);
                     }
-                    
-                    if(execution == numExecutions-1){
-                        pontualError[currentIteration] = getIndividualError((Function)bestSoFar.trees[0].child, data[0], output);
-                    }
-                    
                     iterativeErrors[currentIteration] = getTotalError(solution, data[0]);
-                    if(execution == numExecutions-1){
-                        bestFitness[currentIteration] = bestFitnessList.toArray(new Double[bestFitnessList.size()]);
-                    }
                     
                     System.out.println(iterativeErrors[currentIteration]);
                     
@@ -270,10 +249,6 @@ public class GeSeC{
                     mainState.output.close();
                 }
                 stats.updateIterativeErrors(iterativeErrors);
-                if(execution == numExecutions-1){
-                    stats.updateBestOfGenErrors(bestFitness);
-                    stats.updatePontualError(pontualError);
-                }
                 // Test
                 solution.test(data[0], data[1], stats);
                 stats.finishExecution();
@@ -288,7 +263,7 @@ public class GeSeC{
     }
     
     public static void main(String args[]){
-        GeSeC ps = new GeSeC(args);
+        GeSeC_v2 ps = new GeSeC_v2(args);
         ps.execute();
     }
 
@@ -344,33 +319,5 @@ public class GeSeC{
             totalError += Math.abs(evaluated - instance.output);
         }
         return totalError;
-    }
-    
-    private double[] getIndividualError(Function solution, Dataset dataset) {
-        return getIndividualError(solution, dataset, null);
-    }
-    
-    private double[] getIndividualError(Function solution, Dataset dataset, double[] output) {
-        double individualError[] = new double[dataset.size()];
-        for(int i = 0; i < dataset.size(); i++){
-            Instance instance = dataset.data.get(i);
-            double evaluated = solution.eval(instance.input);
-            if(output == null){
-                individualError[i] = Math.abs(evaluated - instance.output);
-            }
-            else{
-                individualError[i] = Math.abs(evaluated - output[i]);
-            }
-        }
-        return individualError;
-    }
-    
-    private double getGenerationBestFitness(final EvolutionState state){
-        Individual ind = state.population.subpops[0].individuals[0];
-        for(int y=1;y<state.population.subpops[0].individuals.length;y++){
-            if (state.population.subpops[0].individuals[y].fitness.betterThan(ind.fitness))
-                ind = state.population.subpops[0].individuals[y];
-        }
-        return ((KozaFitness)ind.fitness).standardizedFitness();
     }
 }

@@ -19,6 +19,9 @@ public class HoldoutHandler implements DataProducer{
     /** Random number generator. */
     private MersenneTwisterFast rnd;
     
+    /** Defines if absolute quatities are used */
+    private boolean useAbsoluteQuantity;
+    
     /** Input dataset. */
     private Dataset dataset;
     
@@ -43,6 +46,12 @@ public class HoldoutHandler implements DataProducer{
      */
     public HoldoutHandler(double testPercentage) {
         this.testPercentage = testPercentage;
+        if(this.testPercentage > 1){
+            useAbsoluteQuantity = true;
+        }
+        else{
+            useAbsoluteQuantity = false;
+        }
     }
     
     /**
@@ -56,7 +65,13 @@ public class HoldoutHandler implements DataProducer{
         ArrayList<Instance> dataCopy = new ArrayList<Instance>(dataset.data);
         data[0] = new Dataset();
         data[1] = new Dataset();
-        int testSize = (int)Math.round(testPercentage * dataCopy.size());
+        int testSize = 0;
+        if(!useAbsoluteQuantity){
+            testSize = (int)Math.round(testPercentage * dataCopy.size());
+        }
+        else{
+            testSize = (int)Math.round(testPercentage);
+        }
         int trainingSize = dataCopy.size() - testSize;
         if(rnd == null){
             Iterator<Instance> it = dataCopy.iterator();
@@ -92,7 +107,7 @@ public class HoldoutHandler implements DataProducer{
 
     @Override
     public boolean isValid() {
-        if(testPercentage >= 0 && testPercentage < 1)
+        if(testPercentage >= 0)
             return true;
         return false;
     }
