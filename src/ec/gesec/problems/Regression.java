@@ -140,14 +140,15 @@ public class Regression extends GPProblem implements SimpleProblemForm{
                     
                 if (error <= hitLevel) hits++;  // whatever!
 
+                TSE += squaredError;
 //                TSE += error;
-                TSE += error;
             }
                 
             // the fitness better be KozaFitness!
             KozaFitness f = ((KozaFitness)ind.fitness);            
             
 //            f.setDoubleFitness(TSE);
+//            f.setStandardizedFitness(state, TSE);
             f.setStandardizedFitness(state, TSE);
             f.hits = hits;
             ind.evaluated = true;            

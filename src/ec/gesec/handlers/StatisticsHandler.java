@@ -17,32 +17,41 @@ import java.util.Locale;
  * @author luiz
  */
 public class StatisticsHandler {    
-    private double train[][][];
-    private double test[][][];
+    private final double train[][][];
+    private final double test[][][];
         
 //    private int numGenerations[];
     private int currentExecution;
-    private double trainingError[][];
+    private final double iterativeTrainingError[][];
+    private final double iterativeTestError[][];
+    private int solutionSize[];
     private double pontualError[][];
-    private Double bestOfGenError[][];
+    private double bestOfGenError[][][];
 
     public StatisticsHandler(int numExecutions) {  
         train = new double[numExecutions][][];
         test = new double[numExecutions][][];
-        trainingError = new double[numExecutions][];
+        iterativeTrainingError = new double[numExecutions][];
+        iterativeTestError = new double[numExecutions][];
+        solutionSize = new int[numExecutions];
        
         // First dimension of size two (fisrt for ecjCovered and second for treeCovered)
 //        numGenerations = new int[numExecutions];
         currentExecution = 0;
     }
     
-    public void updateIterativeErrors(double[] errors){
+    public void updateIterativeErrors(double[] trainingError, double[] testError){
 //        this.numGenerations[currentExecution] += numGenerations;
-        trainingError[currentExecution] = errors;        
+        iterativeTrainingError[currentExecution] = trainingError;        
+        iterativeTestError[currentExecution] = testError;
     }
     
-    public void updateBestOfGenErrors(Double[][] errors){
+    public void updateBestOfGenErrors(double[][][] errors){
         bestOfGenError = errors;        
+    }
+    
+    public void updateSolutionSize(int solutionSize){
+        this.solutionSize[currentExecution] = solutionSize;
     }
     
     public void updatePontualError(double[][] pontualError) {
@@ -100,23 +109,41 @@ public class StatisticsHandler {
         // Write this data only for training
         if(isTraining){
             bw.write("\nError during iterations (execution x iteration)\n");
-            for(int i = 0; i < trainingError.length; i++){
-                for(int j = 0; j < trainingError[i].length; j++){
-                    bw.write(formatter.format(trainingError[i][j]) + ",");
+            for(int i = 0; i < iterativeTrainingError.length; i++){
+                for(int j = 0; j < iterativeTrainingError[i].length; j++){
+                    bw.write(formatter.format(iterativeTrainingError[i][j]) + ",");
                 }
                 bw.write("\n");
             }
             bw.write("\nBest of Generation Error (iteration x generation) \n");
             for(int i = 0; i < bestOfGenError.length; i++){
                 for(int j = 0; j < bestOfGenError[i].length; j++){
-                    bw.write(formatter.format(bestOfGenError[i][j]) + ",");
+                    for(int k = 0; k < bestOfGenError[i][j].length; k++){
+//                    bw.write(formatter.format(bestOfGenError[i][j]/train.length) + ",");
+                        bw.write(formatter.format(bestOfGenError[i][j][k]) + ",");
+                    }
+                    bw.write("\n");
                 }
-                bw.write("\n");
+                bw.write("\n\n");
             }
             bw.write("\nPontual Error per Iteration (iteration x point) \n");
             for(int i = 0; i < pontualError.length; i++){
                 for(int j = 0; j < pontualError[i].length; j++){
-                    bw.write(formatter.format(pontualError[i][j]) + ",");
+                    bw.write(formatter.format(pontualError[i][j]/train.length) + ",");
+                }
+                bw.write("\n");
+            }
+            bw.write("\nNumber of nodes (per execution) \n");
+            for(int i = 0; i < solutionSize.length; i++){
+                bw.write(solutionSize[i] + ",");
+            }
+            bw.write("\n");
+        }
+        else{
+            bw.write("\nError during iterations (execution x iteration)\n");
+            for(int i = 0; i < iterativeTestError.length; i++){
+                for(int j = 0; j < iterativeTestError[i].length; j++){
+                    bw.write(formatter.format(iterativeTestError[i][j]) + ",");
                 }
                 bw.write("\n");
             }
@@ -290,14 +317,5 @@ public class StatisticsHandler {
             ret[i] = (double)modValues.get(i);
         }        
         return ret;
-    }
-    
-    public static double[] sumDoubleArray(double[] a, double[] b){
-        double[] c = new double[Math.max(a.length, b.length)];
-        int maxIteration = Math.min(a.length, b.length);
-        for(int i = 0; i < maxIteration; i++){
-            c[i] = a[i] + b[i];
-        }
-        return c;
     }
 }
