@@ -14,39 +14,39 @@ gp.fs.size = 1
 gp.fs.0.name = f0
 # O default é 10, mas como não queremos ERC, colocamos 9 operadores
 gp.fs.0.size = 16
-gp.fs.0.func.0 = ec.gesec.functions.X01
+gp.fs.0.func.0 = ec.ssr.functions.X01
 gp.fs.0.func.0.nc = nc0
-gp.fs.0.func.1 = ec.gesec.functions.X02
+gp.fs.0.func.1 = ec.ssr.functions.X02
 gp.fs.0.func.1.nc = nc0
-gp.fs.0.func.2 = ec.gesec.functions.X03
+gp.fs.0.func.2 = ec.ssr.functions.X03
 gp.fs.0.func.2.nc = nc0
-gp.fs.0.func.3 = ec.gesec.functions.X04
+gp.fs.0.func.3 = ec.ssr.functions.X04
 gp.fs.0.func.3.nc = nc0
-gp.fs.0.func.4 = ec.gesec.functions.X05
+gp.fs.0.func.4 = ec.ssr.functions.X05
 gp.fs.0.func.4.nc = nc0
-gp.fs.0.func.5 = ec.gesec.functions.X06
+gp.fs.0.func.5 = ec.ssr.functions.X06
 gp.fs.0.func.5.nc = nc0
-gp.fs.0.func.6 = ec.gesec.functions.X07
+gp.fs.0.func.6 = ec.ssr.functions.X07
 gp.fs.0.func.6.nc = nc0
-gp.fs.0.func.7 = ec.gesec.functions.X08
+gp.fs.0.func.7 = ec.ssr.functions.X08
 gp.fs.0.func.7.nc = nc0
-gp.fs.0.func.8 = ec.gesec.functions.X09
+gp.fs.0.func.8 = ec.ssr.functions.X09
 gp.fs.0.func.8.nc = nc0
-gp.fs.0.func.9 = ec.gesec.functions.X10
+gp.fs.0.func.9 = ec.ssr.functions.X10
 gp.fs.0.func.9.nc = nc0
-gp.fs.0.func.10 = ec.gesec.functions.X11
+gp.fs.0.func.10 = ec.ssr.functions.X11
 gp.fs.0.func.10.nc = nc0
-gp.fs.0.func.11 = ec.gesec.functions.Add
+gp.fs.0.func.11 = ec.ssr.functions.Add
 gp.fs.0.func.11.nc = nc2
-gp.fs.0.func.12 = ec.gesec.functions.Mul
+gp.fs.0.func.12 = ec.ssr.functions.Mul
 gp.fs.0.func.12.nc = nc2
-gp.fs.0.func.13 = ec.gesec.functions.Sub
+gp.fs.0.func.13 = ec.ssr.functions.Sub
 gp.fs.0.func.13.nc = nc2
-gp.fs.0.func.14 = ec.gesec.functions.Div
+gp.fs.0.func.14 = ec.ssr.functions.Div
 gp.fs.0.func.14.nc = nc2
-gp.fs.0.func.15 = ec.gesec.functions.RegERC
+gp.fs.0.func.15 = ec.ssr.functions.RegERC
 gp.fs.0.func.15.nc = nc0
-#gp.fs.0.func.16 = ec.gesec.functions.Exp
+#gp.fs.0.func.16 = ec.ssr.functions.Exp
 #gp.fs.0.func.16.nc = nc1
 
 #gp.fs.0.func.4.nc = nc2
@@ -90,10 +90,10 @@ generations =							50
 select.tournament.size =                4
 
 
-eval.problem = 							ec.gesec.problems.Regression
+eval.problem = 							ec.ssr.problems.Regression
 
 # Overwrite fitness option
-#pop.subpop.0.species.fitness = 			ec.gesec.problems.fitness.DoubleKozaFitness
+#pop.subpop.0.species.fitness = 			ec.ssr.problems.fitness.DoubleKozaFitness
 
 
 ### Don't show best individual information on screen
