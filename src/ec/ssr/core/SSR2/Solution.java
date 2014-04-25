@@ -4,70 +4,16 @@
  */
 package ec.ssr.core.SSR2;
 
-import ec.ssr.core.Dataset;
-import ec.ssr.core.Instance;
 import ec.ssr.functions.Function;
-import ec.ssr.handlers.StatisticsHandler;
-import ec.gp.GPNode;
 
 /**
  * Solution.java
  * Copyright (C) 20014, Federal University of Minas Gerais, Belo Horizonte, Brazil
  */
-public class Solution implements Function{
-    protected Function t1;
-    protected Function t2;
-    private double tr;
+public class Solution extends ec.ssr.core.SSR1.Solution{
     
     public Solution(Function t1, double tr) {
-        this.tr = tr;
-        this.t1 = t1;
-    }
-
-    public Function getT2() {
-        return t2;
-    }
-
-    public Function getT1() {
-        return t1;
-    }
-    
-    public void setT2(Function t2) {
-        this.t2 = t2;
-    }
-    
-    @Override
-    public String print() {
-        if(t2 != null)
-            return tr + "," + t1.print() + "\n" + t2.print();
-        return tr + "," + t1.print();
-        
-//        return "(" + tr + "*" + t1.print() + "+(1-" + tr + ")*" + t2.print() + ")";
-    }
-
-    @Override
-    public double eval(double[] val) {
-        if(t2 == null){
-            return t1.eval(val);
-        }
-        return tr*t1.eval(val) + (1-tr)*t2.eval(val);
-    }
-
-    public void test(Dataset training, Dataset test, StatisticsHandler stats) {
-        int index = 0;
-        stats.newTrainingExecution(training.size());
-        for(Instance instance : training.data){
-            double output = eval(instance.input);
-            stats.addTrainingData(instance.input, instance.output, output, index);
-            index++;
-        }    
-        index = 0;
-        stats.newTestExecution(test.size());
-        for(Instance instance : test.data){
-            double output = eval(instance.input);
-            stats.addTestData(instance.input, instance.output, output, index);
-            index++;
-        }
+        super(t1, tr);
     }
 
     public int getNumberNodes() {
@@ -77,12 +23,12 @@ public class Solution implements Function{
                 total += ((Solution)t2).getNumberNodes();
             }
             else{
-                total += ((NRangeFunction)t2).getNumNodes();
+                total += ((NormFunction)t2).getNumNodes();
                 // Add 5, equivalent to +(1-r)*
                 total += 5;
             }
         }
-        total += ((NRangeFunction)t1).getNumNodes();
+        total += ((NormFunction)t1).getNumNodes();
         // Add 2, equivalent to *r
         total += 2;
         return total;

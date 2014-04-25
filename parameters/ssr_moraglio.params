@@ -25,9 +25,9 @@ gp.fs.0.func.4 = ec.ssr.functions.RegERC
 gp.fs.0.func.4.nc = nc0
 
 # Default = 1024
-generations =				100
-pop.subpop.0.size =                     100
+generations =					100
+pop.subpop.0.size =				100
 
 # Default = 7 
 # 1024/7, 500/5
-elect.tournament.size =			3
+elect.tournament.size =			4

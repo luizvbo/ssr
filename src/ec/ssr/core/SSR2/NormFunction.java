@@ -13,14 +13,14 @@ import ec.ssr.functions.Function;
  *
  * @author luiz
  */
-public class NRangeFunction implements Function{
+public class NormFunction implements Function{
     protected Function function;
-    protected double min;
-    protected double max;
+    protected double mean;
+    protected double std;
 
-    public NRangeFunction(double min, double max) {
-        this.min = min;
-        this.max = max;
+    public NormFunction(double mean, double std) {
+        this.mean = mean;
+        this.std = std;
     }
 
     public void setFunction(Function function) {
@@ -29,12 +29,12 @@ public class NRangeFunction implements Function{
     
     @Override
     public double eval(double[] val) {
-        return (function.eval(val)*(max-min))+min;
+        return (function.eval(val)*(std))+mean;
     }
 
     @Override
     public String print() {
-        return "(" + min + "+" + function.print() + "*" + (max-min) + ")";
+        return "(" + mean + "+" + function.print() + "*" + std + ")";
     }
     
     public int getNumNodes(){

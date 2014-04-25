@@ -265,8 +265,8 @@ public class SSR{
                                                         getIndividualError((Function)bestSoFar.trees[0].child, data[0], output), 
                                                         pontualError[currentIteration]);
                     
-                    iterativeTrainingErrors[currentIteration] = getTotalError(solution, data[0]);
-                    iterativeTestErrors[currentIteration] = getTotalError(solution, data[1]);
+                    iterativeTrainingErrors[currentIteration] = getRMSE(solution, data[0]);
+                    iterativeTestErrors[currentIteration] = getRMSE(solution, data[1]);
                     
 //                    if(execution == numExecutions-1){
                         bestFitness[execution][currentIteration] = Utils.doubleListToArray(bestFitnessList);
@@ -327,7 +327,7 @@ public class SSR{
         }
     }
 
-    protected double[] getNewOutput(Dataset dataset, double[] oldOutput, double tr){
+    protected final double[] getNewOutput(Dataset dataset, double[] oldOutput, double tr){
         double[] newOutput = new double[dataset.size()];
         for(int i = 0; i < dataset.size(); i++){
             Instance instance = dataset.get(i);
@@ -337,7 +337,7 @@ public class SSR{
         return newOutput;
     }
     
-    protected double[] getFirstRunOutput(Dataset dataset) {
+    protected final double[] getFirstRunOutput(Dataset dataset) {
         double[] output = new double[dataset.size()];
         int i = 0;
         for(Instance instance : dataset.data){
@@ -347,25 +347,34 @@ public class SSR{
     }
 
     /**
-     * Calculate the total absolute error, given a solution object and a datase
+     * Calculate the MSE, given a solution object and a datase
      * @param solution Solution objetc
      * @param dataset Dataset used to calculate the error
      * @return Total error
      */
-    private double getTotalError(Solution solution, Dataset dataset) {
+    protected final double getRMSE(Solution solution, Dataset dataset) {
         double totalError = 0;
         for(Instance instance : dataset.data){
             double evaluated = solution.eval(instance.input);
-            totalError += Math.abs(evaluated - instance.output);
+            double error = evaluated - instance.output;
+            totalError += error * error;
         }
-        return totalError;
+        return Math.sqrt(totalError/dataset.data.size());
     }
     
-    private double[] getIndividualError(Function solution, Dataset dataset) {
+    protected final double[] getIndividualError(Function solution, Dataset dataset) {
         return getIndividualError(solution, dataset, null);
     }
     
-    private double[] getIndividualError(Function solution, Dataset dataset, double[] output) {
+    /**
+     * Calculates the difference between the output of a funtion and the desired output
+     * for a given dataset (absolute error).
+     * @param solution
+     * @param dataset
+     * @param output
+     * @return 
+     */
+    protected double[] getIndividualError(Function solution, Dataset dataset, double[] output) {
         double individualError[] = new double[dataset.size()];
         for(int i = 0; i < dataset.size(); i++){
             Instance instance = dataset.data.get(i);
@@ -380,7 +389,7 @@ public class SSR{
         return individualError;
     }
     
-    private double getGenerationBestFitness(final EvolutionState state){
+    protected final double getGenerationBestFitness(final EvolutionState state){
         Individual ind = state.population.subpops[0].individuals[0];
         for(int y=1;y<state.population.subpops[0].individuals.length;y++){
             if (state.population.subpops[0].individuals[y].fitness.betterThan(ind.fitness))

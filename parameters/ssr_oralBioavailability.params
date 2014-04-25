@@ -12,7 +12,7 @@ parent.0 = ssr.params
 gp.fs.size = 1
 gp.fs.0.name = f0
 # O default é 10, mas como não queremos ERC, colocamos 9 operadores
-gp.fs.0.size = 246
+gp.fs.0.size = 245
 gp.fs.0.func.0 = ec.ssr.functions.X001
 gp.fs.0.func.0.nc = nc0
 gp.fs.0.func.1 = ec.ssr.functions.X002
@@ -506,11 +506,24 @@ gp.fs.0.func.244.nc = nc2
 gp.fs.0.func.245 = ec.ssr.functions.RegERC
 gp.fs.0.func.245.nc = nc0
 
+# Max depth during mutation and crossover operations
+gp.koza.mutate.maxdepth = 50
+gp.koza.xover.maxdepth = 50
+
+# Grow method used only during subtree generation
+# on mutation operator. 
+gp.koza.grow.min-depth = 2
+gp.koza.grow.max-depth = 6
+
+# Ramped half-half used for generating initial
+# population
+gp.koza.half.min-depth = 2
+gp.koza.half.max-depth = 6
 
 # Default = 1024
-generations =							100
+generations =							2000
 pop.subpop.0.size =                     100
 
 # Default = 7 
 # 1024/7, 500/5
-elect.tournament.size =					3
+elect.tournament.size =					4

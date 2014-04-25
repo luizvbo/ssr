@@ -2,14 +2,15 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package ec.ssr.core.SSR2;
+package ec.ssr.core.SSR3;
 
 import ec.EvolutionState;
-import ec.ssr.core.Dataset;
-import ec.ssr.core.Utils;
 import ec.gp.GPIndividual;
 import ec.gp.koza.KozaFitness;
 import ec.simple.SimpleStatistics;
+import ec.ssr.core.Dataset;
+import ec.ssr.core.SSR2.*;
+import ec.ssr.core.Utils;
 import ec.ssr.functions.Function;
 import ec.ssr.handlers.FileHandler;
 import ec.ssr.problems.Regression;
@@ -23,13 +24,11 @@ import java.util.Arrays;
  * Version with range normalization ([0,1]) and internal crossover
  * @author luiz
  */
-public class SSR extends ec.ssr.core.SSR1.SSR{      
-    
-    
+public class SSR extends ec.ssr.core.SSR2.SSR{
     public SSR(String[] args){
         super(args);
     }
-    
+
     @Override
     public void execute(){
         try {            
@@ -38,6 +37,10 @@ public class SSR extends ec.ssr.core.SSR1.SSR{
             ArrayList<Double> bestFitnessList = new ArrayList<Double>();
             // Matrix to store best fitness during iterations
             double[][][] bestFitnessMatrix = new double[numExecutions][maxIterations][];
+            // Stores the distribution of outputs (norm. and raw)
+            ArrayList<double[]> rawOutputHistory[] = new ArrayList[numExecutions];
+            ArrayList<double[]> normOutputHistory[] = new ArrayList[numExecutions];
+            
             
             // Run the algorithm for a defined number of repetitions
             for(int execution = 0; execution < numExecutions; execution++){
@@ -53,12 +56,18 @@ public class SSR extends ec.ssr.core.SSR1.SSR{
                 boolean canStop = false;
                 // The original expected output
                 double output[] = getFirstRunOutput(data[0]);
+                // Initializing the history lists
+                rawOutputHistory[execution] = new ArrayList<double[]>();
+                normOutputHistory[execution] = new ArrayList<double[]>();
+                
                 while(!canStop){
                     System.out.println("\n======= Execution " + (execution*maxIterations + currentIteration+1)  + " of " + totalNumberGPExecs + " =======");
                     mainState.startFresh();
                     double normalizedOutput[] = Arrays.copyOf(output, output.length);
-//                    double lBound = setLowerBound(normalizedOutput);
                     NormFunction f = normalizeData(normalizedOutput);
+                    
+                    rawOutputHistory[execution].add(output);
+                    normOutputHistory[execution].add(normalizedOutput);
 
                     // Load new inputs on the proble Object
                     ((Regression)mainState.evaluator.p_problem).setDataset(data[0]);
@@ -72,12 +81,7 @@ public class SSR extends ec.ssr.core.SSR1.SSR{
                     while(result == EvolutionState.R_NOTDONE ){
                         result = mainState.evolve();
                         // Store the best fitness of generation
-                        double currentBestFitness = getGenerationBestFitness(mainState);
-                        
-                        if(currentBestFitness == 0){
-                            int x = 1;
-                        }
-                        
+                        double currentBestFitness = getGenerationBestFitness(mainState);                     
                         bestFitnessList.add(currentBestFitness);                        
                     }                                                        
                     GPIndividual bestSoFar = (GPIndividual)((SimpleStatistics)mainState.statistics).getBestSoFar()[0];
@@ -89,7 +93,6 @@ public class SSR extends ec.ssr.core.SSR1.SSR{
                         canStop = true;
                     }
                     else{
-//                        double tr = possibleR1[mainState.random[0].nextInt(possibleR1.length)];
                         double tr = mainState.random[0].nextDouble();
                         addFunctionToSolution(f, tr);
                         output = getNewOutput(data[0], output, tr);
@@ -102,14 +105,7 @@ public class SSR extends ec.ssr.core.SSR1.SSR{
                     iterativeTrainingErrors[currentIteration] = getRMSE(solution, data[0]);
                     iterativeTestErrors[currentIteration] = getRMSE(solution, data[1]);
                     
-//                    if(execution == numExecutions-1){
-                        bestFitnessMatrix[execution][currentIteration] = Utils.doubleListToArray(bestFitnessList);
-//                    }
-//                    double[] currentBestFitness = Utils.doubleListToArray(bestFitnessList);
-//                    if(bestFitness[currentIteration] == null){
-//                        bestFitness[currentIteration] = new double[currentBestFitness.length];
-//                    }
-//                    bestFitness[currentIteration] = Utils.sumDoubleArray(bestFitness[currentIteration], currentBestFitness);
+                    bestFitnessMatrix[execution][currentIteration] = Utils.doubleListToArray(bestFitnessList);
                     
                     System.out.println(iterativeTrainingErrors[currentIteration]);
                     
@@ -131,6 +127,8 @@ public class SSR extends ec.ssr.core.SSR1.SSR{
             // Write statistics on a file
             FileHandler.writeResults(outputPath, outputPrefix, stats, hitLevel);
             FileHandler.writeSolution(outputPath, outputPrefix, s_solution.toString());
+            
+            FileHandler.writeOutputDist(outputPath, outputPrefix, rawOutputHistory, normOutputHistory);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -140,117 +138,26 @@ public class SSR extends ec.ssr.core.SSR1.SSR{
         SSR ps = new SSR(args);
         ps.execute();
     }
-
-    protected void addFunctionToSolution(Function generatedFunction, double tr) {
-        if(solution == null){
-            solution = new Solution(generatedFunction, tr);
-            currentSolution = solution;
-        }
-        else{
-            currentSolution.setT2(new Solution(generatedFunction, tr));
-            currentSolution = (Solution)currentSolution.getT2();
-        }
-    }
     
-    protected void addLastFunctionToSolution(Function lastFunction){
-        if(solution == null){
-            solution = new Solution(lastFunction, 1);
-        }
-        else{
-            currentSolution.setT2(lastFunction);
-        }
-    }
-
-//    protected double[] getNewOutput(Dataset dataset, double[] oldOutput, double tr){
-//        double[] newOutput = new double[dataset.size()];
-//        for(int i = 0; i < dataset.size(); i++){
-//            Instance instance = dataset.get(i);
-//            double output = currentSolution.getT1().eval(instance.input);
-//            newOutput[i] = (oldOutput[i] - tr*output)/(1-tr);
-//        }
-//        return newOutput;
-//    }
-    
-//    protected double[] getFirstRunOutput(Dataset dataset) {
-//        double[] output = new double[dataset.size()];
-//        int i = 0;
-//        for(Instance instance : dataset.data){
-//            output[i++] = instance.output;
-//        }
-//        return output;
-//    }
-
-    /**
-     * Calculate the total absolute error, given a solution object and a datase
-     * @param solution Solution objetc
-     * @param dataset Dataset used to calculate the error
-     * @return Total error
-     */
-//    private double getRMSE(Solution solution, Dataset dataset) {
-//        double totalError = 0;
-//        for(Instance instance : dataset.data){
-//            double evaluated = solution.eval(instance.input);
-//            double error  = evaluated - instance.output;
-//            totalError += error * error;
-//        }
-//        return totalError;
-//    }
-    
-//    private double[] getIndividualError(Function solution, Dataset dataset) {
-//        return getIndividualError(solution, dataset, null);
-//    }
-    
-//    private double[] getIndividualError(Function solution, Dataset dataset, double[] output) {
-//        double individualError[] = new double[dataset.size()];
-//        for(int i = 0; i < dataset.size(); i++){
-//            Instance instance = dataset.data.get(i);
-//            double evaluated = solution.eval(instance.input);
-//            if(output == null){
-//                individualError[i] = Math.abs(evaluated - instance.output);
-//            }
-//            else{
-//                individualError[i] = Math.abs(evaluated - output[i]);
-//            }
-//        }
-//        return individualError;
-//    }
-    
-//    private double getGenerationBestFitness(final EvolutionState state){
-//        Individual ind = state.population.subpops[0].individuals[0];
-//        for(int y=1;y<state.population.subpops[0].individuals.length;y++){
-//            if (state.population.subpops[0].individuals[y].fitness.betterThan(ind.fitness))
-//                ind = state.population.subpops[0].individuals[y];
-//        }
-//        return ((KozaFitness)ind.fitness).standardizedFitness();
-//    }
-
-    private double setLowerBound(double[] output) {
-        double lBound = Double.MAX_VALUE;
-        for(int i = 0; i < output.length; i++){
-            if(output[i] < lBound){
-                lBound = output[i];
-            }
-        }
-        for(int i = 0; i < output.length; i++){
-            output[i]-=lBound;
-        }
-        return lBound;
-    }
-
+    @Override
     protected NormFunction normalizeData(double[] output) {
-        double min = Double.MAX_VALUE, max = Double.MIN_VALUE;
+        // Calculates the mean
+        double mean = 0;
         for(int i = 0; i < output.length; i++){
-            if(output[i] < min){
-                min = output[i];
-            }
-            if(output[i] > max){
-                max = output[i];
-            }
+            mean += output[i];
         }       
-        double range = max-min;
+        mean = mean/output.length;
+        // Calculates the std. dev.
+        double std = 0;
         for(int i = 0; i < output.length; i++){
-            output[i]=(output[i]-min)/range;
+            double aux = output[i] - mean;
+            std += aux * aux;
         }
-        return new NormFunction(min, range);
+        std /= output.length-1;
+        std = Math.sqrt(std);
+        for(int i = 0; i < output.length; i++){
+            output[i]=(output[i]-mean)/std;
+        }
+        return new NormFunction(mean, std);
     }
 }

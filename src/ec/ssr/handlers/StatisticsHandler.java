@@ -17,6 +17,9 @@ import java.util.Locale;
  * @author luiz
  */
 public class StatisticsHandler {    
+    public static final int TRAIN = 0;
+    public static final int TEST = 1;
+    
     private final double train[][][];
     private final double test[][][];
         
@@ -56,6 +59,11 @@ public class StatisticsHandler {
     
     public void updatePontualError(double[][] pontualError) {
         this.pontualError = pontualError;
+        for (double[] errorPerExec : this.pontualError) {
+            for (int j = 0; j < errorPerExec.length; j++) {
+                errorPerExec[j] /= train.length;
+            }
+        }
     }
     
     public void finishExecution(){
@@ -74,31 +82,31 @@ public class StatisticsHandler {
     
     public void writeErrorToFile(BufferedWriter bw, double hitLevel, double[][][] data, boolean isTraining) throws IOException{
         // Transpose the matrix to calculate the mean and sd
-        double[][] transposeError = new double[data[0].length+1][data.length];
-        double[] totalError = new double[data.length];
-        double[] mse = new double[data.length];
-        double[] hits = new double[data.length];
-        for(int exec = 0; exec < data.length; exec ++){            
-            bw.write("Execution " + (exec+1) + "\n");
-            bw.write("input,output,evaluated,error\n");
-            for(int j = 0; j < data[exec].length; j++){
-                int inputSize = data[exec][j].length;
-                double error = Math.abs(data[exec][j][inputSize-1]-data[exec][j][inputSize-2]);
-                totalError[exec] += error;
-                mse[exec] += error * error;
-                StringBuilder inputAux = new StringBuilder();
-                for(int k = 0; k < inputSize - 2; k++){
-                    inputAux.append(data[exec][j][k]).append(",");
-                }
-                bw.write(inputAux.toString() + data[exec][j][inputSize-2] + "," + data[exec][j][inputSize-1] + "," + error);
-                bw.write("\n");
-                transposeError[j][exec]= error;
-                                
-                if(error <= hitLevel)
-                    hits[exec]++;
-            }
-            bw.write("Error:," + totalError[exec] + ",Hits:," + hits[exec] + "\n\n");
-        }
+//        double[][] transposeError = new double[data[0].length+1][data.length];
+//        double[] totalError = new double[data.length];
+//        double[] mse = new double[data.length];
+//        double[] hits = new double[data.length];
+//        for(int exec = 0; exec < data.length; exec ++){            
+//            bw.write("Execution " + (exec+1) + "\n");
+//            bw.write("input,output,evaluated,error\n");
+//            for(int j = 0; j < data[exec].length; j++){
+//                int inputSize = data[exec][j].length;
+//                double error = Math.abs(data[exec][j][inputSize-1]-data[exec][j][inputSize-2]);
+//                totalError[exec] += error;
+//                mse[exec] += error * error;
+//                StringBuilder inputAux = new StringBuilder();
+//                for(int k = 0; k < inputSize - 2; k++){
+//                    inputAux.append(data[exec][j][k]).append(",");
+//                }
+//                bw.write(inputAux.toString() + data[exec][j][inputSize-2] + "," + data[exec][j][inputSize-1] + "," + error);
+//                bw.write("\n");
+//                transposeError[j][exec]= error;
+//                                
+//                if(error <= hitLevel)
+//                    hits[exec]++;
+//            }
+//            bw.write("Error:," + totalError[exec] + ",Hits:," + hits[exec] + "\n\n");
+//        }
 //        bw.write("Point, error mean, DP\n");
 //        for(int i = 0; i < transposeError.length; i++){
 //            double mean = getMean(transposeError[i]);
@@ -108,75 +116,75 @@ public class StatisticsHandler {
         DecimalFormat formatter = new DecimalFormat("#.###", new DecimalFormatSymbols(Locale.ENGLISH));
         // Write this data only for training
         if(isTraining){
-            bw.write("\nError during iterations (execution x iteration)\n");
-            for (double[] byExecution : iterativeTrainingError) {
-                for (int j = 0; j < byExecution.length; j++) {
-                    bw.write(formatter.format(byExecution[j]) + ",");
-                }
-                bw.write("\n");
-            }
-            bw.write("\nBest of Generation Error (iteration x generation) \n");
-            for (double[][] byExecution : bestOfGenError) {
-                for (double[] byIteration : byExecution) {
-                    for (int k = 0; k < byIteration.length; k++) {
-//                    bw.write(formatter.format(bestOfGenError[i][j]/train.length) + ",");
-                        bw.write(formatter.format(byIteration[k]) + ",");
-                    }
-                    bw.write("\n");
-                }
-                bw.write("\n\n");
-            }
-            bw.write("\nPontual Error per Iteration (iteration x point) \n");
-            for(int i = 0; i < pontualError.length; i++){
-                for(int j = 0; j < pontualError[i].length; j++){
-                    bw.write(formatter.format(pontualError[i][j]/train.length) + ",");
-                }
-                bw.write("\n");
-            }
-            bw.write("\nNumber of nodes (per execution) \n");
-            for(int i = 0; i < solutionSize.length; i++){
-                bw.write(solutionSize[i] + ",");
-            }
-            bw.write("\n");
+//            bw.write("\nMSE during iterations (execution x iteration)\n");
+//            for (double[] byExecution : iterativeTrainingError) {
+//                for (int j = 0; j < byExecution.length; j++) {
+//                    bw.write(formatter.format(byExecution[j]) + ",");
+//                }
+//                bw.write("\n");
+//            }
+//            bw.write("\nBest of Generation Error (iteration x generation) \n");
+//            for (double[][] byExecution : bestOfGenError) {
+//                for (double[] byIteration : byExecution) {
+//                    for (int k = 0; k < byIteration.length; k++) {
+////                    bw.write(formatter.format(bestOfGenError[i][j]/train.length) + ",");
+//                        bw.write(formatter.format(byIteration[k]) + ",");
+//                    }
+//                    bw.write("\n");
+//                }
+//                bw.write("\n\n");
+//            }
+//            bw.write("\nPontual Error per Iteration (iteration x point) \n");
+//            for(int i = 0; i < pontualError.length; i++){
+//                for(int j = 0; j < pontualError[i].length; j++){
+//                    bw.write(formatter.format(pontualError[i][j]/train.length) + ",");
+//                }
+//                bw.write("\n");
+//            }
+//            bw.write("\nNumber of nodes (per execution) \n");
+//            for(int i = 0; i < solutionSize.length; i++){
+//                bw.write(solutionSize[i] + ",");
+//            }
+//            bw.write("\n");
         }
         else{
-            bw.write("\nError during iterations (execution x iteration)\n");
-            for(int i = 0; i < iterativeTestError.length; i++){
-                for(int j = 0; j < iterativeTestError[i].length; j++){
-                    bw.write(formatter.format(iterativeTestError[i][j]) + ",");
-                }
-                bw.write("\n");
-            }
+//            bw.write("\nMSE during iterations (execution x iteration)\n");
+//            for(int i = 0; i < iterativeTestError.length; i++){
+//                for(int j = 0; j < iterativeTestError[i].length; j++){
+//                    bw.write(formatter.format(iterativeTestError[i][j]) + ",");
+//                }
+//                bw.write("\n");
+//            }
         }
-        double rmse[] = new double[data.length];
-        double mae[] = new double[data.length];
-        for(int i = 0; i < data.length; i++){
-            mse[i] /= data[i].length;
-            rmse[i] = Math.sqrt(mse[i]);
-            mae[i] = totalError[i] / data[i].length;
-        }
-//        double rmseMedian = getMedian(rmse);
-//        double iqr = getIQR(rmse, rmseMedian);
-        double mTotalError = getMean(totalError);
-        double sdTotalError = getSD(totalError, mTotalError);
-        double mMae = getMean(mae);
-        
-//        if(Double.isNaN(mMae) || Double.isInfinite(mMae)){
-//            int x=1;
+//        double rmse[] = new double[data.length];
+//        double mae[] = new double[data.length];
+//        for(int i = 0; i < data.length; i++){
+//            mse[i] /= data[i].length;
+//            rmse[i] = Math.sqrt(mse[i]);
+//            mae[i] = totalError[i] / data[i].length;
 //        }
-        
-        double sdMae = getSD(mae, mMae);
-        double mMse = getMean(mse);
-        double sdMse = getSD(mse, mMse);
-        double mHits = getMean(hits);
-        double sdHits = getSD(hits, mHits);
-        String out = "MAE," + formatter.format(mMae) + "," + formatter.format(sdMae) + "\n"
-                //+ "RMSE (median)," + formatter.format(rmseMedian) + ",IQR," + formatter.format(iqr) + "\n" 
-                + "MSE," + formatter.format(mMse) + "," + formatter.format(sdMse) + "\n" 
-                + "Total Error," + formatter.format(mTotalError) + "," + formatter.format(sdTotalError) + "\n"
-                + "Hits," + formatter.format(mHits) + ","+ formatter.format(sdHits);
-        bw.write(out);
-        System.out.println(out);
+////        double rmseMedian = getMedian(rmse);
+////        double iqr = getIQR(rmse, rmseMedian);
+//        double mTotalError = getMean(totalError);
+//        double sdTotalError = getSD(totalError, mTotalError);
+//        double mMae = getMean(mae);
+//        
+////        if(Double.isNaN(mMae) || Double.isInfinite(mMae)){
+////            int x=1;
+////        }
+//        
+//        double sdMae = getSD(mae, mMae);
+//        double mMse = getMean(mse);
+//        double sdMse = getSD(mse, mMse);
+//        double mHits = getMean(hits);
+//        double sdHits = getSD(hits, mHits);
+//        String out = "MAE," + formatter.format(mMae) + "," + formatter.format(sdMae) + "\n"
+//                //+ "RMSE (median)," + formatter.format(rmseMedian) + ",IQR," + formatter.format(iqr) + "\n" 
+//                + "MSE," + formatter.format(mMse) + "," + formatter.format(sdMse) + "\n" 
+//                + "Total Error," + formatter.format(mTotalError) + "," + formatter.format(sdTotalError) + "\n"
+//                + "Hits," + formatter.format(mHits) + ","+ formatter.format(sdHits);
+//        bw.write(out);
+//        System.out.println(out);
     }
     
     public double getMean(double[] data){
@@ -317,5 +325,122 @@ public class StatisticsHandler {
             ret[i] = (double)modValues.get(i);
         }        
         return ret;
+    }
+
+    public String getFinalPointError(int type, double hitLevel) {
+        double[][][] data;
+        if(type == TRAIN){
+            data = train;
+        }
+        else{
+            data = test;
+        }
+        DecimalFormat formatter = new DecimalFormat("#.###", new DecimalFormatSymbols(Locale.ENGLISH));
+        StringBuilder outputStr = new StringBuilder();
+        // Transpose the matrix to calculate the mean and sd
+        double[][] transposeError = new double[data[0].length+1][data.length];
+        double[] totalError = new double[data.length];
+        double[] rmse = new double[data.length];
+        double[] hits = new double[data.length];
+               
+        for(int exec = 0; exec < data.length; exec ++){            
+            outputStr.append("Execution " + (exec+1) + "\n");
+            outputStr.append("input,output,evaluated,error\n");
+            for(int j = 0; j < data[exec].length; j++){
+                int inputSize = data[exec][j].length;
+                double error = Math.abs(data[exec][j][inputSize-1]-data[exec][j][inputSize-2]);
+                totalError[exec] += error;
+                rmse[exec] += error * error;
+                StringBuilder inputAux = new StringBuilder();
+                for(int k = 0; k < inputSize - 2; k++){
+                    inputAux.append(data[exec][j][k]).append(",");
+                }
+                outputStr.append(inputAux.toString() + data[exec][j][inputSize-2] + "," + data[exec][j][inputSize-1] + "," + error);
+                outputStr.append("\n");
+                transposeError[j][exec]= error;
+                                
+                if(error <= hitLevel)
+                    hits[exec]++;
+            }
+            outputStr.append("Error:," + totalError[exec] + ",Hits:," + hits[exec] + "\n\n");
+        }
+        outputStr.append("Number of nodes (per execution) \n");
+        for(int i = 0; i < solutionSize.length; i++){
+            outputStr.append(solutionSize[i] + ",");
+        }
+        outputStr.append("\n");
+        
+        double mae[] = new double[data.length];
+        for(int i = 0; i < data.length; i++){
+            rmse[i] /= data[i].length;
+            rmse[i] = Math.sqrt(rmse[i]);
+            mae[i] = totalError[i] / data[i].length;
+        }
+        double mTotalError = getMean(totalError);
+        double sdTotalError = getSD(totalError, mTotalError);
+        double mMAE = getMean(mae);
+        double sdMAE = getSD(mae, mMAE);
+        double mRMSE = getMean(rmse);
+        double sdRMSE = getSD(rmse, mRMSE);
+        double mHits = getMean(hits);
+        double sdHits = getSD(hits, mHits);
+        String out = "MAE," + formatter.format(mMAE) + "," + formatter.format(sdMAE) + "\n"
+                + "RMSE," + formatter.format(mRMSE) + "," + formatter.format(sdRMSE) + "\n" 
+                + "Total Error," + formatter.format(mTotalError) + "," + formatter.format(sdTotalError) + "\n"
+                + "Hits," + formatter.format(mHits) + ","+ formatter.format(sdHits);
+        outputStr.append(out);
+        System.out.println(out);
+        return outputStr.toString();
+    }
+
+    public String getRMSEperIteration(int type) {
+        double[][] errorPerIteration;
+        if(type == TRAIN){
+            errorPerIteration = iterativeTrainingError;
+        }
+        else{
+            errorPerIteration = iterativeTestError;
+        }
+        DecimalFormat formatter = new DecimalFormat("#.###", new DecimalFormatSymbols(Locale.ENGLISH));
+        StringBuilder outputStr = new StringBuilder();
+        outputStr.append("RMSE during iterations (execution x iteration)\n");
+        for (double[] byExecution : errorPerIteration) {
+            for (int j = 0; j < byExecution.length; j++) {
+                outputStr.append(formatter.format(byExecution[j]) + ",");
+            }
+            outputStr.append("\n");
+        }
+        return outputStr.toString();
+    }
+
+    public String getErrorBestOfGeneration() {
+        DecimalFormat formatter = new DecimalFormat("#.###", new DecimalFormatSymbols(Locale.ENGLISH));
+        StringBuilder outputStr = new StringBuilder();
+        outputStr.append("Sum of squared error (not the mean) of the best individual of each generation (iteration x generation). Relative to the iteration output vector.\n");
+        for (double[][] byExecution : bestOfGenError) {
+            for (double[] byIteration : byExecution) {
+                if(byIteration != null){
+                    for (int k = 0; k < byIteration.length; k++) {
+                        outputStr.append(formatter.format(byIteration[k]) + ",");
+                    }
+                }
+                outputStr.append("\n");
+            }
+            outputStr.append("\n\n");
+        }
+        return outputStr.toString();
+    }
+
+    public String getErrorPointPerIteration() {
+        DecimalFormat formatter = new DecimalFormat("#.###", new DecimalFormatSymbols(Locale.ENGLISH));
+        StringBuilder outputStr = new StringBuilder();
+        outputStr.append("Abolute error (average of executions) for each point per iteration (iteration x point). Relative to the iteration output vector.\n");
+        for(int i = 0; i < pontualError.length; i++){
+            for(int j = 0; j < pontualError[i].length; j++){
+                outputStr.append(formatter.format(pontualError[i][j]/train.length) + ",");
+            }
+            outputStr.append("\n");
+        }
+        return outputStr.toString();
     }
 }

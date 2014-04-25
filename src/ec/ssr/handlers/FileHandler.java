@@ -9,6 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * FileHandler.java
@@ -144,25 +145,54 @@ public class FileHandler {
                      StatisticsHandler stats,
                      double hitLevel) throws Exception{
         File outputDir = getOutputDir(outputPath);
-        
+        outputDir = new File(outputDir.getAbsolutePath()+ "/" + outputPrefix);
+        outputDir.mkdirs();
         // Object to write results on file
         BufferedWriter bw;
-        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + outputPrefix + "testError.csv"));
-        stats.writeTestErrorToFile(bw, hitLevel);
+        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + "trFinalPoinError.csv"));
+        bw.write(stats.getFinalPointError(StatisticsHandler.TRAIN, hitLevel));
         bw.close();
-        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + outputPrefix + "trainingError.csv"));
-        stats.writeTrainingErrorToFile(bw, hitLevel);
+        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + "tsFinalPoinError.csv"));
+        bw.write(stats.getFinalPointError(StatisticsHandler.TEST, hitLevel));
         bw.close();
+        
+        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + "trRMSEperIteration.csv"));
+        bw.write(stats.getRMSEperIteration(StatisticsHandler.TRAIN));
+        bw.close();
+        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + "tsRMSEperIteration.csv"));
+        bw.write(stats.getRMSEperIteration(StatisticsHandler.TEST));
+        bw.close();
+        
+//        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + "trErrorBestOfGen.csv"));
+//        bw.write(stats.getErrorBestOfGeneration());
+//        bw.close();
+        
+        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + "trErrorPerGeneration.csv"));
+        bw.write(stats.getErrorBestOfGeneration());
+        bw.close();
+        
+        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + "trErrorPointPerIt.csv"));
+        bw.write(stats.getErrorPointPerIteration());
+        bw.close();
+        
+//        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + outputPrefix + "testError.csv"));
+//        stats.writeTestErrorToFile(bw, hitLevel);
+//        bw.close();
+//        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + outputPrefix + "trainingError.csv"));
+//        stats.writeTrainingErrorToFile(bw, hitLevel);
+//        bw.close();
     }
     
     public static void writeSolution(String outputPath,
                                      String outputPrefix,
                                      String stringSolution) throws Exception{
         File outputDir = getOutputDir(outputPath);
+        outputDir = new File(outputDir.getAbsolutePath()+ "/" + outputPrefix);
+        outputDir.mkdirs();
         
         // Object to write results on file
         BufferedWriter bw;
-        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + outputPrefix + "solution.txt"));
+        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + "solution.txt"));
         bw.write(stringSolution);
         bw.close();
     }
@@ -181,6 +211,14 @@ public class FileHandler {
             outputDir = new File(System.getProperty("user.dir"));
         }  
         return outputDir;
+    }
+
+    public static void writeOutputDist(String outputPath, String outputPrefix, ArrayList<double[]>[] rawOutputHistory, ArrayList<double[]>[] normOutputHistory) {
+        File outputDir = getOutputDir(outputPath);
+        outputDir = new File(outputDir.getAbsolutePath()+ "/" + outputPrefix);
+        outputDir.mkdirs();
+        
+        
     }
     
 }
