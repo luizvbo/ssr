@@ -4,6 +4,7 @@
  */
 package ec.ssr.handlers;
 
+import ec.ssr.core.Utils;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -19,6 +20,7 @@ import java.util.Locale;
 public class StatisticsHandler {    
     public static final int TRAIN = 0;
     public static final int TEST = 1;
+    public static final int PRECISION = 5;
     
     private final double train[][][];
     private final double test[][][];
@@ -27,7 +29,7 @@ public class StatisticsHandler {
     private int currentExecution;
     private final double iterativeTrainingError[][];
     private final double iterativeTestError[][];
-    private int solutionSize[];
+    private final int solutionSize[];
     private double pontualError[][];
     private double bestOfGenError[][][];
 
@@ -335,7 +337,6 @@ public class StatisticsHandler {
         else{
             data = test;
         }
-        DecimalFormat formatter = new DecimalFormat("#.###", new DecimalFormatSymbols(Locale.ENGLISH));
         StringBuilder outputStr = new StringBuilder();
         // Transpose the matrix to calculate the mean and sd
         double[][] transposeError = new double[data[0].length+1][data.length];
@@ -353,16 +354,20 @@ public class StatisticsHandler {
                 rmse[exec] += error * error;
                 StringBuilder inputAux = new StringBuilder();
                 for(int k = 0; k < inputSize - 2; k++){
-                    inputAux.append(data[exec][j][k]).append(",");
+                    inputAux.append(Utils.printDouble(data[exec][j][k], PRECISION)).append(",");
                 }
-                outputStr.append(inputAux.toString() + data[exec][j][inputSize-2] + "," + data[exec][j][inputSize-1] + "," + error);
+                outputStr.append(inputAux.toString() + 
+                        Utils.printDouble(data[exec][j][inputSize-2], PRECISION) + "," +
+                        Utils.printDouble(data[exec][j][inputSize-1], PRECISION) + "," + 
+                        Utils.printDouble(error, PRECISION));
                 outputStr.append("\n");
                 transposeError[j][exec]= error;
                                 
                 if(error <= hitLevel)
                     hits[exec]++;
             }
-            outputStr.append("Error:," + totalError[exec] + ",Hits:," + hits[exec] + "\n\n");
+            outputStr.append("Error:," + Utils.printDouble(totalError[exec], PRECISION) +
+                    ",Hits:," + Utils.printDouble(hits[exec], PRECISION) + "\n\n");
         }
         outputStr.append("Number of nodes (per execution) \n");
         for(int i = 0; i < solutionSize.length; i++){
@@ -384,10 +389,14 @@ public class StatisticsHandler {
         double sdRMSE = getSD(rmse, mRMSE);
         double mHits = getMean(hits);
         double sdHits = getSD(hits, mHits);
-        String out = "MAE," + formatter.format(mMAE) + "," + formatter.format(sdMAE) + "\n"
-                + "RMSE," + formatter.format(mRMSE) + "," + formatter.format(sdRMSE) + "\n" 
-                + "Total Error," + formatter.format(mTotalError) + "," + formatter.format(sdTotalError) + "\n"
-                + "Hits," + formatter.format(mHits) + ","+ formatter.format(sdHits);
+        String out = "MAE," + Utils.printDouble(mMAE, PRECISION) + "," + 
+                Utils.printDouble(sdMAE, PRECISION) + "\nRMSE," + 
+                Utils.printDouble(mRMSE, PRECISION) + "," +
+                Utils.printDouble(sdRMSE, PRECISION) + "\nTotal Error," + 
+                Utils.printDouble(mTotalError, PRECISION) + "," + 
+                Utils.printDouble(sdTotalError, PRECISION) + "\nHits," +
+                Utils.printDouble(mHits, PRECISION) + ","+ 
+                Utils.printDouble(sdHits, PRECISION);
         outputStr.append(out);
         System.out.println(out);
         return outputStr.toString();
@@ -401,12 +410,11 @@ public class StatisticsHandler {
         else{
             errorPerIteration = iterativeTestError;
         }
-        DecimalFormat formatter = new DecimalFormat("#.###", new DecimalFormatSymbols(Locale.ENGLISH));
         StringBuilder outputStr = new StringBuilder();
         outputStr.append("RMSE during iterations (execution x iteration)\n");
         for (double[] byExecution : errorPerIteration) {
             for (int j = 0; j < byExecution.length; j++) {
-                outputStr.append(formatter.format(byExecution[j]) + ",");
+                outputStr.append(Utils.printDouble(byExecution[j], PRECISION) + ",");
             }
             outputStr.append("\n");
         }
@@ -414,14 +422,13 @@ public class StatisticsHandler {
     }
 
     public String getErrorBestOfGeneration() {
-        DecimalFormat formatter = new DecimalFormat("#.###", new DecimalFormatSymbols(Locale.ENGLISH));
         StringBuilder outputStr = new StringBuilder();
         outputStr.append("Sum of squared error (not the mean) of the best individual of each generation (iteration x generation). Relative to the iteration output vector.\n");
         for (double[][] byExecution : bestOfGenError) {
             for (double[] byIteration : byExecution) {
                 if(byIteration != null){
                     for (int k = 0; k < byIteration.length; k++) {
-                        outputStr.append(formatter.format(byIteration[k]) + ",");
+                        outputStr.append(Utils.printDouble(byIteration[k], PRECISION) + ",");
                     }
                 }
                 outputStr.append("\n");
@@ -432,12 +439,11 @@ public class StatisticsHandler {
     }
 
     public String getErrorPointPerIteration() {
-        DecimalFormat formatter = new DecimalFormat("#.###", new DecimalFormatSymbols(Locale.ENGLISH));
         StringBuilder outputStr = new StringBuilder();
         outputStr.append("Abolute error (average of executions) for each point per iteration (iteration x point). Relative to the iteration output vector.\n");
         for(int i = 0; i < pontualError.length; i++){
             for(int j = 0; j < pontualError[i].length; j++){
-                outputStr.append(formatter.format(pontualError[i][j]/train.length) + ",");
+                outputStr.append(Utils.printDouble(pontualError[i][j]/train.length, PRECISION) + ",");
             }
             outputStr.append("\n");
         }

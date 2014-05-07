@@ -102,7 +102,8 @@ public class Regression extends GPProblem implements SimpleProblemForm{
             double TSE = 0.0;
             double error;
             double squaredError;
-            for (int i = 0; i < dataset.size(); i++){
+            boolean overflow = false;
+            for (int i = 0; i < dataset.size() && !overflow; i++){
                 currentValue = dataset.get(i).input;
                 ((GPIndividual)ind).trees[0].child.eval(
                     state, threadnum, regressionData, stack, ((GPIndividual)ind),this);
@@ -137,11 +138,16 @@ public class Regression extends GPProblem implements SimpleProblemForm{
                     squaredError = error * error;
 //                    squaredError = error;
                 }
-                    
-                if (error <= hitLevel) hits++;  // whatever!
-
-                TSE += squaredError;
-//                TSE += error;
+                
+                if(Double.isInfinite(squaredError)){
+                    overflow = true;
+                    hits = 0;
+                    TSE = BIG_NUMBER; 
+                }
+                else{
+                    if (error <= hitLevel) hits++;  // whatever!
+                    TSE += squaredError;
+                }
             }
                 
             // the fitness better be KozaFitness!

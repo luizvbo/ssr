@@ -70,7 +70,7 @@ public class Div extends GPNode implements Function{
 
     @Override
     public String print() {
-        return "(" + ((Function)children[0]).print() + "/" + ((Function)children[1]).print() + ")";
+        return "div(" + ((Function)children[0]).print() + "," + ((Function)children[1]).print() + ")";
     }
 }
 

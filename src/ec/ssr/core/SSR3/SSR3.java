@@ -9,7 +9,8 @@ import ec.gp.GPIndividual;
 import ec.gp.koza.KozaFitness;
 import ec.simple.SimpleStatistics;
 import ec.ssr.core.Dataset;
-import ec.ssr.core.SSR2.*;
+import ec.ssr.core.SSR2.NormalizedFunction;
+import ec.ssr.core.SSR2.NormalizationParameters;
 import ec.ssr.core.Utils;
 import ec.ssr.functions.Function;
 import ec.ssr.handlers.FileHandler;
@@ -21,11 +22,12 @@ import java.util.Arrays;
 
 
 /**
- * Version with range normalization ([0,1]) and internal crossover
+ * Version with Student's t-statistic normalization and internal crossover
+ * New outputs are calculated over the non-normalized outputs.   
  * @author luiz
  */
-public class SSR extends ec.ssr.core.SSR2.SSR{
-    public SSR(String[] args){
+public class SSR3 extends ec.ssr.core.SSR2.SSR2{
+    public SSR3(String[] args){
         super(args);
     }
 
@@ -64,7 +66,7 @@ public class SSR extends ec.ssr.core.SSR2.SSR{
                     System.out.println("\n======= Execution " + (execution*maxIterations + currentIteration+1)  + " of " + totalNumberGPExecs + " =======");
                     mainState.startFresh();
                     double normalizedOutput[] = Arrays.copyOf(output, output.length);
-                    NormFunction f = normalizeData(normalizedOutput);
+                    NormalizationParameters normParameters = normalizeData(normalizedOutput);
                     
                     rawOutputHistory[execution].add(output);
                     normOutputHistory[execution].add(normalizedOutput);
@@ -86,7 +88,7 @@ public class SSR extends ec.ssr.core.SSR2.SSR{
                     }                                                        
                     GPIndividual bestSoFar = (GPIndividual)((SimpleStatistics)mainState.statistics).getBestSoFar()[0];
                     KozaFitness fitness = (KozaFitness)bestSoFar.fitness;
-                    f.setFunction((Function)bestSoFar.trees[0].child);
+                    Function f = new NormalizedFunction((Function)bestSoFar.trees[0].child, normParameters);
                     
                     if(currentIteration == maxIterations - 1 || fitness.hits == data[0].size()){
                         addLastFunctionToSolution(f);
@@ -95,6 +97,7 @@ public class SSR extends ec.ssr.core.SSR2.SSR{
                     else{
                         double tr = mainState.random[0].nextDouble();
                         addFunctionToSolution(f, tr);
+//                        output = getNewOutput(data[0], output, tr);
                         output = getNewOutput(data[0], output, tr);
                     }
                     
@@ -113,7 +116,7 @@ public class SSR extends ec.ssr.core.SSR2.SSR{
                     mainState.output.close();
                 }
                 stats.updateIterativeErrors(iterativeTrainingErrors, iterativeTestErrors);
-                stats.updateSolutionSize(solution.getNumberNodes());
+                stats.updateSolutionSize(solution.getNumNodes());
                 if(execution == numExecutions-1){
                     
                     stats.updatePontualError(pontualError);
@@ -121,7 +124,7 @@ public class SSR extends ec.ssr.core.SSR2.SSR{
                 // Test
                 solution.test(data[0], data[1], stats);
                 stats.finishExecution();
-                s_solution.append(solution.print()).append("\n\n");
+                s_solution.append("Iteration ").append(execution+1).append("\n").append(solution.print()).append("\n\n");
             }
             stats.updateBestOfGenErrors(bestFitnessMatrix);
             // Write statistics on a file
@@ -135,12 +138,12 @@ public class SSR extends ec.ssr.core.SSR2.SSR{
     }
     
     public static void main(String args[]){
-        SSR ps = new SSR(args);
+        SSR3 ps = new SSR3(args);
         ps.execute();
     }
     
     @Override
-    protected NormFunction normalizeData(double[] output) {
+    protected NormalizationParameters normalizeData(double[] output) {
         // Calculates the mean
         double mean = 0;
         for(int i = 0; i < output.length; i++){
@@ -155,9 +158,14 @@ public class SSR extends ec.ssr.core.SSR2.SSR{
         }
         std /= output.length-1;
         std = Math.sqrt(std);
+        
+        if(Double.isInfinite(std)){
+            int x= 0;
+        }
+        
         for(int i = 0; i < output.length; i++){
             output[i]=(output[i]-mean)/std;
         }
-        return new NormFunction(mean, std);
+        return new NormalizationParameters(mean, std);
     }
 }

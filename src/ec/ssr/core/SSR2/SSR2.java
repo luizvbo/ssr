@@ -5,11 +5,12 @@
 package ec.ssr.core.SSR2;
 
 import ec.EvolutionState;
-import ec.ssr.core.Dataset;
-import ec.ssr.core.Utils;
 import ec.gp.GPIndividual;
 import ec.gp.koza.KozaFitness;
 import ec.simple.SimpleStatistics;
+import ec.ssr.core.Dataset;
+import ec.ssr.core.SSR2.Solution;
+import ec.ssr.core.Utils;
 import ec.ssr.functions.Function;
 import ec.ssr.handlers.FileHandler;
 import ec.ssr.problems.Regression;
@@ -23,10 +24,10 @@ import java.util.Arrays;
  * Version with range normalization ([0,1]) and internal crossover
  * @author luiz
  */
-public class SSR extends ec.ssr.core.SSR1.SSR{      
+public class SSR2 extends ec.ssr.core.SSR1.SSR1{      
     
     
-    public SSR(String[] args){
+    public SSR2(String[] args){
         super(args);
     }
     
@@ -58,7 +59,8 @@ public class SSR extends ec.ssr.core.SSR1.SSR{
                     mainState.startFresh();
                     double normalizedOutput[] = Arrays.copyOf(output, output.length);
 //                    double lBound = setLowerBound(normalizedOutput);
-                    NormFunction f = normalizeData(normalizedOutput);
+                    NormalizationParameters normParameters = normalizeData(normalizedOutput);
+//                    NormalizedFunction f = normalizeData(normalizedOutput);
 
                     // Load new inputs on the proble Object
                     ((Regression)mainState.evaluator.p_problem).setDataset(data[0]);
@@ -82,7 +84,7 @@ public class SSR extends ec.ssr.core.SSR1.SSR{
                     }                                                        
                     GPIndividual bestSoFar = (GPIndividual)((SimpleStatistics)mainState.statistics).getBestSoFar()[0];
                     KozaFitness fitness = (KozaFitness)bestSoFar.fitness;
-                    f.setFunction((Function)bestSoFar.trees[0].child);
+                    NormalizedFunction f = new NormalizedFunction((Function)bestSoFar.trees[0].child, normParameters);
                     
                     if(currentIteration == maxIterations - 1 || fitness.hits == data[0].size()){
                         addLastFunctionToSolution(f);
@@ -117,7 +119,7 @@ public class SSR extends ec.ssr.core.SSR1.SSR{
                     mainState.output.close();
                 }
                 stats.updateIterativeErrors(iterativeTrainingErrors, iterativeTestErrors);
-                stats.updateSolutionSize(solution.getNumberNodes());
+                stats.updateSolutionSize(solution.getNumNodes());
                 if(execution == numExecutions-1){
                     
                     stats.updatePontualError(pontualError);
@@ -125,7 +127,7 @@ public class SSR extends ec.ssr.core.SSR1.SSR{
                 // Test
                 solution.test(data[0], data[1], stats);
                 stats.finishExecution();
-                s_solution.append(solution.print()).append("\n\n");
+                s_solution.append("Iteration ").append(execution+1).append("\n").append(solution.print()).append("\n\n");
             }
             stats.updateBestOfGenErrors(bestFitnessMatrix);
             // Write statistics on a file
@@ -137,7 +139,7 @@ public class SSR extends ec.ssr.core.SSR1.SSR{
     }
     
     public static void main(String args[]){
-        SSR ps = new SSR(args);
+        SSR2 ps = new SSR2(args);
         ps.execute();
     }
 
@@ -237,7 +239,7 @@ public class SSR extends ec.ssr.core.SSR1.SSR{
         return lBound;
     }
 
-    protected NormFunction normalizeData(double[] output) {
+    protected NormalizationParameters normalizeData(double[] output) {
         double min = Double.MAX_VALUE, max = Double.MIN_VALUE;
         for(int i = 0; i < output.length; i++){
             if(output[i] < min){
@@ -251,6 +253,6 @@ public class SSR extends ec.ssr.core.SSR1.SSR{
         for(int i = 0; i < output.length; i++){
             output[i]=(output[i]-min)/range;
         }
-        return new NormFunction(min, range);
+        return new NormalizationParameters(min, range);
     }
 }

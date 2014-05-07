@@ -6,7 +6,10 @@
 
 package ec.ssr.core;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
+import java.util.Locale;
 
 /**
  *
@@ -27,5 +30,18 @@ public class Utils {
         for(int i = 0; i < output.length; i++)
             output[i] = a.get(i);
         return output;
+    }
+    
+    public static String printDouble(double number, int precision){
+        String s_precision = "";
+        for(int i = 0; i < precision; i++) s_precision += "#";
+        DecimalFormat formatter = new DecimalFormat("#." + s_precision, new DecimalFormatSymbols(Locale.ENGLISH));
+        if(Double.isNaN(number)){
+            return "NaN";
+        }
+        if(Double.isInfinite(number)){
+            return formatter.format(Double.MAX_VALUE);
+        }
+        return formatter.format(number);
     }
 }

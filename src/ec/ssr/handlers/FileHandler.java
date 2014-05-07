@@ -213,12 +213,33 @@ public class FileHandler {
         return outputDir;
     }
 
-    public static void writeOutputDist(String outputPath, String outputPrefix, ArrayList<double[]>[] rawOutputHistory, ArrayList<double[]>[] normOutputHistory) {
+    public static void writeOutputDist(String outputPath, String outputPrefix, ArrayList<double[]>[] rawOutputHistory, ArrayList<double[]>[] normOutputHistory) throws Exception{
         File outputDir = getOutputDir(outputPath);
         outputDir = new File(outputDir.getAbsolutePath()+ "/" + outputPrefix);
         outputDir.mkdirs();
         
+        BufferedWriter bw;
+        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + "rawOutput.txt"));
+        for(ArrayList<double[]> execOutput : rawOutputHistory){
+            for(double[] output : execOutput){
+                for(int i = 0; i < output.length; i++){
+                    bw.write(output[i] + ",");
+                }
+                bw.write("\n");
+            }
+        }
+        bw.close();
         
+        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + "normOutput.txt"));
+        for(ArrayList<double[]> execOutput : normOutputHistory){
+            for(double[] output : execOutput){
+                for(int i = 0; i < output.length; i++){
+                    bw.write(output[i] + ",");
+                }
+                bw.write("\n");
+            }
+        }
+        bw.close();
     }
     
 }

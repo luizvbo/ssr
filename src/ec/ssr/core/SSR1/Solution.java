@@ -9,15 +9,16 @@ import ec.ssr.core.Instance;
 import ec.ssr.functions.Function;
 import ec.ssr.handlers.StatisticsHandler;
 import ec.gp.GPNode;
+import ec.ssr.core.Branch;
 
 /**
  * Solution.java
  * Copyright (C) 20014, Federal University of Minas Gerais, Belo Horizonte, Brazil
  */
-public class Solution implements Function{
+public class Solution implements Function, Branch{
     protected Function t1;
     protected Function t2;
-    private double tr;
+    protected double tr;
     
     public Solution(Function t1, double tr) {
         this.tr = tr;
@@ -70,21 +71,36 @@ public class Solution implements Function{
         }
     }
 
-    public int getNumberNodes() {
+    @Override
+    public int getNumNodes() {
         int total = 0;
         if(t2 != null){
-            if(t2 instanceof Solution){
-                total += ((Solution)t2).getNumberNodes();
-            }
-            else{
+            if(t2 instanceof GPNode){
                 total += ((GPNode)t2).numNodes(GPNode.NODESEARCH_ALL);
                 // Add 5, equivalent to +(1-r)*
                 total += 5;
             }
+            else{
+                total += ((Branch)t2).getNumNodes();
+            }
+            
+//            if(t2 instanceof Solution){
+//                total += ((Solution)t2).getNumNodes();
+//            }
+//            else{
+//                total += ((GPNode)t2).numNodes(GPNode.NODESEARCH_ALL);
+//                // Add 5, equivalent to +(1-r)*
+//                total += 5;
+//            }
         }
-        total += ((GPNode)t1).numNodes(GPNode.NODESEARCH_ALL);
-        // Add 2, equivalent to *r
-        total += 2;
+        if(t1 instanceof  GPNode){
+            total += ((GPNode)t1).numNodes(GPNode.NODESEARCH_ALL);
+            // Add 2, equivalent to *r
+            total += 2;
+        }
+        else{
+            total += ((Branch)t1).getNumNodes();
+        }
         return total;
     }
 }

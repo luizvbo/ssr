@@ -29,4 +29,13 @@ public class Instance {
         this.output = output;
         id = IDCounter;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder out = new StringBuilder();
+        for(int i = 0; i < input.length; i++){
+            out.append(input[i]).append(",");
+        }
+        return out.toString() + output;
+    }
 }

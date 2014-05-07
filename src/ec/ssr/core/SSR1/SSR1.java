@@ -7,12 +7,12 @@ package ec.ssr.core.SSR1;
 import ec.EvolutionState;
 import ec.Evolve;
 import ec.Individual;
-import ec.ssr.core.Dataset;
-import ec.ssr.core.Instance;
-import ec.ssr.core.Utils;
 import ec.gp.GPIndividual;
 import ec.gp.koza.KozaFitness;
 import ec.simple.SimpleStatistics;
+import ec.ssr.core.Dataset;
+import ec.ssr.core.Instance;
+import ec.ssr.core.Utils;
 import ec.util.Output;
 import ec.util.ParameterDatabase;
 import ec.ssr.functions.Function;
@@ -35,7 +35,7 @@ import java.util.ArrayList;
  * Version with no normalization and internal crossover
  * @author luiz
  */
-public class SSR{          
+public class SSR1{          
     protected Solution currentSolution;
     protected Solution solution;
     
@@ -54,7 +54,7 @@ public class SSR{
     
     
       
-    public SSR(String[] args){
+    public SSR1(String[] args){
         initialize(args);
         stats = new StatisticsHandler(numExecutions);
     }
@@ -283,7 +283,7 @@ public class SSR{
                     mainState.output.close();
                 }
                 stats.updateIterativeErrors(iterativeTrainingErrors, iterativeTestErrors);
-                stats.updateSolutionSize(solution.getNumberNodes());
+                stats.updateSolutionSize(solution.getNumNodes());
                 if(execution == numExecutions-1){
                     
                     stats.updatePontualError(pontualError);
@@ -291,7 +291,7 @@ public class SSR{
                 // Test
                 solution.test(data[0], data[1], stats);
                 stats.finishExecution();
-                s_solution.append(solution.print()).append("\n\n");
+                s_solution.append("Iteration ").append(execution+1).append("\n").append(solution.print()).append("\n\n");
             }
             stats.updateBestOfGenErrors(bestFitness);
             // Write statistics on a file
@@ -303,7 +303,7 @@ public class SSR{
     }
     
     public static void main(String args[]){
-        SSR ps = new SSR(args);
+        SSR1 ps = new SSR1(args);
         ps.execute();
     }
 
@@ -327,7 +327,7 @@ public class SSR{
         }
     }
 
-    protected final double[] getNewOutput(Dataset dataset, double[] oldOutput, double tr){
+    protected double[] getNewOutput(Dataset dataset, double[] oldOutput, double tr){
         double[] newOutput = new double[dataset.size()];
         for(int i = 0; i < dataset.size(); i++){
             Instance instance = dataset.get(i);

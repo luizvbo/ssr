@@ -507,8 +507,8 @@ gp.fs.0.func.245 = ec.ssr.functions.RegERC
 gp.fs.0.func.245.nc = nc0
 
 # Max depth during mutation and crossover operations
-gp.koza.mutate.maxdepth = 30
-gp.koza.xover.maxdepth = 30
+gp.koza.mutate.maxdepth = 50
+gp.koza.xover.maxdepth = 50
 
 # Grow method used only during subtree generation
 # on mutation operator. 
@@ -521,7 +521,7 @@ gp.koza.half.min-depth = 2
 gp.koza.half.max-depth = 6
 
 # Default = 1024
-generations =							100
+generations =							2000
 pop.subpop.0.size =                     100
 
 # Default = 7 
