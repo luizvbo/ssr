@@ -102,5 +102,17 @@ public class Dataset {
         return size() + ""; //To change body of generated methods, choose Tools | Templates.
     }
     
-    
+    /**
+     * Return a String representing the list of IDs of the instances in this dataset
+     * @return The list in String format
+     */
+    public String getStringIDs(){
+        StringBuilder ids = new StringBuilder();
+        String separator = "";
+        for(Instance instance : data){
+            ids.append(separator).append(instance.id);
+            separator = ",";
+        }
+        return ids.toString();
+    }
 }

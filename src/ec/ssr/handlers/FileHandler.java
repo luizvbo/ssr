@@ -241,5 +241,18 @@ public class FileHandler {
         }
         bw.close();
     }
-    
+
+    public static void writeTrainingIds(String outputPath, 
+                                      String outputPrefix, 
+                                      String stringIds) throws Exception{
+        File outputDir = getOutputDir(outputPath);
+        outputDir = new File(outputDir.getAbsolutePath()+ "/" + outputPrefix);
+        outputDir.mkdirs();
+        
+        // Object to write results on file
+        BufferedWriter bw;
+        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + "trainingIds.txt"));
+        bw.write(stringIds);
+        bw.close();
+    }
 }

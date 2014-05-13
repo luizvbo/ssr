@@ -43,11 +43,14 @@ public class SSR4 extends ec.ssr.core.SSR3.SSR3{
             // Stores the distribution of outputs (norm. and raw)
             ArrayList<double[]> rawOutputHistory[] = new ArrayList[numExecutions];
             ArrayList<double[]> normOutputHistory[] = new ArrayList[numExecutions];
-            
+            // Stores the ids of the training instances
+            StringBuilder trainingIds = new StringBuilder("Each line a different execution\n");
             
             // Run the algorithm for a defined number of repetitions
             for(int execution = 0; execution < numExecutions; execution++){
                 Dataset[] data = dataProducer.getTrainintTestData();
+                trainingIds.append(data[0].getStringIDs() + "\n");
+                
                 // Solution reset
                 solution = null;
                 currentSolution = null;
@@ -84,11 +87,7 @@ public class SSR4 extends ec.ssr.core.SSR3.SSR3{
                     while(result == EvolutionState.R_NOTDONE ){
                         result = mainState.evolve();
                         // Store the best fitness of generation
-                        double currentBestFitness = getGenerationBestFitness(mainState);  
-                        if(currentBestFitness == 0){
-                              int x = 0;
-                        }
-                        
+                        double currentBestFitness = getGenerationBestFitness(mainState);
                         bestFitnessList.add(currentBestFitness);                        
                     }                                                        
                     GPIndividual bestSoFar = (GPIndividual)((SimpleStatistics)mainState.statistics).getBestSoFar()[0];
@@ -134,6 +133,7 @@ public class SSR4 extends ec.ssr.core.SSR3.SSR3{
             // Write statistics on a file
             FileHandler.writeResults(outputPath, outputPrefix, stats, hitLevel);
             FileHandler.writeSolution(outputPath, outputPrefix, s_solution.toString());
+            FileHandler.writeTrainingIds(outputPath, outputPrefix, trainingIds.toString());
             
             FileHandler.writeOutputDist(outputPath, outputPrefix, rawOutputHistory, normOutputHistory);
         } catch (Exception ex) {

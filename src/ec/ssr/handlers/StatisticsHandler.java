@@ -413,8 +413,10 @@ public class StatisticsHandler {
         StringBuilder outputStr = new StringBuilder();
         outputStr.append("RMSE during iterations (execution x iteration)\n");
         for (double[] byExecution : errorPerIteration) {
+            String separator = "";
             for (int j = 0; j < byExecution.length; j++) {
-                outputStr.append(Utils.printDouble(byExecution[j], PRECISION) + ",");
+                outputStr.append(separator + Utils.printDouble(byExecution[j], PRECISION));
+                separator = ",";
             }
             outputStr.append("\n");
         }
@@ -427,8 +429,10 @@ public class StatisticsHandler {
         for (double[][] byExecution : bestOfGenError) {
             for (double[] byIteration : byExecution) {
                 if(byIteration != null){
+                    String separator = "";
                     for (int k = 0; k < byIteration.length; k++) {
-                        outputStr.append(Utils.printDouble(byIteration[k], PRECISION) + ",");
+                        outputStr.append(separator + Utils.printDouble(byIteration[k], PRECISION));
+                        separator = ",";
                     }
                 }
                 outputStr.append("\n");
@@ -442,8 +446,10 @@ public class StatisticsHandler {
         StringBuilder outputStr = new StringBuilder();
         outputStr.append("Abolute error (average of executions) for each point per iteration (iteration x point). Relative to the iteration output vector.\n");
         for(int i = 0; i < pontualError.length; i++){
+            String separator = "";
             for(int j = 0; j < pontualError[i].length; j++){
-                outputStr.append(Utils.printDouble(pontualError[i][j]/train.length, PRECISION) + ",");
+                outputStr.append(separator + Utils.printDouble(pontualError[i][j]/train.length, PRECISION));
+                separator = ",";
             }
             outputStr.append("\n");
         }
