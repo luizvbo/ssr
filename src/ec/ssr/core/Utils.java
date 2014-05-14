@@ -9,6 +9,7 @@ package ec.ssr.core;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Locale;
 
 /**
@@ -43,5 +44,35 @@ public class Utils {
             return formatter.format(Double.MAX_VALUE);
         }
         return formatter.format(number);
+    }
+    
+    public static double getMedian(double[] array) {
+        double[] auxArray = Arrays.copyOf(array, array.length);
+        Arrays.sort(auxArray);
+        // Even number
+        if(auxArray.length % 2 == 0){
+            int secondElement = auxArray.length / 2;
+            return (auxArray[secondElement-1]+auxArray[secondElement])/2;
+        }
+        else{
+            int element = (auxArray.length-1)/2;
+            return auxArray[element];
+        }
+    }
+    
+    public static double getMean(double[] data){
+        double sum = 0;
+        for(int i = 0; i < data.length; i++){
+            sum += data[i];
+        }
+        return sum / data.length; 
+    }
+    
+    public static double getSD(double[] data, double mean){
+        double sum = 0;
+        for(int i = 0; i < data.length; i++){
+            sum += (data[i]-mean) * (data[i]-mean);
+        }
+        return Math.sqrt(sum/(data.length-1));
     }
 }

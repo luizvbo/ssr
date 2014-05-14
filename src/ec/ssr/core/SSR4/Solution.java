@@ -7,7 +7,6 @@
 package ec.ssr.core.SSR4;
 
 import ec.ssr.core.SSR2.NormalizationParameters;
-import ec.ssr.core.SSR2.NormalizedFunction;
 import ec.ssr.functions.Function;
 
 /**

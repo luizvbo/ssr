@@ -189,22 +189,6 @@ public class StatisticsHandler {
 //        System.out.println(out);
     }
     
-    public double getMean(double[] data){
-        double sum = 0;
-        for(int i = 0; i < data.length; i++){
-            sum += data[i];
-        }
-        return sum / data.length; 
-    }
-    
-    public double getSD(double[] data, double mean){
-        double sum = 0;
-        for(int i = 0; i < data.length; i++){
-            sum += (data[i]-mean) * (data[i]-mean);
-        }
-        return Math.sqrt(sum/(data.length-1));
-    }
-    
     public double[] getMeanFromArrayList(ArrayList<double[]> data){
         if(data != null && !data.isEmpty()){
             double[] sum = new double[data.get(0).length];
@@ -277,20 +261,6 @@ public class StatisticsHandler {
         return rmse;
     }
 
-    private double getMedian(double[] array) {
-        double[] auxArray = Arrays.copyOf(array, array.length);
-        Arrays.sort(auxArray);
-        // Even number
-        if(auxArray.length % 2 == 0){
-            int secondElement = auxArray.length / 2;
-            return (auxArray[secondElement-1]+auxArray[secondElement])/2;
-        }
-        else{
-            int element = (auxArray.length-1)/2;
-            return auxArray[element];
-        }
-    }
-
     private double getIQR(double[] values, double median) {
         if (values.length < 3)
             return 0;
@@ -298,7 +268,7 @@ public class StatisticsHandler {
         double[] lowerHalf = getValuesLessThan(values, median, true);
         double[] upperHalf = getValuesGreaterThan(values, median, true);
 
-        return getMedian(upperHalf) - getMedian(lowerHalf);
+        return Utils.getMedian(upperHalf) - Utils.getMedian(lowerHalf);
     }
     
     public static double[] getValuesGreaterThan(double[] values, double limit, boolean orEqualTo) {
@@ -339,7 +309,7 @@ public class StatisticsHandler {
         }
         StringBuilder outputStr = new StringBuilder();
         // Transpose the matrix to calculate the mean and sd
-        double[][] transposeError = new double[data[0].length+1][data.length];
+//        double[][] transposeError = new double[data[0].length+1][data.length];
         double[] totalError = new double[data.length];
         double[] rmse = new double[data.length];
         double[] hits = new double[data.length];
@@ -361,7 +331,7 @@ public class StatisticsHandler {
                         Utils.printDouble(data[exec][j][inputSize-1], PRECISION) + "," + 
                         Utils.printDouble(error, PRECISION));
                 outputStr.append("\n");
-                transposeError[j][exec]= error;
+//                transposeError[j][exec]= error;
                                 
                 if(error <= hitLevel)
                     hits[exec]++;
@@ -381,14 +351,14 @@ public class StatisticsHandler {
             rmse[i] = Math.sqrt(rmse[i]);
             mae[i] = totalError[i] / data[i].length;
         }
-        double mTotalError = getMean(totalError);
-        double sdTotalError = getSD(totalError, mTotalError);
-        double mMAE = getMean(mae);
-        double sdMAE = getSD(mae, mMAE);
-        double mRMSE = getMean(rmse);
-        double sdRMSE = getSD(rmse, mRMSE);
-        double mHits = getMean(hits);
-        double sdHits = getSD(hits, mHits);
+        double mTotalError = Utils.getMean(totalError);
+        double sdTotalError = Utils.getSD(totalError, mTotalError);
+        double mMAE = Utils.getMean(mae);
+        double sdMAE = Utils.getSD(mae, mMAE);
+        double mRMSE = Utils.getMean(rmse);
+        double sdRMSE = Utils.getSD(rmse, mRMSE);
+        double mHits = Utils.getMean(hits);
+        double sdHits = Utils.getSD(hits, mHits);
         String out = "MAE," + Utils.printDouble(mMAE, PRECISION) + "," + 
                 Utils.printDouble(sdMAE, PRECISION) + "\nRMSE," + 
                 Utils.printDouble(mRMSE, PRECISION) + "," +

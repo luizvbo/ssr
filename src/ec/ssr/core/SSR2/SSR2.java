@@ -75,11 +75,6 @@ public class SSR2 extends ec.ssr.core.SSR1.SSR1{
                         result = mainState.evolve();
                         // Store the best fitness of generation
                         double currentBestFitness = getGenerationBestFitness(mainState);
-                        
-                        if(currentBestFitness == 0){
-                            int x = 1;
-                        }
-                        
                         bestFitnessList.add(currentBestFitness);                        
                     }                                                        
                     GPIndividual bestSoFar = (GPIndividual)((SimpleStatistics)mainState.statistics).getBestSoFar()[0];
@@ -226,18 +221,18 @@ public class SSR2 extends ec.ssr.core.SSR1.SSR1{
 //        return ((KozaFitness)ind.fitness).standardizedFitness();
 //    }
 
-    private double setLowerBound(double[] output) {
-        double lBound = Double.MAX_VALUE;
-        for(int i = 0; i < output.length; i++){
-            if(output[i] < lBound){
-                lBound = output[i];
-            }
-        }
-        for(int i = 0; i < output.length; i++){
-            output[i]-=lBound;
-        }
-        return lBound;
-    }
+//    private double setLowerBound(double[] output) {
+//        double lBound = Double.MAX_VALUE;
+//        for(int i = 0; i < output.length; i++){
+//            if(output[i] < lBound){
+//                lBound = output[i];
+//            }
+//        }
+//        for(int i = 0; i < output.length; i++){
+//            output[i]-=lBound;
+//        }
+//        return lBound;
+//    }
 
     protected NormalizationParameters normalizeData(double[] output) {
         double min = Double.MAX_VALUE, max = Double.MIN_VALUE;

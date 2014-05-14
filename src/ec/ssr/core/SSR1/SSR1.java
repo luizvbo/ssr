@@ -53,7 +53,6 @@ public class SSR1{
     protected DataProducer dataProducer;
     
     
-      
     public SSR1(String[] args){
         initialize(args);
         stats = new StatisticsHandler(numExecutions);
@@ -149,7 +148,7 @@ public class SSR1{
         inputValidation();
         
         Output mainOutput = Evolve.buildOutput();
-        mainOutput.getLog(0).appendOnRestart=true;
+        mainOutput.getLog(0).appendOnRestart = true;
         
         File parameterFile = new File(parameterFilePath);
         ParameterDatabase dbase = new ParameterDatabase(parameterFile);
@@ -210,7 +209,7 @@ public class SSR1{
             
             final int totalNumberGPExecs = numExecutions*maxIterations;
             StringBuilder s_solution = new StringBuilder();
-            ArrayList<Double> bestFitnessList = bestFitnessList= new ArrayList<Double>();
+            ArrayList<Double> bestFitnessList = new ArrayList<Double>();
             // Matrix to store best fitness during iterations
             double[][][] bestFitness = new double[numExecutions][maxIterations][];
             
