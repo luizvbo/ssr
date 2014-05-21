@@ -78,7 +78,6 @@ public class Regression extends GPProblem implements SimpleProblemForm{
     
     /**
      * Sets the dataset used during training
-     * @param training Dataset used during training
      */
     public void setDataset(Dataset dataset){
         this.dataset = dataset;
@@ -116,16 +115,15 @@ public class Regression extends GPProblem implements SimpleProblemForm{
                 // my knowledge.
 
                 
-                final double PROBABLY_ZERO = 4.0e-320;
-                final double BIG_NUMBER = 1.0e300;  // the same as lilgp uses
+                final double PROBABLY_ZERO = 1.4e-45;
+                final double BIG_NUMBER = 3.4e+38;
 //                final double PROBABLY_ZERO = 1.11E-15;
 //                final double BIG_NUMBER = 1.0e15;  // the same as lilgp uses
 
                 error = Math.abs(output[i] - regressionData.x);
                 
-                if (! (error < BIG_NUMBER ) ){   // *NOT* (input.x >= BIG_NUMBER)
-                    error = BIG_NUMBER;
-                    squaredError = error;
+                if (error > Float.MAX_VALUE){   // *NOT* (input.x >= BIG_NUMBER)
+                    squaredError = BIG_NUMBER;
                 }
                 // very slight math errors can creep in when evaluating
                 // two equivalent by differently-ordered functions, like
@@ -139,7 +137,7 @@ public class Regression extends GPProblem implements SimpleProblemForm{
 //                    squaredError = error;
                 }
                 
-                if(Double.isInfinite(squaredError)){
+                if(Double.isInfinite(squaredError) || squaredError >= BIG_NUMBER){
                     overflow = true;
                     hits = 0;
                     TSE = BIG_NUMBER; 
@@ -155,7 +153,7 @@ public class Regression extends GPProblem implements SimpleProblemForm{
             
 //            f.setDoubleFitness(TSE);
 //            f.setStandardizedFitness(state, TSE);
-            f.setStandardizedFitness(state, TSE);
+            f.setStandardizedFitness(state, (float)Math.sqrt(TSE/dataset.size()));
             f.hits = hits;
             ind.evaluated = true;            
         }

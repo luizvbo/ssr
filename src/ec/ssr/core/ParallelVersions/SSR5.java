@@ -21,11 +21,11 @@ import java.io.IOException;
 import java.util.Arrays;
 
 /**
- *
+ * The same as SSR4 but with no normalization on the first run
  * @author luiz
  */
-public class SSR4 extends SSR3{
-    public SSR4(Dataset trainingSet, Dataset testSet, String outputPath, String outputPrefix, int numIterations, int numExecutions, double hitLevel, String parameterFilePath) throws NullPointerException, FileNotFoundException, IOException, Exception {
+public class SSR5 extends SSR3{
+    public SSR5(Dataset trainingSet, Dataset testSet, String outputPath, String outputPrefix, int numIterations, int numExecutions, double hitLevel, String parameterFilePath) throws NullPointerException, FileNotFoundException, IOException, Exception {
         super(trainingSet, testSet, outputPath, outputPrefix, numIterations, numExecutions, hitLevel, parameterFilePath);
     }
  
@@ -35,17 +35,20 @@ public class SSR4 extends SSR3{
         // The original expected output
         double output[] = getFirstRunOutput(trainingSet);
         int currentIteration = 0;
+        NormalizationParameters normParameters = null;
         while(!canStop){
             System.out.println("\nIteration: " + (currentIteration+1));
             mainState.startFresh();
             double normalizedOutput[] = Arrays.copyOf(output, output.length);
-            NormalizationParameters normParameters = normalizeData(normalizedOutput);
+            // No normalization on the first iteration
+            if(currentIteration != 0){
+                normParameters = normalizeData(normalizedOutput);
+            }
             // Load new inputs on the proble Object
             ((Regression)mainState.evaluator.p_problem).setDataset(trainingSet);
             ((Regression)mainState.evaluator.p_problem).setHitLevel(hitLevel);
             ((Regression)mainState.evaluator.p_problem).setOutput(normalizedOutput);
             int result = EvolutionState.R_NOTDONE;
-            double[] lastOutput = output;            
             // Generations
             while(result == EvolutionState.R_NOTDONE ){
                 result = mainState.evolve();
@@ -66,7 +69,7 @@ public class SSR4 extends SSR3{
                 output = getNewOutput(trainingSet, normalizedOutput, tr);
             }
 
-            stats.updatePontualError(bestFunction, lastOutput);
+            stats.updatePontualError(bestFunction, output);
             stats.updateIterativeErrors(solution);
 
             stats.finishIteration();

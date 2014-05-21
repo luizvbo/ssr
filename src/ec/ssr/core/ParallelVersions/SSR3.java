@@ -35,6 +35,7 @@ public class SSR3 extends SSR2{
         double output[] = getFirstRunOutput(trainingSet);
         int currentIteration = 0;
         while(!canStop){
+            System.out.println("\nIteration: " + (currentIteration+1));
             mainState.startFresh();
             double normalizedOutput[] = Arrays.copyOf(output, output.length);
             NormalizationParameters normParameters = normalizeData(normalizedOutput);
@@ -88,10 +89,6 @@ public class SSR3 extends SSR2{
         }
         std /= output.length-1;
         std = Math.sqrt(std);
-        
-        if(Double.isInfinite(std)){
-            int x= 0;
-        }
         
         for(int i = 0; i < output.length; i++){
             output[i]=(output[i]-mean)/std;

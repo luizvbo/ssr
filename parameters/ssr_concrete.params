@@ -42,12 +42,12 @@ gp.fs.0.func.12.nc = nc0
 
 # Default = 1024
 generations =					200
-pop.subpop.0.size =				200
+pop.subpop.0.size =				100
 
 # Default = 7 
 # 1024/7, 500/5
-elect.tournament.size =			5
+elect.tournament.size =			3
 
 # Max depth during mutation and crossover operations
-gp.koza.mutate.maxdepth =  30
-gp.koza.xover.maxdepth = 30
+gp.koza.mutate.maxdepth =  7
+gp.koza.xover.maxdepth = 7

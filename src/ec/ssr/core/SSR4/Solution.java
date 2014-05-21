@@ -20,13 +20,19 @@ public class Solution extends ec.ssr.core.SSR1.Solution{
         super(t1, tr);
     }
     
-    public static Solution createSolution(Function t1, double tr, NormalizationParameters parameters){
-        Solution newSolution = new Solution(t1, tr);
-        newSolution.parameters = parameters;
+    public static ec.ssr.core.SSR1.Solution createSolution(Function t1, double tr, NormalizationParameters parameters){
+        ec.ssr.core.SSR1.Solution newSolution;
+        if(parameters == null){
+            newSolution = new ec.ssr.core.SSR1.Solution(t1, tr);
+        }
+        else{
+            newSolution = new Solution(t1, tr);
+            ((Solution)newSolution).parameters = parameters;
+        }
         return newSolution;
     }
     
-    public static Solution createSolution(Function t1, NormalizationParameters parameters){
+    public static ec.ssr.core.SSR1.Solution createSolution(Function t1, NormalizationParameters parameters){
         return createSolution(t1, 1, parameters);
     }
     
@@ -49,7 +55,7 @@ public class Solution extends ec.ssr.core.SSR1.Solution{
     @Override
     public String print() {
         if(t2 != null)
-            return tr + "*("  + unNormalized2String(t1) + ")+\n" + "(1-" + tr+ ")*(" + unNormalized2String(t2) + ")";
+            return tr + "*("  + unNormalized2String(t1) + ")+\n" + "(1-" + tr + ")*(" + unNormalized2String(t2) + ")";
         return tr + "*(" + unNormalized2String(t1) + ")";
         
 //        return "(" + tr + "*" + t1.print() + "+(1-" + tr + ")*" + t2.print() + ")";

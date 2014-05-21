@@ -32,7 +32,7 @@ stat.gather-full = true
 eval.problem = ec.ssr.problems.Regression
 
 ### Don't show best individual information on screen
-stat.do-message = 						true
+stat.do-message = 						false
 
 # Elitism size = 1
 breed.elite.0 =							1

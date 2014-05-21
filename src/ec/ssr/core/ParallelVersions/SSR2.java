@@ -42,6 +42,7 @@ public class SSR2 extends SSR1{
         double output[] = getFirstRunOutput(trainingSet);
         int currentIteration = 0;
         while(!canStop){
+            System.out.println("\nIteration: " + (currentIteration+1));
             mainState.startFresh();
             double normalizedOutput[] = Arrays.copyOf(output, output.length);
             NormalizationParameters normParameters = normalizeData(normalizedOutput);

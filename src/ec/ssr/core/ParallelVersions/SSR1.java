@@ -43,12 +43,14 @@ public class SSR1 extends SSR{
         double output[] = getFirstRunOutput(trainingSet);
         int currentIteration = 0;
         while(!canStop){
+            System.out.println("\nIteration: " + (currentIteration+1));
             mainState.startFresh();
             // Load new inputs on the proble Object
             ((Regression)mainState.evaluator.p_problem).setDataset(trainingSet);
             ((Regression)mainState.evaluator.p_problem).setHitLevel(hitLevel);
             ((Regression)mainState.evaluator.p_problem).setOutput(output);
             int result = EvolutionState.R_NOTDONE;
+            double[] lastOutput = output;
             // Generations
             while(result == EvolutionState.R_NOTDONE ){
                 result = mainState.evolve();
@@ -69,7 +71,8 @@ public class SSR1 extends SSR{
                 output = getNewOutput(trainingSet, output, tr);
             }
 
-            stats.updatePontualError(bestFunction, output);
+            stats.updatePontualError(bestFunction, lastOutput);
+            stats.updateOutputVectors(lastOutput);
             stats.updateIterativeErrors(solution);
 
             stats.finishIteration();

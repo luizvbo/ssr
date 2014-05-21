@@ -295,6 +295,10 @@ public class FileHandler {
         bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + "trErrorPointPerIt.csv"));
         bw.write(getErrorPointPerIteration(threadsSSR));
         bw.close();
+        
+        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + "outputVectors.csv"));
+        bw.write(getOutputVectors(threadsSSR));
+        bw.close();
     }
 
     public static void writeSolution(SSR[] threadsSSR, 
@@ -415,29 +419,28 @@ public class FileHandler {
 
     private static String getErrorPointPerIteration(SSR[] threadsSSR) {
         StringBuilder outputStr = new StringBuilder();
-        outputStr.append("Abolute error (average of executions) for each point per iteration (iteration x point). Relative to the iteration output vector.\n");
-        double[][] sumOverExecutions = null;
+        outputStr.append("Abolute error (each block is an execution) for each point per iteration (iteration x point). Relative to the iteration output vector.\n");
         for(SSR execution : threadsSSR){
             double pontualError[][] = execution.getStatistics().getPontualError();
-            if(sumOverExecutions == null){
-                sumOverExecutions = pontualError;
-            }
-            else{
-                for(int i = 0; i < pontualError.length; i++){
-                    for(int j = 0; j < pontualError[0].length; j++){
-                        sumOverExecutions[i][j] += pontualError[i][j];
-                    }
+            for(int i = 0; i < pontualError.length; i++){
+                String separator = "";
+                for(int j = 0; j < pontualError[i].length; j++){
+                    outputStr.append(separator + Utils.printDouble(pontualError[i][j], PRECISION));
+                    separator = ",";
                 }
-            }
-        }
-        for(int i = 0; i < sumOverExecutions.length; i++){
-            String separator = "";
-            for(int j = 0; j < sumOverExecutions[i].length; j++){
-                outputStr.append(separator + Utils.printDouble(sumOverExecutions[i][j]/threadsSSR.length, PRECISION));
-                separator = ",";
+                outputStr.append("\n");
             }
             outputStr.append("\n");
         }
+//        
+//        for(int i = 0; i < sumOverExecutions.length; i++){
+//            String separator = "";
+//            for(int j = 0; j < sumOverExecutions[i].length; j++){
+//                outputStr.append(separator + Utils.printDouble(sumOverExecutions[i][j]/threadsSSR.length, PRECISION));
+//                separator = ",";
+//            }
+//            outputStr.append("\n");
+//        }
         return outputStr.toString();
     }
 
@@ -448,5 +451,23 @@ public class FileHandler {
             s_solution.append("Iteration ").append(execCounter++).append("\n").append(execution.getSolution().print()).append("\n\n");
         }
         return s_solution.toString();
+    }
+
+    private static String getOutputVectors(SSR[] threadsSSR) {
+        StringBuilder outputStr = new StringBuilder();
+        outputStr.append("Output vector (each block is an execution) for each iteration (iteration x point). Relative to the iteration.\n");
+        for(SSR execution : threadsSSR){
+            double outputVectors[][] = execution.getStatistics().getOutputVectors();
+            for(int i = 0; i < outputVectors.length; i++){
+                String separator = "";
+                for(int j = 0; j < outputVectors[i].length; j++){
+                    outputStr.append(separator + Utils.printDouble(outputVectors[i][j], PRECISION));
+                    separator = ",";
+                }
+                outputStr.append("\n");
+            }
+            outputStr.append("\n");
+        }
+        return outputStr.toString();
     }
 }

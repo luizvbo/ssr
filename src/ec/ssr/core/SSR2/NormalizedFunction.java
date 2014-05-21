@@ -42,7 +42,7 @@ public class NormalizedFunction implements Function, Branch{
 
     @Override
     public String print() {
-        return "(" + parameters.mean + "+" + function.print() + "*" + parameters.std + ")";
+        return "(" + parameters.std + "*(" + function.print() + ")+" + parameters.mean + ")";
     }
     
     @Override

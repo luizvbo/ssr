@@ -9,7 +9,6 @@ package ec.ssr.core;
 import ec.EvolutionState;
 import ec.Evolve;
 import ec.Individual;
-import ec.gp.GPIndividual;
 import ec.gp.koza.KozaFitness;
 import ec.ssr.core.SSR1.Solution;
 import ec.ssr.functions.Function;

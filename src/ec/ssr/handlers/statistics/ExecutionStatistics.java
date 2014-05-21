@@ -14,9 +14,6 @@ import ec.ssr.core.Instance;
 import ec.ssr.core.SSR1.Solution;
 import ec.ssr.core.Utils;
 import ec.ssr.functions.Function;
-import ec.ssr.handlers.StatisticsHandler;
-import static ec.ssr.handlers.StatisticsHandler.PRECISION;
-import static ec.ssr.handlers.StatisticsHandler.TRAIN;
 import java.util.ArrayList;
 
 /**
@@ -41,6 +38,7 @@ public class ExecutionStatistics {
     private int solutionSize;
     private double pontualError[][];
     private double bestOfGenError[][];
+    private double outputVectors[][];
     
     private int currentIteration;
     
@@ -48,6 +46,7 @@ public class ExecutionStatistics {
         trainError = new double[trainingSet.size()][];
         testError = new double[testSet.size()][];
         iterativeTrainingError = new double[numIterations];
+        outputVectors = new double[numIterations][];
         iterativeTestError = new double[numIterations];
         pontualError = new double[numIterations][];
         bestOfGenError = new double[numIterations][];
@@ -81,6 +80,7 @@ public class ExecutionStatistics {
     }
     
     public void updatePontualError(Function f, double[] output){
+        // numIterations x numInstances
         pontualError[currentIteration] = getIndividualError(f, trainingSet, output);
     }
     
@@ -101,7 +101,7 @@ public class ExecutionStatistics {
     }
     
     /**
-     * Returns the fitness of the best individual of the current generation
+     * Returns the RMSE of the best individual of the current generation
      * @param state Evolution state from ECJ
      * @return The best fitness from this generation
      */
@@ -188,5 +188,13 @@ public class ExecutionStatistics {
 
     public double[][] getPontualError() {
         return pontualError;
+    }
+
+    public void updateOutputVectors(double[] output) {
+        outputVectors[currentIteration] = output;
+    }
+
+    public double[][] getOutputVectors() {
+        return outputVectors;
     }
 }

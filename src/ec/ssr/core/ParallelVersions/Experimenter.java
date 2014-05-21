@@ -7,7 +7,6 @@
 package ec.ssr.core.ParallelVersions;
 
 import ec.EvolutionState;
-import ec.Evolve;
 import ec.ssr.core.Dataset;
 import ec.ssr.core.Instance;
 import ec.ssr.core.SSR;
@@ -18,11 +17,7 @@ import ec.ssr.handlers.FileHandler;
 import ec.ssr.handlers.GesecException;
 import ec.ssr.handlers.HoldoutHandler;
 import ec.ssr.handlers.StatisticsHandler;
-import ec.ssr.handlers.statistics.ExecutionStatistics;
 import ec.util.MersenneTwisterFast;
-import ec.util.Output;
-import ec.util.ParameterDatabase;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
@@ -95,6 +90,9 @@ public class Experimenter {
                 break;
             case 4:
                 algorithm = new SSR4(trainingSet, testSet, outputPath, outputPrefix, numIterations, numExecutions, hitLevel, parameterFilePath);
+                break;
+            case 6:
+                algorithm = new SSR6(trainingSet, testSet, outputPath, outputPrefix, numIterations, numExecutions, hitLevel, parameterFilePath);
                 break;
             default:
                 algorithm = new SSR4(trainingSet, testSet, outputPath, outputPrefix, numIterations, numExecutions, hitLevel, parameterFilePath);
