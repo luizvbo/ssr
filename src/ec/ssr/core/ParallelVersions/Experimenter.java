@@ -52,8 +52,10 @@ public class Experimenter {
     }
     
     public static void main(String args[]){
+        long startTime = System.currentTimeMillis();
         Experimenter experiment = new Experimenter(args);
         experiment.execute();
+        System.out.println("Elapsed Time: " + ((System.currentTimeMillis() - startTime)/1000) + " seconds");
     }
     
     private void execute(){

@@ -72,6 +72,11 @@ public class Inv extends GPNode implements Function{
     public String print() {
         return "(1/" + ((Function)children[0]).print() + ")";
     }
+    
+    @Override
+    public int getNumNodes() {
+        return numNodes(GPNode.NODESEARCH_ALL);
+    }
 }
 
 

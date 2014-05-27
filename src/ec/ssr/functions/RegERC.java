@@ -120,7 +120,9 @@ public class RegERC extends ERC implements Function {
     public String print() {
         return value+"";
     }
+    
+    @Override
+    public int getNumNodes() {
+        return numNodes(GPNode.NODESEARCH_ALL);
+    }
 }
-
-
-

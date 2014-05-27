@@ -59,6 +59,11 @@ public abstract class X extends GPNode implements Function{
     public String print() {
         return getVariableName();
     }
+    
+    @Override
+    public int getNumNodes() {
+        return numNodes(GPNode.NODESEARCH_ALL);
+    }
 }
 
 

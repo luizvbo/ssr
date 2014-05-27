@@ -137,7 +137,7 @@ public class Regression extends GPProblem implements SimpleProblemForm{
 //                    squaredError = error;
                 }
                 
-                if(Double.isInfinite(squaredError) || squaredError >= BIG_NUMBER){
+                if(Double.isInfinite(squaredError) || Double.isNaN(squaredError) || squaredError >= BIG_NUMBER){
                     overflow = true;
                     hits = 0;
                     TSE = BIG_NUMBER; 

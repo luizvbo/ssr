@@ -66,8 +66,14 @@ public class SSR4 extends SSR3{
                 output = getNewOutput(trainingSet, normalizedOutput, tr);
             }
 
+            if(currentIteration == 29){
+                int x=0;
+            }
+            
             stats.updatePontualError(bestFunction, lastOutput);
             stats.updateIterativeErrors(solution);
+            stats.updateOutputVectors(lastOutput);
+            stats.updateSolutionSize(solution);
 
             stats.finishIteration();
             currentIteration++;

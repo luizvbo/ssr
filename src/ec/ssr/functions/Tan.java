@@ -60,6 +60,11 @@ public class Tan extends GPNode implements Function{
     public String print() {
         return "tan(" + ((Function)children[0]).print() + ")";
     }
+    
+    @Override
+    public int getNumNodes() {
+        return numNodes(GPNode.NODESEARCH_ALL);
+    }
 }
 
 

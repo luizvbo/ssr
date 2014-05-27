@@ -9,13 +9,12 @@ import ec.ssr.core.Instance;
 import ec.ssr.functions.Function;
 import ec.ssr.handlers.StatisticsHandler;
 import ec.gp.GPNode;
-import ec.ssr.core.Branch;
 
 /**
  * Solution.java
  * Copyright (C) 20014, Federal University of Minas Gerais, Belo Horizonte, Brazil
  */
-public class Solution implements Function, Branch{
+public class Solution implements Function{
     protected Function t1;
     protected Function t2;
     protected double tr;
@@ -40,7 +39,7 @@ public class Solution implements Function, Branch{
     @Override
     public String print() {
         if(t2 != null)
-            return tr + "*(" + t1.print() + ")+(1-" + tr + ")*(" + t2.print() + ")";
+            return tr + "*(" + t1.print() + ")+\n(1-" + tr + ")*(" + t2.print() + ")";
         return t1.print();
 //        return tr + "," + t1.print();
         
@@ -76,14 +75,18 @@ public class Solution implements Function, Branch{
     public int getNumNodes() {
         int total = 0;
         if(t2 != null){
-            if(t2 instanceof GPNode){
-                total += ((GPNode)t2).numNodes(GPNode.NODESEARCH_ALL);
-                // Add 5, equivalent to +(1-r)*
-                total += 5;
-            }
-            else{
-                total += ((Branch)t2).getNumNodes();
-            }
+            // Add 5, equivalent to f1 <*> <r> <+> <(1-r)> <*> f2
+            total += (t2.getNumNodes() + 5);
+        }
+            
+//            if(t2 instanceof GPNode){
+//                total += ((GPNode)t2).numNodes(GPNode.NODESEARCH_ALL);
+//                // Add 2, equivalent to 1-r (as a constant) and *
+//                total += 2;
+//            }
+//            else{
+//                total += ((Branch)t2).getNumNodes();
+//            }
             
 //            if(t2 instanceof Solution){
 //                total += ((Solution)t2).getNumNodes();
@@ -93,15 +96,15 @@ public class Solution implements Function, Branch{
 //                // Add 5, equivalent to +(1-r)*
 //                total += 5;
 //            }
-        }
-        if(t1 instanceof  GPNode){
-            total += ((GPNode)t1).numNodes(GPNode.NODESEARCH_ALL);
-            // Add 2, equivalent to *r
-            total += 2;
-        }
-        else{
-            total += ((Branch)t1).getNumNodes();
-        }
+//        if(t1 instanceof  GPNode){
+//            total += ((GPNode)t1).numNodes(GPNode.NODESEARCH_ALL);
+//            // Add 2, equivalent to *r
+//            total += 2;
+//        }
+//        else{
+//            total += ((Branch)t1).getNumNodes();
+//        }
+        total += (t1.getNumNodes());
         return total;
     }
 }

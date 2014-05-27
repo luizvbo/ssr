@@ -66,7 +66,6 @@ public abstract class SSR extends Thread{
     public void run() {
         runAlgorithm();
         stats.testSolution(solution);
-        stats.setSolutionSize(solution.getNumNodes());
     }
     
     public abstract void runAlgorithm();

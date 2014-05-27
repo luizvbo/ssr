@@ -56,7 +56,9 @@ public class Sin extends GPNode implements Function{
     public String print() {
         return "sin(" + ((Function)children[0]).print() + ")";
     }
+    
+    @Override
+    public int getNumNodes() {
+        return numNodes(GPNode.NODESEARCH_ALL);
+    }
 }
-
-
-

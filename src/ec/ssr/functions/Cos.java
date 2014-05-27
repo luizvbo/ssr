@@ -53,6 +53,11 @@ public class Cos extends GPNode implements Function{
     public String print() {
         return "cos(" + ((Function)children[0]).print() + ")";
     }
+    
+    @Override
+    public int getNumNodes() {
+        return numNodes(GPNode.NODESEARCH_ALL);
+    }
 }
 
 

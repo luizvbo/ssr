@@ -12,4 +12,6 @@ public interface Function {
     public double eval(double[] val);
     
     public String print();
+    
+    public int getNumNodes();
 }

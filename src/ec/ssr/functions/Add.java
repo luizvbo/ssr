@@ -65,6 +65,11 @@ public class Add extends GPNode implements Function{
     public String print() {
         return "(" + ((Function)children[0]).print() + "+" + ((Function)children[1]).print() + ")";
     }
+    
+    @Override
+    public int getNumNodes() {
+        return numNodes(GPNode.NODESEARCH_ALL);
+    }
 }
 
 

@@ -74,6 +74,7 @@ public class SSR1 extends SSR{
             stats.updatePontualError(bestFunction, lastOutput);
             stats.updateOutputVectors(lastOutput);
             stats.updateIterativeErrors(solution);
+            stats.updateSolutionSize(solution);
 
             stats.finishIteration();
             currentIteration++;

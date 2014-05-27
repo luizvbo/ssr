@@ -53,6 +53,11 @@ public class Exp extends GPNode implements Function{
     public String print() {
         return "exp(" + ((Function)children[0]).print() + ")";
     }
+    
+    @Override
+    public int getNumNodes() {
+        return numNodes(GPNode.NODESEARCH_ALL);
+    }
 }
 
 

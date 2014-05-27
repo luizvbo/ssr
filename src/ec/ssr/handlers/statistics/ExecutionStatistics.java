@@ -35,7 +35,7 @@ public class ExecutionStatistics {
     
     private double iterativeTrainingError[];
     private double iterativeTestError[];
-    private int solutionSize;
+    private int solutionSize[];
     private double pontualError[][];
     private double bestOfGenError[][];
     private double outputVectors[][];
@@ -48,6 +48,7 @@ public class ExecutionStatistics {
         iterativeTrainingError = new double[numIterations];
         outputVectors = new double[numIterations][];
         iterativeTestError = new double[numIterations];
+        solutionSize = new int[numIterations];
         pontualError = new double[numIterations][];
         bestOfGenError = new double[numIterations][];
         generationBestFitness = new ArrayList<Double>();
@@ -70,13 +71,19 @@ public class ExecutionStatistics {
         generationBestFitness.clear();
         currentIteration++;
     }
-    
-    public void setSolutionSize(int solutionSize){
-        this.solutionSize = solutionSize;
+        
+    public void updateSolutionSize(Solution solution) {
+        this.solutionSize[currentIteration] = solution.getNumNodes();
     }
 
-    public int getSolutionSize() {
-        return solutionSize;
+    public String getSolutionSizeAsString() {
+        String sep = "";
+        StringBuilder output = new StringBuilder();
+        for(int i = 0; i < solutionSize.length; i++){
+            output.append(sep + solutionSize[i]);
+            sep = ",";
+        }
+        return output.toString();
     }
     
     public void updatePontualError(Function f, double[] output){

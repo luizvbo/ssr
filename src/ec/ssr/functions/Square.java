@@ -58,6 +58,11 @@ public class Square extends GPNode implements Function{
     public String print() {
         return "(" + ((Function)children[0]).print() + ")^2";
     }
+    
+    @Override
+    public int getNumNodes() {
+        return numNodes(GPNode.NODESEARCH_ALL);
+    }
 }
 
 

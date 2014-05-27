@@ -7,14 +7,13 @@
 package ec.ssr.core.SSR2;
 
 import ec.gp.GPNode;
-import ec.ssr.core.Branch;
 import ec.ssr.functions.Function;
 
 /**
  *
  * @author luiz
  */
-public class NormalizedFunction implements Function, Branch{
+public class NormalizedFunction implements Function{
     protected Function function;
     protected NormalizationParameters parameters; 
 
@@ -47,6 +46,6 @@ public class NormalizedFunction implements Function, Branch{
     
     @Override
     public int getNumNodes(){
-        return ((GPNode)function).numNodes(GPNode.NODESEARCH_ALL);
+        return function.getNumNodes();
     }
 }
