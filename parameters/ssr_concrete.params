@@ -37,7 +37,7 @@ gp.fs.0.func.10 = ec.ssr.functions.Sub
 gp.fs.0.func.10.nc = nc2
 gp.fs.0.func.11 = ec.ssr.functions.RegERC
 gp.fs.0.func.11.nc = nc0
-gp.fs.0.func.12 = ec.ssr.functions.DivNotKoza
+gp.fs.0.func.12 = ec.ssr.functions.Div
 gp.fs.0.func.12.nc = nc2
 
 # Default = 1024

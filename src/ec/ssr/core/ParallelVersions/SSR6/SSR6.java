@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package ec.ssr.core.ParallelVersions;
+package ec.ssr.core.ParallelVersions.SSR6;
 
 import ec.EvolutionState;
 import ec.gp.GPIndividual;
@@ -12,12 +12,13 @@ import ec.gp.koza.KozaFitness;
 import ec.simple.SimpleStatistics;
 import ec.ssr.core.Dataset;
 import ec.ssr.core.Instance;
-import ec.ssr.core.SSR;
+import ec.ssr.core.ParallelVersions.SSR;
 import ec.ssr.core.SSR1.Solution;
 import ec.ssr.functions.Function;
 import ec.ssr.problems.Regression;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * In this version functions are concatenated externaly
@@ -42,6 +43,7 @@ public class SSR6 extends SSR{
         boolean canStop = false;
         // The original expected output
         double output[] = getFirstRunOutput(trainingSet);
+        double newOutput[] = Arrays.copyOf(output, output.length);
         int currentIteration = 0;
         while(!canStop){
             System.out.println("\nIteration: " + (currentIteration+1));
@@ -49,7 +51,7 @@ public class SSR6 extends SSR{
             // Load new inputs on the proble Object
             ((Regression)mainState.evaluator.p_problem).setDataset(trainingSet);
             ((Regression)mainState.evaluator.p_problem).setHitLevel(hitLevel);
-            ((Regression)mainState.evaluator.p_problem).setOutput(output);
+            ((Regression)mainState.evaluator.p_problem).setOutput(newOutput);
             int result = EvolutionState.R_NOTDONE;
             double[] lastOutput = output; 
             // Generations
@@ -70,7 +72,7 @@ public class SSR6 extends SSR{
             else{
                 double tr = mainState.random[0].nextDouble();
                 addFunctionToSolution(bestFunction, tr);
-                output = getNewOutput(trainingSet, output, tr);
+                newOutput = getNewOutput(trainingSet, output, tr);
             }
 
             stats.updatePontualError(bestFunction, lastOutput);
@@ -87,7 +89,7 @@ public class SSR6 extends SSR{
             solution = new Solution(generatedFunction, tr);
         }
         else{
-            solution.setT2(generatedFunction);
+            ((Solution)solution).setT2(generatedFunction);
             solution = new Solution(solution, tr);
         }
     }
@@ -97,16 +99,15 @@ public class SSR6 extends SSR{
             solution = new Solution(generatedFunction, 1);
         }
         else{
-            solution.setT2(generatedFunction);
+            ((Solution)solution).setT2(generatedFunction);
         }
     }
     
-    @Override
     protected double[] getNewOutput(Dataset dataset, double[] oldOutput, double tr){
         double[] newOutput = new double[dataset.size()];
         for(int i = 0; i < dataset.size(); i++){
             Instance instance = dataset.get(i);
-            double output = solution.getT1().eval(instance.input);
+            double output = ((Solution)solution).getT1().eval(instance.input);
             newOutput[i] = (oldOutput[i] - tr*output)/(1-tr);
         }
         return newOutput;

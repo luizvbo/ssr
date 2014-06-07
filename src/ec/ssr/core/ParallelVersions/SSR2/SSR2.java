@@ -4,8 +4,9 @@
  * and open the template in the editor.
  */
 
-package ec.ssr.core.ParallelVersions;
+package ec.ssr.core.ParallelVersions.SSR2;
 
+import ec.ssr.core.ParallelVersions.SSR1.SSR1;
 import ec.EvolutionState;
 import ec.gp.GPIndividual;
 import ec.gp.koza.KozaFitness;

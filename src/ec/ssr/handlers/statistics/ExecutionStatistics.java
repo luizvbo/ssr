@@ -11,7 +11,6 @@ import ec.Individual;
 import ec.gp.koza.KozaFitness;
 import ec.ssr.core.Dataset;
 import ec.ssr.core.Instance;
-import ec.ssr.core.SSR1.Solution;
 import ec.ssr.core.Utils;
 import ec.ssr.functions.Function;
 import java.util.ArrayList;
@@ -57,7 +56,7 @@ public class ExecutionStatistics {
         currentIteration = 0;
     }
     
-    public void updateIterativeErrors(Solution solution){
+    public void updateIterativeErrors(Function solution){
         iterativeTrainingError[currentIteration] = getRMSE(solution, trainingSet);
         iterativeTestError[currentIteration] = getRMSE(solution, testSet);
     }
@@ -72,7 +71,7 @@ public class ExecutionStatistics {
         currentIteration++;
     }
         
-    public void updateSolutionSize(Solution solution) {
+    public void updateSolutionSize(Function solution) {
         this.solutionSize[currentIteration] = solution.getNumNodes();
     }
 
@@ -97,7 +96,7 @@ public class ExecutionStatistics {
      * @param dataset Dataset used to calculate the error
      * @return Total error
      */
-    protected final double getRMSE(Solution solution, Dataset dataset) {
+    protected final double getRMSE(Function solution, Dataset dataset) {
         double totalError = 0;
         for(Instance instance : dataset.data){
             double evaluated = solution.eval(instance.input);
@@ -122,7 +121,7 @@ public class ExecutionStatistics {
     }
     
     /**
-     * Calculates the difference between the output of a funtion and the desired output
+     * Calculates the difference between the output of a function and the desired output
      * for a given dataset (absolute error).
      * @param solution Input solution 
      * @param dataset Input data 
@@ -143,7 +142,7 @@ public class ExecutionStatistics {
      * Tests a solution with a training and a testSolution set, storing the results
      * @param solution Solution being teste
      */
-    public void testSolution(Solution solution) {
+    public void testSolution(Function solution) {
         int index = 0;
         for(Instance instance : trainingSet.data){
             double output = solution.eval(instance.input);

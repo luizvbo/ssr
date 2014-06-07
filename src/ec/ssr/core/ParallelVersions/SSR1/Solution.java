@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package ec.ssr.core.SSR1;
+package ec.ssr.core.ParallelVersions.SSR1;
 
 import ec.ssr.core.Dataset;
 import ec.ssr.core.Instance;

@@ -12,7 +12,7 @@ parent.0 = ssr.params
 gp.fs.size = 1
 gp.fs.0.name = f0
 # O default é 10, mas como não queremos ERC, colocamos 9 operadores
-gp.fs.0.size = 5
+gp.fs.0.size = 6
 gp.fs.0.func.0 = ec.ssr.functions.Add
 gp.fs.0.func.0.nc = nc2
 gp.fs.0.func.1 = ec.ssr.functions.Mul
@@ -34,15 +34,15 @@ gp.fs.0.func.5.nc = nc2
 # Default = 1024
 generations =							200
 
-pop.subpop.0.size =                     100
+pop.subpop.0.size =                     500
 
 # Default = 7 
 # 1024/7, 500/5, 200/4, 100/3
-select.tournament.size =                3
+select.tournament.size =                5
 
 # Max depth during mutation and crossover operations
-gp.koza.mutate.maxdepth =  				3
-gp.koza.xover.maxdepth = 				3
+gp.koza.mutate.maxdepth =  				7
+gp.koza.xover.maxdepth = 				7
 
 pop.subpop.0.species.pipe.num-sources = 2
 pop.subpop.0.species.pipe.source.0 = ec.gp.koza.CrossoverPipeline

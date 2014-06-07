@@ -4,8 +4,9 @@
  * and open the template in the editor.
  */
 
-package ec.ssr.core.ParallelVersions;
+package ec.ssr.core.ParallelVersions.SSR3;
 
+import ec.ssr.core.ParallelVersions.SSR2.SSR2;
 import ec.EvolutionState;
 import ec.gp.GPIndividual;
 import ec.gp.koza.KozaFitness;
@@ -13,7 +14,6 @@ import ec.simple.SimpleStatistics;
 import ec.ssr.core.Dataset;
 import ec.ssr.core.SSR2.NormalizationParameters;
 import ec.ssr.core.SSR2.NormalizedFunction;
-import ec.ssr.core.SSR4.Solution;
 import ec.ssr.functions.Function;
 import ec.ssr.problems.Regression;
 import java.io.FileNotFoundException;
@@ -24,11 +24,11 @@ import java.util.Arrays;
  *
  * @author luiz
  */
-public class SSR4 extends SSR3{
-    public SSR4(Dataset trainingSet, Dataset testSet, String outputPath, String outputPrefix, int numIterations, int numExecutions, double hitLevel, String parameterFilePath) throws NullPointerException, FileNotFoundException, IOException, Exception {
+public class SSR3 extends SSR2{
+    public SSR3(Dataset trainingSet, Dataset testSet, String outputPath, String outputPrefix, int numIterations, int numExecutions, double hitLevel, String parameterFilePath) throws NullPointerException, FileNotFoundException, IOException, Exception {
         super(trainingSet, testSet, outputPath, outputPrefix, numIterations, numExecutions, hitLevel, parameterFilePath);
     }
- 
+    
     @Override
     public void runAlgorithm() {
         boolean canStop = false;
@@ -45,7 +45,6 @@ public class SSR4 extends SSR3{
             ((Regression)mainState.evaluator.p_problem).setHitLevel(hitLevel);
             ((Regression)mainState.evaluator.p_problem).setOutput(normalizedOutput);
             int result = EvolutionState.R_NOTDONE;
-            double[] lastOutput = output;            
             // Generations
             while(result == EvolutionState.R_NOTDONE ){
                 result = mainState.evolve();
@@ -54,26 +53,20 @@ public class SSR4 extends SSR3{
             }                                                        
             GPIndividual bestSoFar = (GPIndividual)((SimpleStatistics)mainState.statistics).getBestSoFar()[0];
             KozaFitness fitness = (KozaFitness)bestSoFar.fitness;
-            Function bestFunction =  (Function)bestSoFar.trees[0].child;
-            
+            NormalizedFunction bestFunction =  new NormalizedFunction((Function)bestSoFar.trees[0].child, normParameters);
+
             if(currentIteration == maxIterations - 1 || fitness.hits == trainingSet.size()){
-                addLastFunctionToSolution(bestFunction, normParameters);
+                addLastFunctionToSolution(bestFunction);
                 canStop = true;
             }
             else{
                 double tr = mainState.random[0].nextDouble();
-                addFunctionToSolution(bestFunction, tr, normParameters);
-                output = getNewOutput(trainingSet, normalizedOutput, tr);
+                addFunctionToSolution(bestFunction, tr);
+                output = getNewOutput(trainingSet, output, tr);
             }
 
-            if(currentIteration == 29){
-                int x=0;
-            }
-            
-            stats.updatePontualError(bestFunction, lastOutput);
+            stats.updatePontualError(bestFunction, output);
             stats.updateIterativeErrors(solution);
-            stats.updateOutputVectors(lastOutput);
-            stats.updateSolutionSize(solution);
 
             stats.finishIteration();
             currentIteration++;
@@ -81,26 +74,26 @@ public class SSR4 extends SSR3{
         }
     }
     
-    protected void addFunctionToSolution(Function generatedFunction, double tr, NormalizationParameters parameters) {
-        if(solution == null){
-            solution = Solution.createSolution(generatedFunction, tr, parameters);
-            currentSolution = solution;
+    @Override
+    protected NormalizationParameters normalizeData(double[] output) {
+        // Calculates the mean
+        double mean = 0;
+        for(int i = 0; i < output.length; i++){
+            mean += output[i];
+        }       
+        mean = mean/output.length;
+        // Calculates the std. dev.
+        double std = 0;
+        for(int i = 0; i < output.length; i++){
+            double aux = output[i] - mean;
+            std += aux * aux;
         }
-        else{
-            // Add a new level of normalization
-            currentSolution.setT2(Solution.createSolution(generatedFunction, tr, parameters));
-            currentSolution = (Solution)currentSolution.getT2();
+        std /= output.length-1;
+        std = Math.sqrt(std);
+        
+        for(int i = 0; i < output.length; i++){
+            output[i]=(output[i]-mean)/std;
         }
-    }
-    
-    protected void addLastFunctionToSolution(Function lastFunction, NormalizationParameters parameters){
-        if(solution == null){
-            solution = Solution.createSolution(lastFunction, parameters);
-        }
-        else{
-            // Add a new level of normalization
-            Function normalizedT2 = new NormalizedFunction(lastFunction, parameters);
-            currentSolution.setT2(normalizedT2);
-        }
+        return new NormalizationParameters(mean, std);
     }
 }

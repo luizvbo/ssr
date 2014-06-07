@@ -4,8 +4,9 @@
  * and open the template in the editor.
  */
 
-package ec.ssr.core.ParallelVersions;
+package ec.ssr.core.ParallelVersions.SSR5;
 
+import ec.ssr.core.ParallelVersions.SSR3.SSR3;
 import ec.EvolutionState;
 import ec.gp.GPIndividual;
 import ec.gp.koza.KozaFitness;
@@ -85,8 +86,8 @@ public class SSR5 extends SSR3{
         }
         else{
             // Add a new level of normalization
-            currentSolution.setT2(Solution.createSolution(generatedFunction, tr, parameters));
-            currentSolution = (Solution)currentSolution.getT2();
+            ((ec.ssr.core.SSR1.Solution)currentSolution).setT2(Solution.createSolution(generatedFunction, tr, parameters));
+            currentSolution = ((ec.ssr.core.SSR1.Solution)currentSolution).getT2();
         }
     }
     
@@ -97,7 +98,7 @@ public class SSR5 extends SSR3{
         else{
             // Add a new level of normalization
             Function normalizedT2 = new NormalizedFunction(lastFunction, parameters);
-            currentSolution.setT2(normalizedT2);
+            ((Solution)currentSolution).setT2(normalizedT2);
         }
     }
 }

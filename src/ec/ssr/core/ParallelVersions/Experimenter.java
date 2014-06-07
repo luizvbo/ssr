@@ -6,10 +6,15 @@
 
 package ec.ssr.core.ParallelVersions;
 
+import ec.ssr.core.ParallelVersions.SSR6.SSR6;
+import ec.ssr.core.ParallelVersions.SSR4.SSR4;
+import ec.ssr.core.ParallelVersions.SSR3.SSR3;
+import ec.ssr.core.ParallelVersions.SSR2.SSR2;
+import ec.ssr.core.ParallelVersions.SSR1.SSR1;
 import ec.EvolutionState;
 import ec.ssr.core.Dataset;
 import ec.ssr.core.Instance;
-import ec.ssr.core.SSR;
+import ec.ssr.core.ParallelVersions.SSR7.SSR7;
 import ec.ssr.core.SSR1.Solution;
 import ec.ssr.handlers.CrossvalidationHandler;
 import ec.ssr.handlers.DataProducer;
@@ -40,6 +45,7 @@ public class Experimenter {
     protected int numIterations = 10;
     protected double hitLevel = 0.01;
     protected int numExecutions = 1;
+    protected int numThreads = 1;
     protected boolean shuffle = true;
     
     protected StatisticsHandler stats;
@@ -61,8 +67,7 @@ public class Experimenter {
     private void execute(){
         try {
             SSR[] threadsSSR = new SSR[numExecutions];
-            int numCores = Runtime.getRuntime().availableProcessors()-1;
-            ExecutorService executor = Executors.newFixedThreadPool(numCores);
+            ExecutorService executor = Executors.newFixedThreadPool(numThreads);
             // Run the algorithm for a defined number of repetitions
             for(int execution = 0; execution < numExecutions; execution++){
                 Dataset[] data = dataProducer.getTrainintTestData();
@@ -95,6 +100,9 @@ public class Experimenter {
                 break;
             case 6:
                 algorithm = new SSR6(trainingSet, testSet, outputPath, outputPrefix, numIterations, numExecutions, hitLevel, parameterFilePath);
+                break;
+            case 7:
+                algorithm = new SSR7(trainingSet, testSet, outputPath, outputPrefix, numIterations, numExecutions, hitLevel, parameterFilePath);
                 break;
             default:
                 algorithm = new SSR4(trainingSet, testSet, outputPath, outputPrefix, numIterations, numExecutions, hitLevel, parameterFilePath);
@@ -144,6 +152,10 @@ public class Experimenter {
             inputString = FileHandler.readOption("n", args);
             if(!inputString.equals("")){
                 numExecutions = Integer.parseInt(inputString);
+            }
+            inputString = FileHandler.readOption("t", args);
+            if(!inputString.equals("")){
+                numThreads = Integer.parseInt(inputString);
             }
             inputString = FileHandler.readOption("v", args);
             if(!inputString.equals("")){
@@ -234,6 +246,8 @@ public class Experimenter {
                 + "     Path to the output files.\n"
                 + "  -a <prefix string>\n"
                 + "     Identifier prefix for files.\n"
+                + "  -t <int>\n"
+                + "     Number of threads (for parallel execution)."
                 + "  -g <int>\n"
                 + "     Maximum number of iterations (default = 10).\n"
                 + "  -n <int>\n"

@@ -2,7 +2,7 @@ package ec.ssr.handlers;
 
 
 import ec.ssr.core.Dataset;
-import ec.ssr.core.SSR;
+import ec.ssr.core.ParallelVersions.SSR;
 import ec.ssr.core.Utils;
 import static ec.ssr.handlers.StatisticsHandler.PRECISION;
 import ec.ssr.handlers.statistics.ExecutionStatistics;
@@ -270,12 +270,12 @@ public class FileHandler {
         outputDir.mkdirs();
         // Object to write results on file
         BufferedWriter bw;
-        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + "trFinalPoinError.csv"));
-        bw.write(getFinalPointError(threadsSSR, ExecutionStatistics.TRAIN, hitLevel));
-        bw.close();
-        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + "tsFinalPoinError.csv"));
-        bw.write(getFinalPointError(threadsSSR, ExecutionStatistics.TEST, hitLevel));
-        bw.close();
+//        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + "trFinalPoinError.csv"));
+//        bw.write(getFinalPointError(threadsSSR, ExecutionStatistics.TRAIN, hitLevel));
+//        bw.close();
+//        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + "tsFinalPoinError.csv"));
+//        bw.write(getFinalPointError(threadsSSR, ExecutionStatistics.TEST, hitLevel));
+//        bw.close();
         
         bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + "trRMSEperIteration.csv"));
         bw.write(getRMSEperIteration(threadsSSR, ExecutionStatistics.TRAIN));
@@ -296,9 +296,15 @@ public class FileHandler {
         bw.write(getErrorPointPerIteration(threadsSSR));
         bw.close();
         
-        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + "outputVectors.csv"));
-        bw.write(getOutputVectors(threadsSSR));
+//        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + "outputVectors.csv"));
+//        bw.write(getOutputVectors(threadsSSR));
+//        bw.close();
+        
+        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + "numNodes.csv"));
+        bw.write(getNumNodes(threadsSSR));
         bw.close();
+        
+        
     }
 
     public static void writeSolution(SSR[] threadsSSR, 
@@ -314,6 +320,8 @@ public class FileHandler {
         bw.write(getSolutionsAsString(threadsSSR));
         bw.close();
     }
+    
+    
 
     private static String getFinalPointError(SSR[] threadsSSR, int type, double hitLevel) {
         StringBuilder outputStr = new StringBuilder();
@@ -346,13 +354,6 @@ public class FileHandler {
             outputStr.append("Error:," + Utils.printDouble(totalError[exec], PRECISION) +
                     ",Hits:," + Utils.printDouble(hits[exec], PRECISION) + "\n\n");
         }
-        outputStr.append("Number of nodes (per execution) \n");
-        String separator = "";
-        for(SSR algorithm : threadsSSR){
-            outputStr.append(separator + algorithm.getStatistics().getSolutionSize());
-            separator = ",";
-        }
-        outputStr.append("\n");
         
         double mae[] = new double[threadsSSR.length];
         for(int exec = 0; exec < threadsSSR.length; exec++){
@@ -448,7 +449,7 @@ public class FileHandler {
         StringBuilder s_solution = new StringBuilder();
         int execCounter = 1;
         for(SSR execution : threadsSSR){
-            s_solution.append("Iteration ").append(execCounter++).append("\n").append(execution.getSolution().print()).append("\n\n");
+            s_solution.append("Execution ").append(execCounter++).append("\n").append(execution.getSolution().print()).append("\n\n");
         }
         return s_solution.toString();
     }
@@ -466,6 +467,15 @@ public class FileHandler {
                 }
                 outputStr.append("\n");
             }
+            outputStr.append("\n");
+        }
+        return outputStr.toString();
+    }
+
+    private static String getNumNodes(SSR[] threadsSSR) {
+        StringBuilder outputStr = new StringBuilder("Number of nodes (per execution) \n");
+        for(SSR algorithm : threadsSSR){
+            outputStr.append(algorithm.getStatistics().getSolutionSizeAsString());
             outputStr.append("\n");
         }
         return outputStr.toString();

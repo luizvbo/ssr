@@ -4,13 +4,14 @@
  * and open the template in the editor.
  */
 
-package ec.ssr.core;
+package ec.ssr.core.ParallelVersions;
 
 import ec.EvolutionState;
 import ec.Evolve;
 import ec.Individual;
 import ec.gp.koza.KozaFitness;
-import ec.ssr.core.SSR1.Solution;
+import ec.ssr.core.Dataset;
+import ec.ssr.core.Instance;
 import ec.ssr.functions.Function;
 import ec.ssr.handlers.statistics.ExecutionStatistics;
 import ec.util.Output;
@@ -22,8 +23,7 @@ import java.io.File;
  * @author luiz
  */
 public abstract class SSR extends Thread{
-    protected Solution currentSolution;
-    protected Solution solution;
+    protected Function solution;
     
     protected Dataset trainingSet;
     protected Dataset testSet;
@@ -70,15 +70,7 @@ public abstract class SSR extends Thread{
     
     public abstract void runAlgorithm();
 
-    protected double[] getNewOutput(Dataset dataset, double[] oldOutput, double tr){
-        double[] newOutput = new double[dataset.size()];
-        for(int i = 0; i < dataset.size(); i++){
-            Instance instance = dataset.get(i);
-            double output = currentSolution.getT1().eval(instance.input);
-            newOutput[i] = (oldOutput[i] - tr*output)/(1-tr);
-        }
-        return newOutput;
-    }
+    
     
     protected final double[] getFirstRunOutput(Dataset dataset) {
         double[] output = new double[dataset.size()];
@@ -129,7 +121,7 @@ public abstract class SSR extends Thread{
         return stats;
     }
 
-    public Solution getSolution() {
+    public Function getSolution() {
         return solution;
     }
 }

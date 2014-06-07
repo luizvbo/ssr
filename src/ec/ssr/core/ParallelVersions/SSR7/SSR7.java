@@ -4,27 +4,27 @@
  * and open the template in the editor.
  */
 
-package ec.ssr.core.ParallelVersions;
+package ec.ssr.core.ParallelVersions.SSR7;
 
 import ec.EvolutionState;
 import ec.gp.GPIndividual;
 import ec.gp.koza.KozaFitness;
 import ec.simple.SimpleStatistics;
 import ec.ssr.core.Dataset;
-import ec.ssr.core.SSR;
-import ec.ssr.core.SSR1.Solution;
+import ec.ssr.core.ParallelVersions.SSR;
 import ec.ssr.functions.Function;
 import ec.ssr.problems.Regression;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
- *
+ * In this version functions are concatenated externaly
  * @author luiz
  */
-public class SSR1 extends SSR{
+public class SSR7 extends SSR{
 
-    public SSR1(Dataset trainingSet, 
+    public SSR7(Dataset trainingSet, 
                Dataset testSet, 
                String outputPath, 
                String outputPrefix, 
@@ -41,6 +41,7 @@ public class SSR1 extends SSR{
         boolean canStop = false;
         // The original expected output
         double output[] = getFirstRunOutput(trainingSet);
+        double newOutput[] = Arrays.copyOf(output, output.length);
         int currentIteration = 0;
         while(!canStop){
             System.out.println("\nIteration: " + (currentIteration+1));
@@ -48,9 +49,9 @@ public class SSR1 extends SSR{
             // Load new inputs on the proble Object
             ((Regression)mainState.evaluator.p_problem).setDataset(trainingSet);
             ((Regression)mainState.evaluator.p_problem).setHitLevel(hitLevel);
-            ((Regression)mainState.evaluator.p_problem).setOutput(output);
+            ((Regression)mainState.evaluator.p_problem).setOutput(newOutput);
             int result = EvolutionState.R_NOTDONE;
-            double[] lastOutput = output;
+            double[] lastOutput = output; 
             // Generations
             while(result == EvolutionState.R_NOTDONE ){
                 result = mainState.evolve();
@@ -61,18 +62,17 @@ public class SSR1 extends SSR{
             KozaFitness fitness = (KozaFitness)bestSoFar.fitness;
             Function bestFunction = (Function)bestSoFar.trees[0].child;
 
+            addFunctionToSolution(bestFunction, trainingSet);
             if(currentIteration == maxIterations - 1 || fitness.hits == trainingSet.size()){
-                addLastFunctionToSolution(bestFunction);
                 canStop = true;
             }
             else{
-                double tr = mainState.random[0].nextDouble();
-                addFunctionToSolution(bestFunction, tr);
-                output = getNewOutput(trainingSet, output, tr);
+                newOutput = ((Solution)solution).getError();
+//                newOutput = getNewOutput(trainingSet, output);
             }
+            
 
             stats.updatePontualError(bestFunction, lastOutput);
-            stats.updateOutputVectors(lastOutput);
             stats.updateIterativeErrors(solution);
             stats.updateSolutionSize(solution);
 
@@ -82,23 +82,31 @@ public class SSR1 extends SSR{
         }
     }
     
-    protected void addFunctionToSolution(Function generatedFunction, double tr) {
+    protected void addFunctionToSolution(Function generatedFunction, Dataset training) {
         if(solution == null){
-            solution = new Solution(generatedFunction, tr);
-            currentSolution = solution;
+            solution = new Solution(generatedFunction, training);
         }
         else{
-            currentSolution.setT2(new Solution(generatedFunction, tr));
-            currentSolution = (Solution)currentSolution.getT2();
+            ((Solution)solution).addFunction(generatedFunction, training);
         }
     }
     
-    protected void addLastFunctionToSolution(Function generatedFunction){
-        if(solution == null){
-            solution = new Solution(generatedFunction, 1);
-        }
-        else{
-            currentSolution.setT2(generatedFunction);
-        }
-    }
+//    protected void addLastFunctionToSolution(Function generatedFunction){
+//        if(solution == null){
+//            solution = new Solution(generatedFunction, 1);
+//        }
+//        else{
+//            solution.setT2(generatedFunction);
+//        }
+//    }
+    
+//    protected double[] getNewOutput(Dataset dataset, double[] oldOutput){
+//        double[] newOutput = new double[dataset.size()];
+//        for(int i = 0; i < dataset.size(); i++){
+//            Instance instance = dataset.get(i);
+//            double output = solution.getT1().eval(instance.input);
+//            newOutput[i] = oldOutput[i] - output;
+//        }
+//        return newOutput;
+//    }
 }
