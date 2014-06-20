@@ -10,7 +10,7 @@ import ec.ssr.functions.Function;
  * Solution.java
  * Copyright (C) 20014, Federal University of Minas Gerais, Belo Horizonte, Brazil
  */
-public class Solution extends ec.ssr.core.SSR1.Solution{
+public class Solution extends ec.ssr.core.ParallelVersions.SSR1.Solution{
     
     public Solution(Function t1, double tr) {
         super(t1, tr);

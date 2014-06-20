@@ -13,7 +13,6 @@ import ec.simple.SimpleStatistics;
 import ec.ssr.core.Dataset;
 import ec.ssr.core.Instance;
 import ec.ssr.core.ParallelVersions.SSR;
-import ec.ssr.core.SSR1.Solution;
 import ec.ssr.functions.Function;
 import ec.ssr.problems.Regression;
 import java.io.FileNotFoundException;
@@ -73,12 +72,14 @@ public class SSR1 extends SSR{
                 output = getNewOutput(trainingSet, output, tr);
             }
 
-            stats.updatePontualError(bestFunction, lastOutput);
-            stats.updateOutputVectors(lastOutput);
-            stats.updateIterativeErrors(solution);
-            stats.updateSolutionSize(solution);
-
-            stats.finishIteration();
+            stats.updateOnIteration(solution);
+            
+//            stats.updatePontualError(bestFunction, lastOutput);
+//            stats.updateOutputVectors(lastOutput);
+//            stats.updateIterativeErrors(solution);
+//            stats.updateSolutionSize(solution);
+//
+//            stats.finishIteration();
             currentIteration++;
             mainState.output.close();
         }

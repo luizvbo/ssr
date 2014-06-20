@@ -71,12 +71,13 @@ public class SSR7 extends SSR{
 //                newOutput = getNewOutput(trainingSet, output);
             }
             
+            stats.updateOnIteration(solution);
 
-            stats.updatePontualError(bestFunction, lastOutput);
-            stats.updateIterativeErrors(solution);
-            stats.updateSolutionSize(solution);
-
-            stats.finishIteration();
+//            stats.updatePontualError(bestFunction, lastOutput);
+//            stats.updateIterativeErrors(solution);
+//            stats.updateSolutionSize(solution);
+//
+//            stats.finishIteration();
             currentIteration++;
             mainState.output.close();
         }

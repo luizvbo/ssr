@@ -77,6 +77,8 @@ public class Div extends GPNode implements Function{
     public int getNumNodes() {
         return numNodes(GPNode.NODESEARCH_ALL);
     }
+    
+    public static int numZeroDiv = 0;
 }
 
 

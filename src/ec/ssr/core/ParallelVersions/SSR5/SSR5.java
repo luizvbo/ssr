@@ -14,7 +14,7 @@ import ec.simple.SimpleStatistics;
 import ec.ssr.core.Dataset;
 import ec.ssr.core.SSR2.NormalizationParameters;
 import ec.ssr.core.SSR2.NormalizedFunction;
-import ec.ssr.core.SSR4.Solution;
+import ec.ssr.core.ParallelVersions.SSR4.Solution;
 import ec.ssr.functions.Function;
 import ec.ssr.problems.Regression;
 import java.io.FileNotFoundException;
@@ -70,10 +70,12 @@ public class SSR5 extends SSR3{
                 output = getNewOutput(trainingSet, normalizedOutput, tr);
             }
 
-            stats.updatePontualError(bestFunction, output);
-            stats.updateIterativeErrors(solution);
-
-            stats.finishIteration();
+            stats.updateOnIteration(solution);
+            
+//            stats.updatePontualError(bestFunction, output);
+//            stats.updateIterativeErrors(solution);
+//
+//            stats.finishIteration();
             currentIteration++;
             mainState.output.close();
         }
@@ -86,8 +88,8 @@ public class SSR5 extends SSR3{
         }
         else{
             // Add a new level of normalization
-            ((ec.ssr.core.SSR1.Solution)currentSolution).setT2(Solution.createSolution(generatedFunction, tr, parameters));
-            currentSolution = ((ec.ssr.core.SSR1.Solution)currentSolution).getT2();
+            ((ec.ssr.core.ParallelVersions.SSR1.Solution)currentSolution).setT2(Solution.createSolution(generatedFunction, tr, parameters));
+            currentSolution = ((ec.ssr.core.ParallelVersions.SSR1.Solution)currentSolution).getT2();
         }
     }
     

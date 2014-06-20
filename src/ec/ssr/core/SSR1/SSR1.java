@@ -4,6 +4,7 @@
  */
 package ec.ssr.core.SSR1;
 
+import ec.ssr.core.ParallelVersions.SSR1.Solution;
 import ec.EvolutionState;
 import ec.Evolve;
 import ec.Individual;

@@ -72,10 +72,12 @@ public class SSR2 extends SSR1{
                 output = getNewOutput(trainingSet, output, tr);
             }
 
-            stats.updatePontualError(bestFunction, output);
-            stats.updateIterativeErrors(solution);
-
-            stats.finishIteration();
+            stats.updateOnIteration(solution);
+            
+//            stats.updatePontualError(bestFunction, output);
+//            stats.updateIterativeErrors(solution);
+//
+//            stats.finishIteration();
             currentIteration++;
             mainState.output.close();
         }

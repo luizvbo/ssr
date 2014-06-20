@@ -15,7 +15,7 @@ import ec.EvolutionState;
 import ec.ssr.core.Dataset;
 import ec.ssr.core.Instance;
 import ec.ssr.core.ParallelVersions.SSR7.SSR7;
-import ec.ssr.core.SSR1.Solution;
+import ec.ssr.core.ParallelVersions.SSR1.Solution;
 import ec.ssr.handlers.CrossvalidationHandler;
 import ec.ssr.handlers.DataProducer;
 import ec.ssr.handlers.FileHandler;

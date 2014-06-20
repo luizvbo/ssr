@@ -32,46 +32,48 @@ public class ExecutionStatistics {
         
     ArrayList<Double> generationBestFitness;
     
-    private double iterativeTrainingError[];
-    private double iterativeTestError[];
+    private double trainRMSEperIteration[];
+    private double testRMSEperIteration[];
     private int solutionSize[];
     private double pontualError[][];
     private double bestOfGenError[][];
     private double outputVectors[][];
+    private StringBuilder iterativeSolutions;
     
     private int currentIteration;
     
     public ExecutionStatistics(Dataset trainingSet, Dataset testSet, int numIterations) {  
         trainError = new double[trainingSet.size()][];
         testError = new double[testSet.size()][];
-        iterativeTrainingError = new double[numIterations];
+        trainRMSEperIteration = new double[numIterations];
         outputVectors = new double[numIterations][];
-        iterativeTestError = new double[numIterations];
+        testRMSEperIteration = new double[numIterations];
         solutionSize = new int[numIterations];
         pontualError = new double[numIterations][];
         bestOfGenError = new double[numIterations][];
         generationBestFitness = new ArrayList<Double>();
+        iterativeSolutions = new StringBuilder();
         this.trainingSet = trainingSet;
         this.testSet = testSet;
         currentIteration = 0;
     }
     
-    public void updateIterativeErrors(Function solution){
-        iterativeTrainingError[currentIteration] = getRMSE(solution, trainingSet);
-        iterativeTestError[currentIteration] = getRMSE(solution, testSet);
+    private void updateIterationRMSE(Function solution){
+        trainRMSEperIteration[currentIteration] = getRMSE(solution, trainingSet);
+        testRMSEperIteration[currentIteration] = getRMSE(solution, testSet);
     }
     
     public void updateBestOfGeneration(final EvolutionState state){
         generationBestFitness.add(getGenerationBestFitness(state));
     }
     
-    public void finishIteration(){
+    private void finishIteration(){
         bestOfGenError[currentIteration] = Utils.doubleListToArray(generationBestFitness);
         generationBestFitness.clear();
         currentIteration++;
     }
         
-    public void updateSolutionSize(Function solution) {
+    private void updateSolutionSize(Function solution) {
         this.solutionSize[currentIteration] = solution.getNumNodes();
     }
 
@@ -85,7 +87,7 @@ public class ExecutionStatistics {
         return output.toString();
     }
     
-    public void updatePontualError(Function f, double[] output){
+    private void updatePontualError(Function f, double[] output){
         // numIterations x numInstances
         pontualError[currentIteration] = getIndividualError(f, trainingSet, output);
     }
@@ -183,9 +185,9 @@ public class ExecutionStatistics {
 
     public double[] getErrorPerIterarion(int type) {
         if(type == TEST)
-            return iterativeTestError;
+            return testRMSEperIteration;
         else
-            return iterativeTrainingError;
+            return trainRMSEperIteration;
     }
 
     public double[][] getBestOfGenerationError() {
@@ -196,11 +198,26 @@ public class ExecutionStatistics {
         return pontualError;
     }
 
-    public void updateOutputVectors(double[] output) {
+    private void updateOutputVectors(double[] output) {
         outputVectors[currentIteration] = output;
     }
 
     public double[][] getOutputVectors() {
         return outputVectors;
+    }
+
+    public void updateOnIteration(Function solution) {
+        updateIterationSolution(solution);
+        updateIterationRMSE(solution);
+        updateSolutionSize(solution);
+        finishIteration();
+    }
+
+    private void updateIterationSolution(Function solution) {
+        iterativeSolutions.append(solution.print() + "\n");
+    }
+
+    public String getIterativeSolution() {
+        return iterativeSolutions.toString();
     }
 }

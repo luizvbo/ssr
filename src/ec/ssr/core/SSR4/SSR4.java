@@ -4,6 +4,7 @@
  */
 package ec.ssr.core.SSR4;
 
+import ec.ssr.core.ParallelVersions.SSR4.Solution;
 import ec.EvolutionState;
 import ec.gp.GPIndividual;
 import ec.gp.koza.KozaFitness;

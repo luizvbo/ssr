@@ -42,7 +42,7 @@ public class Solution implements Function{
     @Override
     public String print() {
         if(t2 != null)
-            return tr + "*(" + t1.print() + ")+\n(1-" + tr + ")*(" + t2.print() + ")";
+            return tr + "*(" + t1.print() + ")+(1-" + tr + ")*(" + t2.print() + ")";
         return t1.print();
 //        return tr + "," + t1.print();
         

@@ -168,9 +168,9 @@ public class FileHandler {
         bw.write(stats.getRMSEperIteration(StatisticsHandler.TEST));
         bw.close();
         
-//        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + "trErrorBestOfGen.csv"));
-//        bw.write(stats.getErrorBestOfGeneration());
-//        bw.close();
+        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + "trErrorBestOfGen.csv"));
+        bw.write(stats.getErrorBestOfGeneration());
+        bw.close();
         
         bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + "trErrorPerGeneration.csv"));
         bw.write(stats.getErrorBestOfGeneration());
@@ -291,10 +291,10 @@ public class FileHandler {
         bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + "trErrorPerGeneration.csv"));
         bw.write(getErrorBestOfGeneration(threadsSSR));
         bw.close();
-        
-        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + "trErrorPointPerIt.csv"));
-        bw.write(getErrorPointPerIteration(threadsSSR));
-        bw.close();
+//        
+//        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + "trErrorPointPerIt.csv"));
+//        bw.write(getErrorPointPerIteration(threadsSSR));
+//        bw.close();
         
 //        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + "outputVectors.csv"));
 //        bw.write(getOutputVectors(threadsSSR));
@@ -400,7 +400,7 @@ public class FileHandler {
 
     private static String getErrorBestOfGeneration(SSR[] threadsSSR) {
         StringBuilder outputStr = new StringBuilder();
-        outputStr.append("Sum of squared error (not the mean) of the best individual of each generation (iteration x generation). Relative to the iteration output vector.\n");
+        outputStr.append("RMSE of the best individual of each generation (iteration x generation). Relative to the iteration output vector.\n");
         for (SSR execution : threadsSSR) {
             double[][] bestOfGenError = execution.getStatistics().getBestOfGenerationError();
             for (double[] byIteration : bestOfGenError) {
@@ -424,12 +424,14 @@ public class FileHandler {
         for(SSR execution : threadsSSR){
             double pontualError[][] = execution.getStatistics().getPontualError();
             for(int i = 0; i < pontualError.length; i++){
-                String separator = "";
-                for(int j = 0; j < pontualError[i].length; j++){
-                    outputStr.append(separator + Utils.printDouble(pontualError[i][j], PRECISION));
-                    separator = ",";
+                if(pontualError[i] != null){
+                    String separator = "";
+                    for(int j = 0; j < pontualError[i].length; j++){
+                        outputStr.append(separator + Utils.printDouble(pontualError[i][j], PRECISION));
+                        separator = ",";
+                    }
+                    outputStr.append("\n");
                 }
-                outputStr.append("\n");
             }
             outputStr.append("\n");
         }
@@ -449,7 +451,8 @@ public class FileHandler {
         StringBuilder s_solution = new StringBuilder();
         int execCounter = 1;
         for(SSR execution : threadsSSR){
-            s_solution.append("Execution ").append(execCounter++).append("\n").append(execution.getSolution().print()).append("\n\n");
+//            s_solution.append("Execution ").append(execCounter++).append("\n").append(execution.getSolution().print()).append("\n\n");
+            s_solution.append("Execution ").append(execCounter++).append("\n").append(execution.getStatistics().getIterativeSolution()).append("\n\n");
         }
         return s_solution.toString();
     }

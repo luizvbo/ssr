@@ -49,14 +49,14 @@ public class Solution extends ec.ssr.core.ParallelVersions.SSR1.Solution{
     }
     
     private String unNormalized2String(Function f){
-        return parameters.getStd() + "*(" + f.print() +")+" + parameters.getMean();
+        return parameters.getMean() + "+" + parameters.getStd() + "*(" + f.print() +")" ;
     }
     
     @Override
     public String print() {
         if(t2 != null)
-            return tr + "*("  + unNormalized2String(t1) + ")+\n" + "(1-" + tr + ")*(" + unNormalized2String(t2) + ")";
-        return tr + "*(" + unNormalized2String(t1) + ")";
+            return tr + "*("  + unNormalized2String(t1) + ")+" + "(1-" + tr + ")*(" + unNormalized2String(t2) + ")";
+        return "(" + unNormalized2String(t1) + ")";
         
 //        return "(" + tr + "*" + t1.print() + "+(1-" + tr + ")*" + t2.print() + ")";
     }
