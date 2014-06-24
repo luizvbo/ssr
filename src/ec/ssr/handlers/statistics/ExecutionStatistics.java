@@ -12,6 +12,7 @@ import ec.gp.koza.KozaFitness;
 import ec.ssr.core.Dataset;
 import ec.ssr.core.Instance;
 import ec.ssr.core.Utils;
+import ec.ssr.functions.Div;
 import ec.ssr.functions.Function;
 import java.util.ArrayList;
 
@@ -34,6 +35,7 @@ public class ExecutionStatistics {
     
     private double trainRMSEperIteration[];
     private double testRMSEperIteration[];
+    private int numZeroDiv[];
     private int solutionSize[];
     private double pontualError[][];
     private double bestOfGenError[][];
@@ -49,6 +51,7 @@ public class ExecutionStatistics {
         outputVectors = new double[numIterations][];
         testRMSEperIteration = new double[numIterations];
         solutionSize = new int[numIterations];
+        numZeroDiv = new int[numIterations];
         pontualError = new double[numIterations][];
         bestOfGenError = new double[numIterations][];
         generationBestFitness = new ArrayList<Double>();
@@ -59,7 +62,9 @@ public class ExecutionStatistics {
     }
     
     private void updateIterationRMSE(Function solution){
+        Div.numZeroDiv = 0;
         trainRMSEperIteration[currentIteration] = getRMSE(solution, trainingSet);
+        numZeroDiv[currentIteration] = Div.numZeroDiv;
         testRMSEperIteration[currentIteration] = getRMSE(solution, testSet);
     }
     
@@ -188,6 +193,10 @@ public class ExecutionStatistics {
             return testRMSEperIteration;
         else
             return trainRMSEperIteration;
+    }
+
+    public int[] getNumZeroDiv() {
+        return numZeroDiv;
     }
 
     public double[][] getBestOfGenerationError() {

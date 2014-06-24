@@ -300,6 +300,10 @@ public class FileHandler {
 //        bw.write(getOutputVectors(threadsSSR));
 //        bw.close();
         
+        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + "numZeroDiv.csv"));
+        bw.write(getNumZeroDivIteration(threadsSSR));
+        bw.close();
+        
         bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + "numNodes.csv"));
         bw.write(getNumNodes(threadsSSR));
         bw.close();
@@ -391,6 +395,21 @@ public class FileHandler {
             double[] errorPerIteration = execution.getStatistics().getErrorPerIterarion(type);
             for (int j = 0; j < errorPerIteration.length; j++) {
                 outputStr.append(separator + Utils.printDouble(errorPerIteration[j], PRECISION));
+                separator = ",";
+            }
+            outputStr.append("\n");
+        }
+        return outputStr.toString();
+    }
+    
+    private static String getNumZeroDivIteration(SSR[] threadsSSR) {
+        StringBuilder outputStr = new StringBuilder();
+        outputStr.append("Number of zero divisions during iterations (training only) (execution x iteration)\n");
+        for (SSR execution : threadsSSR) {
+            String separator = "";
+            int[] numZeroDivPerIteration = execution.getStatistics().getNumZeroDiv();
+            for (int j = 0; j < numZeroDivPerIteration.length; j++) {
+                outputStr.append(separator + numZeroDivPerIteration[j]);
                 separator = ",";
             }
             outputStr.append("\n");

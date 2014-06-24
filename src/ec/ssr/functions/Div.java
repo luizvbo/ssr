@@ -60,6 +60,7 @@ public class Div extends GPNode implements Function{
         // evaluate children[1] first to determine if the demoniator is 0
         double denominator = ((Function)children[1]).eval(val);        
         if(denominator == 0.0){
+            numZeroDiv++;
             // the answer is 1.0 since the denominator was 0.0
             return 1.0;
         }

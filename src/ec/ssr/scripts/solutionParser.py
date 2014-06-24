@@ -3,7 +3,7 @@
 Created on Thu Jun 12 14:37:48 2014
 
 @author: luiz
-"""
+pd"""
 import numpy as np
 from pylab import *
 from matplotlib.backends.backend_pdf import PdfPages
@@ -25,6 +25,7 @@ def readSolutionFile(path):
             b_startNewSolution = False
         elif not l.strip() == '':
             newSolution.addNewFunction(l)
+    f.close()
     return solutions
     
 def plotSolution(solutionPath, testPath, trainPath, maxIteration = 0, execution = 0):
@@ -91,3 +92,6 @@ class Solution:
         self.functions.append(str_function)
     def getFunctions(self):
         return self.functions
+        
+#plotSolution('/home/luiz/Dados/Trabalho/Pesquisa/Doutorado/Tese/resultados/testes/2014.06.20/SSR4_keijzer2_200g200p30i4t7dpth', '/home/luiz/Dados/Trabalho/Pesquisa/Doutorado/Tese/dados/keijzer/k2_TrTs/ts.01', '/home/luiz/Dados/Trabalho/Pesquisa/Doutorado/Tese/dados/keijzer/k2_TrTs/tr.01', execution=0)
+

@@ -120,27 +120,22 @@ public class Regression extends GPProblem implements SimpleProblemForm{
 //                final double PROBABLY_ZERO = 1.11E-15;
 //                final double BIG_NUMBER = 1.0e15;  // the same as lilgp uses
 
-                error = Math.abs(output[i] - regressionData.x);
+                error = output[i] - regressionData.x;
+                squaredError = error * error;
                 
-                if (error > Float.MAX_VALUE){   // *NOT* (input.x >= BIG_NUMBER)
-                    squaredError = BIG_NUMBER;
-                }
+//                if (error > Float.MAX_VALUE){   // *NOT* (input.x >= BIG_NUMBER)
+//                    squaredError = BIG_NUMBER;
+//                }
                 // very slight math errors can creep in when evaluating
                 // two equivalent by differently-ordered functions, like
                 // x * (x*x*x + x*x)  vs. x*x*x*x + x*x
-                else if (error < PROBABLY_ZERO){  // slightly off
-                    error = 0.0;
+                if (squaredError < PROBABLY_ZERO){  // slightly off
+//                    error = 0.0;
                     squaredError = 0.0;
                 }
-                else{
-                    squaredError = error * error;
-//                    squaredError = error;
-                }
-                
                 if(Double.isInfinite(squaredError) || Double.isNaN(squaredError) || squaredError >= BIG_NUMBER){
                     overflow = true;
                     hits = 0;
-                    TSE = BIG_NUMBER; 
                 }
                 else{
                     if (error <= hitLevel) hits++;  // whatever!
@@ -150,10 +145,10 @@ public class Regression extends GPProblem implements SimpleProblemForm{
                 
             // the fitness better be KozaFitness!
             KozaFitness f = ((KozaFitness)ind.fitness);            
-            
-//            f.setDoubleFitness(TSE);
-//            f.setStandardizedFitness(state, TSE);
-            f.setStandardizedFitness(state, (float)Math.sqrt(TSE/dataset.size()));
+            if(overflow)
+                f.setStandardizedFitness(state, Float.MAX_VALUE);
+            else
+                f.setStandardizedFitness(state, (float)Math.sqrt(TSE/dataset.size()));
             f.hits = hits;
             ind.evaluated = true;            
         }

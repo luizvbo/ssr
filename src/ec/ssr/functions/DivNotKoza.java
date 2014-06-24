@@ -23,7 +23,7 @@ import ec.gp.*;
  * @version 1.0 
  */
 
-public class DivNotKoza extends GPNode implements Function{
+public class DivNotKoza extends Div implements Function{
     public String toString() { 
         return "%"; 
     }
@@ -44,7 +44,8 @@ public class DivNotKoza extends GPNode implements Function{
         children[1].eval(state,thread,input,stack,individual,problem);
         if (rd.x == 0.0){ 
             // the answer is 1.0 since the denominator was 0.0
-            rd.x = Double.MAX_VALUE;
+//            rd.x = Float.MAX_VALUE;
+            rd.x = Float.NaN;
         }
         else{
             double result;
@@ -60,8 +61,10 @@ public class DivNotKoza extends GPNode implements Function{
         // evaluate children[1] first to determine if the demoniator is 0
         double denominator = ((Function)children[1]).eval(val);        
         if(denominator == 0.0){
+            numZeroDiv++;
             // the answer is 1.0 since the denominator was 0.0
-            return Double.MAX_VALUE;
+            return Float.NaN;
+//            return Float.MAX_VALUE;
         }
         else{
             return ((Function)children[0]).eval(val) / denominator;
