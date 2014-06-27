@@ -13,28 +13,30 @@ gp.fs.size = 1
 gp.fs.0.name = f0
 # O default é 10, mas como não queremos ERC, colocamos 9 operadores
 gp.fs.0.size = 6
-gp.fs.0.func.0 = ec.ssr.functions.Add
+gp.fs.0.func.0 = ec.ssr.functions.AddIA
 gp.fs.0.func.0.nc = nc2
-gp.fs.0.func.1 = ec.ssr.functions.Mul
+gp.fs.0.func.1 = ec.ssr.functions.MulIA
 gp.fs.0.func.1.nc = nc2
-gp.fs.0.func.2 = ec.ssr.functions.Sub
+gp.fs.0.func.2 = ec.ssr.functions.SubIA
 gp.fs.0.func.2.nc = nc2
 gp.fs.0.func.3 = ec.ssr.functions.X001
 gp.fs.0.func.3.nc = nc0
 gp.fs.0.func.4 = ec.ssr.functions.RegERC
 gp.fs.0.func.4.nc = nc0
-gp.fs.0.func.5 = ec.ssr.functions.DivNotKoza
+gp.fs.0.func.5 = ec.ssr.functions.DivIA
 gp.fs.0.func.5.nc = nc2
 
+# Necessary to use Arithmetic Interval
+eval.problem = 							ec.ssr.problems.RegressionIA
 
 # Default = 1024
-generations =				200
+generations =							100
 
-pop.subpop.0.size =                     200
+pop.subpop.0.size =                     100
 
 # Default = 7 
 # 1024/7, 500/5, 200/4, 100/3
-select.tournament.size =                4
+select.tournament.size =                3
 
 # Max depth during mutation and crossover operations
 gp.koza.mutate.maxdepth =  		7

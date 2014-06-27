@@ -9,6 +9,8 @@ package ec.ssr.functions;
 import ec.*;
 import ec.app.regression.*;
 import ec.gp.*;
+import ec.ssr.core.Bounds;
+import ec.ssr.core.Utils;
 
 /* 
  * Mul.java
@@ -22,15 +24,8 @@ import ec.gp.*;
  * @version 1.0 
  */
 
-public class Mul extends GPNode implements Function{
-    private static final int EXPECTED_CHILDREN = 2;
+public class MulIA extends Mul implements FunctionIA{
     
-    public String toString() { 
-        return "*"; 
-    }
-    
-    public int expectedChildren() { return 2; }
-
     public void eval(final EvolutionState state,
                      final int thread, 
                      final GPData input,
@@ -38,31 +33,32 @@ public class Mul extends GPNode implements Function{
                      final GPIndividual individual, 
                      final Problem problem){
         
-        double result;
         RegressionData rd = ((RegressionData)(input));
-
+        
+        double result;
         children[0].eval(state,thread,input,stack,individual,problem);
         result = rd.x;
-
+        
         // can't shortcut because of NaN or +-Infinity
-
         children[1].eval(state,thread,input,stack,individual,problem);
         rd.x = result * rd.x;
     }
     
     @Override
-    public double eval(double[] val) {
-        return ((Function)children[0]).eval(val) * ((Function)children[1]).eval(val);
-    }
-    
-    @Override
-    public String print() {
-        return "(" + ((Function)children[0]).print() + "*" + ((Function)children[1]).print() + ")";
-    }
-
-    @Override
-    public int getNumNodes() {
-        return numNodes(GPNode.NODESEARCH_ALL);
+    public Bounds getBounds(Bounds[] bounds) {
+        Bounds newBounds = Bounds.createNaNBounds();
+        Bounds firstTerm = ((FunctionIA)children[0]).getBounds(bounds);
+        if(firstTerm.isInsideBounds()){
+            Bounds secondTerm = ((FunctionIA)children[1]).getBounds(bounds);
+            if(secondTerm.isInsideBounds()){
+                double ll = firstTerm.lowerBound * secondTerm.lowerBound;
+                double lu = firstTerm.lowerBound * secondTerm.upperBound;
+                double ul = firstTerm.upperBound * secondTerm.lowerBound;
+                double uu = firstTerm.upperBound * secondTerm.upperBound;
+                return Utils.getBounds(ll, lu, ul, uu);
+            }
+        }
+        return newBounds;
     }
 }
 

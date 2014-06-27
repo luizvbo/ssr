@@ -11,6 +11,7 @@ import ec.EvolutionState;
 import ec.Problem;
 import ec.app.regression.RegressionData;
 import ec.gp.*;
+import ec.ssr.core.Bounds;
 import ec.util.*;
 import java.io.*;
 
@@ -27,7 +28,7 @@ import java.io.*;
  * @version 1.0 
  */
 
-public class RegERC extends ERC implements Function {
+public class RegERC extends ERC implements Function, FunctionIA {
     public double value;
 
     // Koza claimed to be generating from [-1.0, 1.0] but he wasn't,
@@ -124,5 +125,11 @@ public class RegERC extends ERC implements Function {
     @Override
     public int getNumNodes() {
         return numNodes(GPNode.NODESEARCH_ALL);
+    }
+
+    @Override
+    public Bounds getBounds(Bounds[] bounds) {
+        Bounds newBounds = new Bounds(value, value);
+        return newBounds;
     }
 }

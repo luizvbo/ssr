@@ -25,7 +25,15 @@ import java.util.Arrays;
  * @author luiz
  */
 public class SSR4 extends SSR3{
-    public SSR4(Dataset trainingSet, Dataset testSet, String outputPath, String outputPrefix, int numIterations, int numExecutions, double hitLevel, String parameterFilePath) throws NullPointerException, FileNotFoundException, IOException, Exception {
+    public SSR4(Dataset trainingSet, 
+                Dataset testSet, 
+                String outputPath, 
+                String outputPrefix,
+                int numIterations, 
+                int numExecutions, 
+                double hitLevel, 
+                String parameterFilePath) throws NullPointerException, FileNotFoundException, IOException, Exception {
+        
         super(trainingSet, testSet, outputPath, outputPrefix, numIterations, numExecutions, hitLevel, parameterFilePath);
     }
  
@@ -45,7 +53,6 @@ public class SSR4 extends SSR3{
             ((Regression)mainState.evaluator.p_problem).setHitLevel(hitLevel);
             ((Regression)mainState.evaluator.p_problem).setOutput(normalizedOutput);
             int result = EvolutionState.R_NOTDONE;
-            double[] lastOutput = output;            
             // Generations
             while(result == EvolutionState.R_NOTDONE ){
                 result = mainState.evolve();

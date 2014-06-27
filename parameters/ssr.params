@@ -21,15 +21,14 @@ pop.subpop.0.species.pipe.source.1.prob = 0.3
 #
 # We specify our problem here
 #
-eval.problem.data = ec.app.regression.RegressionData
+eval.problem.data = 					ec.app.regression.RegressionData
+eval.problem = 							ec.ssr.problems.Regression
 
 gp.tree.print-style = c
 #Para imprimir em .dot para visualizar no GraphViz
 #gp.tree.print-style = dot
 
 stat.gather-full = true
-
-eval.problem = ec.ssr.problems.Regression
 
 ### Don't show best individual information on screen
 stat.do-message = 						false

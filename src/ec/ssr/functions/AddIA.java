@@ -14,6 +14,8 @@ import ec.gp.ADFStack;
 import ec.gp.GPData;
 import ec.gp.GPIndividual;
 import ec.gp.GPNode;
+import ec.ssr.core.Bounds;
+import ec.ssr.problems.Regression;
 
 
 /* 
@@ -28,16 +30,7 @@ import ec.gp.GPNode;
  * @version 1.0 
  */
 
-public class Add extends GPNode implements Function{
-    
-    public String toString() {
-        return "+"; 
-    }
-
-    public int expectedChildren() { 
-        return 2; 
-    }
-
+public class AddIA extends Add implements FunctionIA{
 
     public void eval(final EvolutionState state,
                      final int thread,
@@ -46,9 +39,8 @@ public class Add extends GPNode implements Function{
                      final GPIndividual individual,
                      final Problem problem){
         
-        double result;
         RegressionData rd = ((RegressionData)(input));
-
+        double result;
         children[0].eval(state, thread, input, stack, individual, problem);
         result = rd.x;
 
@@ -57,18 +49,17 @@ public class Add extends GPNode implements Function{
     }
 
     @Override
-    public double eval(double[] val) {
-        return ((Function)children[0]).eval(val) + ((Function)children[1]).eval(val);
-    }
-
-    @Override
-    public String print() {
-        return "(" + ((Function)children[0]).print() + "+" + ((Function)children[1]).print() + ")";
-    }
-    
-    @Override
-    public int getNumNodes() {
-        return numNodes(GPNode.NODESEARCH_ALL);
+    public Bounds getBounds(Bounds[] bounds) {
+        Bounds newBounds = Bounds.createNaNBounds();
+        Bounds firstTerm = ((FunctionIA)children[0]).getBounds(bounds);
+        if(firstTerm.isInsideBounds()){
+            Bounds secondTerm = ((FunctionIA)children[1]).getBounds(bounds);
+            if(secondTerm.isInsideBounds()){
+                newBounds.lowerBound = firstTerm.lowerBound + secondTerm.lowerBound;
+                newBounds.upperBound = firstTerm.upperBound + secondTerm.upperBound;
+            }
+        }
+        return newBounds;
     }
 }
 

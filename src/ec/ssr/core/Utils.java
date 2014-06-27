@@ -75,4 +75,38 @@ public class Utils {
         }
         return Math.sqrt(sum/(data.length-1));
     }
+    
+    /**
+     * Returns the max and min value four inputs
+     * @param a Input
+     * @param b Input
+     * @param c Input
+     * @param d Input
+     * @return The max and min values as upper and lower bounds
+     */
+    public static Bounds getBounds(double a, double b, double c, double d){
+        Bounds bounds = new Bounds();
+        Bounds auxBounds = new Bounds();
+        if(a > b){
+            bounds.lowerBound = b;
+            bounds.upperBound = a;
+        }
+        else{   
+            bounds.lowerBound = a;
+            bounds.upperBound = b;
+        }
+        if(c > d){
+            auxBounds.lowerBound = d;
+            auxBounds.upperBound = c;
+        }
+        else{
+            auxBounds.lowerBound = c;
+            auxBounds.upperBound = d;
+        }
+        if(auxBounds.upperBound > bounds.upperBound)
+            bounds.upperBound = auxBounds.upperBound;
+        if(auxBounds.lowerBound < bounds.lowerBound)
+            bounds.lowerBound = auxBounds.lowerBound;
+        return bounds;
+    }
 }

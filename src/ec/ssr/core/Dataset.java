@@ -14,6 +14,9 @@ public class Dataset {
     /** ID conouter. Used to generate exclusive IDs. */
     private int IDCounter;
     
+    /** Lower and upper bounds of each input variable. */
+    private Bounds[] bounds;
+    
     /** Array of instances. */
     public ArrayList<Instance> data;
 
@@ -48,7 +51,7 @@ public class Dataset {
      * @param input Instance input
      * @param output Instance output
      */
-    public void add(double[] input, Double output) {
+    public void add(double[] input, Double output){
         Instance newInstance = new Instance(input, output, IDCounter++);
         data.add(newInstance);
     }
@@ -114,5 +117,36 @@ public class Dataset {
             separator = ",";
         }
         return ids.toString();
+    }
+
+    public Bounds[] getBounds() {
+        if(bounds == null){
+            setBounds(data);
+        }
+        return bounds;
+    }
+    
+    public void setBounds(ArrayList<Instance> data) {
+        if(data != null){
+            if(!data.isEmpty()){
+                initializeBounds(data.get(0).input.length);
+                for(Instance instance : data){
+                    double[] input = instance.input;
+                    for(int i = 0; i < input.length; i++){
+                        if(input[i] < bounds[i].lowerBound)
+                            bounds[i].lowerBound = input[i];
+                        if(input[i] > bounds[i].upperBound)
+                            bounds[i].upperBound = input[i];
+                    }
+                }
+            }
+        }
+    }
+    
+    private void initializeBounds(int inputSize) {
+        bounds = new Bounds[inputSize];
+        for(int i = 0; i < inputSize; i++){
+            bounds[i] = new Bounds();
+        }
     }
 }
