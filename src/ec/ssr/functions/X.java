@@ -11,6 +11,7 @@ import ec.*;
 import ec.app.regression.RegressionData;
 import ec.ssr.problems.Regression;
 import ec.gp.*;
+import ec.ssr.core.Bounds;
 
 /* 
  * X.java
@@ -24,7 +25,7 @@ import ec.gp.*;
  * @version 1.0 
  */
 
-public abstract class X extends GPNode implements Function{ 
+public abstract class X extends GPNode implements Function, FunctionIA{ 
     public abstract String getVariableName();
     
     public abstract int getInputIndex();
@@ -53,6 +54,11 @@ public abstract class X extends GPNode implements Function{
     @Override
     public double eval(double[] x){
         return x[getInputIndex()];
+    }
+    
+    @Override
+    public Bounds getBounds(Bounds bounds[]) {
+        return bounds[getInputIndex()];
     }
 
     @Override

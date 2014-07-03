@@ -6,7 +6,7 @@
 
 package ec.ssr.core.ParallelVersions.SSR4;
 
-import ec.ssr.core.SSR2.NormalizationParameters;
+import ec.ssr.core.ParallelVersions.SSR2.NormalizationParameters;
 import ec.ssr.functions.Function;
 
 /**

@@ -62,10 +62,10 @@ public class ExecutionStatistics {
     }
     
     private void updateIterationRMSE(Function solution){
-        Div.numZeroDiv = 0;
         trainRMSEperIteration[currentIteration] = getRMSE(solution, trainingSet);
-        numZeroDiv[currentIteration] = Div.numZeroDiv;
+        Div.numZeroDiv = 0;
         testRMSEperIteration[currentIteration] = getRMSE(solution, testSet);
+        numZeroDiv[currentIteration] = Div.numZeroDiv;
     }
     
     public void updateBestOfGeneration(final EvolutionState state){

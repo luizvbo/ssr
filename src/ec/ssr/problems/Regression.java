@@ -78,6 +78,7 @@ public class Regression extends GPProblem implements SimpleProblemForm{
     
     /**
      * Sets the dataset used during training
+     * @param dataset Training data
      */
     public void setDataset(Dataset dataset){
         this.dataset = dataset;
@@ -113,24 +114,13 @@ public class Regression extends GPProblem implements SimpleProblemForm{
                 // NaN, we're CAREFULLY wording our cutoff to include NaN.
                 // Interesting that this has never been reported before to
                 // my knowledge.
-
-                
                 final double PROBABLY_ZERO = 1.4e-45;
                 final double BIG_NUMBER = 3.4e+38;
-//                final double PROBABLY_ZERO = 1.11E-15;
-//                final double BIG_NUMBER = 1.0e15;  // the same as lilgp uses
 
                 error = output[i] - regressionData.x;
                 squaredError = error * error;
                 
-//                if (error > Float.MAX_VALUE){   // *NOT* (input.x >= BIG_NUMBER)
-//                    squaredError = BIG_NUMBER;
-//                }
-                // very slight math errors can creep in when evaluating
-                // two equivalent by differently-ordered functions, like
-                // x * (x*x*x + x*x)  vs. x*x*x*x + x*x
                 if (squaredError < PROBABLY_ZERO){  // slightly off
-//                    error = 0.0;
                     squaredError = 0.0;
                 }
                 if(Double.isInfinite(squaredError) || Double.isNaN(squaredError) || squaredError >= BIG_NUMBER){
@@ -153,42 +143,4 @@ public class Regression extends GPProblem implements SimpleProblemForm{
             ind.evaluated = true;            
         }
     }
-
-    /**
-     * During this step, double fitness are normalized to [0,1] and stored as a float
-     */
-//    @Override
-//    public void finishEvaluating(EvolutionState state, int threadnum) {
-////        double smallestFitness = Double.POSITIVE_INFINITY;
-//        double biggestFitness = Double.NEGATIVE_INFINITY;
-//        for(Individual ind : state.population.subpops[0].individuals){
-//            ind.evaluated = false;
-////            if(((DoubleKozaFitness)ind.fitness).getDoubleFitness() < smallestFitness){
-////                smallestFitness = ((DoubleKozaFitness)ind.fitness).getDoubleFitness();
-////            }
-//            if(((DoubleKozaFitness)ind.fitness).getDoubleFitness() > biggestFitness){
-//                biggestFitness = ((DoubleKozaFitness)ind.fitness).getDoubleFitness();
-//            }
-//        }  
-//        
-////        double middleTerm = (biggestFitness + smallestFitness)/2;
-//        
-//        biggestFitness+=1;
-//        
-//        // Normalize the error and calculate the finess of each individual
-//        for(Individual ind : state.population.subpops[0].individuals){
-//            double d_fitness = ((DoubleKozaFitness)ind.fitness).getDoubleFitness();
-//            
-//            float normalizedFitness = (float)(d_fitness/biggestFitness);
-//            
-//            float _f = normalizedFitness;
-//            if(_f < 0.0f || _f == Float.POSITIVE_INFINITY || Float.isNaN(_f)){
-//                int x = 0;
-//            }
-//                
-////            float normalizedFitness = (float)(d_fitness/biggestFitness);
-//            ((DoubleKozaFitness)ind.fitness).setStandardizedFitness(state, normalizedFitness);
-//            
-//        }      
-//    }
 }

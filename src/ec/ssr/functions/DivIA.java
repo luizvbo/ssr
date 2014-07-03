@@ -40,14 +40,15 @@ public class DivIA extends Div implements FunctionIA{
         // evaluate children[1] first to determine if the demoniator is 0
         children[1].eval(state,thread,input,stack,individual,problem);
         result = rd.x;
-
+            
         children[0].eval(state,thread,input,stack,individual,problem);
         rd.x = rd.x / result;
     }
     
     @Override
     public double eval(double val[]) {
-        double denominator = ((Function)children[1]).eval(val);        
+        double denominator = ((Function)children[1]).eval(val);      
+        if(denominator == 0) numZeroDiv++;
         return ((Function)children[0]).eval(val) / denominator;
     }
 

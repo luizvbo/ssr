@@ -12,8 +12,6 @@ import ec.gp.GPIndividual;
 import ec.gp.koza.KozaFitness;
 import ec.simple.SimpleStatistics;
 import ec.ssr.core.Dataset;
-import ec.ssr.core.SSR2.NormalizationParameters;
-import ec.ssr.core.SSR2.NormalizedFunction;
 import ec.ssr.functions.Function;
 import ec.ssr.problems.Regression;
 import java.io.FileNotFoundException;

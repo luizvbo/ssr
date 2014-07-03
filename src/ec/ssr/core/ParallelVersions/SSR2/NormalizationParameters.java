@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package ec.ssr.core.SSR2;
+package ec.ssr.core.ParallelVersions.SSR2;
 
 /**
  *
