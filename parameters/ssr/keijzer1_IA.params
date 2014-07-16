@@ -1,0 +1,21 @@
+parent.0 = ../keijzer1.params
+
+# Function set for interval arithmetic
+gp.fs.0.func.2 = ec.ssr.functions.SubIA
+gp.fs.0.func.2.nc = nc2
+gp.fs.0.func.3 = ec.ssr.functions.AddIA
+gp.fs.0.func.3.nc = nc2
+gp.fs.0.func.4 = ec.ssr.functions.MulIA
+gp.fs.0.func.4.nc = nc2
+gp.fs.0.func.5 = ec.ssr.functions.DivIA
+gp.fs.0.func.5.nc = nc2
+
+# Necessary to use Arithmetic Interval
+eval.problem = 							ec.ssr.problems.RegressionIA
+
+# Default = 1024
+generations =							100
+pop.subpop.0.size =                     100
+
+# 1024/7, 500/5, 200/4, 100/3
+select.tournament.size =                3

@@ -1,0 +1,21 @@
+parent.0 = ../vladis_korns5.params
+
+
+gp.fs.0.func.6 = ec.ssr.functions.MulIA
+gp.fs.0.func.6.nc = nc2
+gp.fs.0.func.7 = ec.ssr.functions.SubIA
+gp.fs.0.func.7.nc = nc2
+gp.fs.0.func.8 = ec.ssr.functions.AddIA
+gp.fs.0.func.8.nc = nc2
+gp.fs.0.func.9 = ec.ssr.functions.DivIA
+gp.fs.0.func.9.nc = nc2
+
+# Necessary to use Arithmetic Interval
+eval.problem = 					ec.ssr.problems.RegressionIA
+
+# Default = 1024
+generations =					200
+pop.subpop.0.size =				200
+
+# 1024/7, 500/5, 200/4, 100/3
+elect.tournament.size =			4

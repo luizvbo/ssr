@@ -42,6 +42,9 @@ public class ExecutionStatistics {
     private double outputVectors[][];
     private StringBuilder iterativeSolutions;
     
+    public double nEval[];
+    public double nOverFlow[];
+    
     private int currentIteration;
     
     public ExecutionStatistics(Dataset trainingSet, Dataset testSet, int numIterations) {  
@@ -59,6 +62,9 @@ public class ExecutionStatistics {
         this.trainingSet = trainingSet;
         this.testSet = testSet;
         currentIteration = 0;
+        
+        nOverFlow = new double[numIterations];
+        nEval = new double[numIterations];
     }
     
     private void updateIterationRMSE(Function solution){
@@ -221,6 +227,14 @@ public class ExecutionStatistics {
         updateSolutionSize(solution);
         finishIteration();
     }
+    
+    public void updateOnIteration(Function solution, double[] output) {
+        updateIterationSolution(solution);
+        updateIterationRMSE(solution);
+        updateSolutionSize(solution);
+        updateOutputVectors(output);
+        finishIteration();
+    }
 
     private void updateIterationSolution(Function solution) {
         iterativeSolutions.append(solution.print() + "\n");
@@ -228,5 +242,10 @@ public class ExecutionStatistics {
 
     public String getIterativeSolution() {
         return iterativeSolutions.toString();
+    }
+
+    public void updateNumberOverflowEval(int nOverflow, int nEval) {
+        this.nOverFlow[currentIteration] = nOverflow;
+        this.nEval[currentIteration] = nEval;
     }
 }

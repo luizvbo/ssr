@@ -10,6 +10,7 @@ package ec.ssr.functions;
 import ec.*;
 import ec.app.regression.RegressionData;
 import ec.gp.*;
+import ec.ssr.core.Bounds;
 
 /* 
  * Cos.java
@@ -23,7 +24,7 @@ import ec.gp.*;
  * @version 1.0 
  */
 
-public class Cos extends GPNode implements Function{
+public class Cos extends GPNode implements FunctionIA{
     public String toString() {
         return "cos"; 
     }
@@ -57,6 +58,23 @@ public class Cos extends GPNode implements Function{
     @Override
     public int getNumNodes() {
         return numNodes(GPNode.NODESEARCH_ALL);
+    }
+
+    @Override
+    public Bounds getBounds(Bounds[] bounds) {
+        Bounds newBounds = new Bounds(-1, 1);
+        Bounds inputBounds = ((FunctionIA)children[0]).getBounds(bounds);
+        if(inputBounds.isInsideBounds()){
+            if(Math.abs(inputBounds.lowerBound - inputBounds.upperBound) < 2*Math.PI ){
+                double lb = Math.cos(inputBounds.lowerBound);
+                double ub = Math.cos(inputBounds.upperBound);
+                if(lb > ub)
+                    newBounds.setBounds(ub, lb);
+                else
+                    newBounds.setBounds(lb, ub);
+            }
+        }
+        return newBounds;
     }
 }
 

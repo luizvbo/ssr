@@ -10,6 +10,7 @@ import ec.ssr.core.Dataset;
 import ec.ssr.core.Instance;
 import ec.ssr.functions.Function;
 import java.util.ArrayList;
+import java.util.Arrays;
 import org.apache.commons.math3.linear.SingularMatrixException;
 import org.apache.commons.math3.stat.regression.OLSMultipleLinearRegression;
 
@@ -66,12 +67,13 @@ public class Solution implements Function{
         }
         regression.newSampleData(y, x);
         try{
-            coefficients = regression.estimateRegressionParameters();
+            coefficients = regression.estimateRegressionParameters();            
             error = regression.estimateResiduals();
         }
         catch(SingularMatrixException e){
-            coefficients = new double[functions.size()+1];
-            for(i = 0; i < coefficients.length; i++) coefficients[i] = 1;
+//            coefficients = new double[functions.size()+1];
+//            for(i = 0; i < coefficients.length; i++) coefficients[i] = 1;
+            coefficients = Arrays.copyOf(coefficients, coefficients.length+1);
             error = new double[training.size()];
             i = 0;
             for(Instance instance : training.data){

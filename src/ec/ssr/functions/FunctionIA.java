@@ -12,6 +12,6 @@ import ec.ssr.core.Bounds;
  *
  * @author luiz
  */
-public interface FunctionIA {
+public interface FunctionIA extends Function{
     public Bounds getBounds(Bounds[] bounds); 
 }

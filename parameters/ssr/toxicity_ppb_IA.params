@@ -1,0 +1,20 @@
+parent.0 = ../toxicity_ppb.params
+
+gp.fs.0.func.627 = ec.ssr.functions.MulIA
+gp.fs.0.func.627.nc = nc2
+gp.fs.0.func.628 = ec.ssr.functions.SubIA
+gp.fs.0.func.628.nc = nc2
+gp.fs.0.func.629 = ec.ssr.functions.AddIA
+gp.fs.0.func.629.nc = nc2
+gp.fs.0.func.630 = ec.ssr.functions.DivIA
+gp.fs.0.func.630.nc = nc2
+
+# Necessary to use Arithmetic Interval
+eval.problem = 					ec.ssr.problems.RegressionIA
+
+# Default = 1024
+generations =					200
+pop.subpop.0.size =				200
+
+# 1024/7, 500/5, 200/4, 100/3
+elect.tournament.size =			4

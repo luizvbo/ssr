@@ -11,6 +11,7 @@ import ec.*;
 import ec.app.regression.RegressionData;
 import ec.ssr.problems.Regression;
 import ec.gp.*;
+import ec.ssr.core.Bounds;
 
 /* 
  * Sin.java
@@ -24,7 +25,7 @@ import ec.gp.*;
  * @version 1.0 
  */
 
-public class Sin extends GPNode implements Function{
+public class Sin extends GPNode implements FunctionIA{
     public String toString() { 
         return "sin"; 
     }
@@ -60,5 +61,22 @@ public class Sin extends GPNode implements Function{
     @Override
     public int getNumNodes() {
         return numNodes(GPNode.NODESEARCH_ALL);
+    }
+    
+    @Override
+    public Bounds getBounds(Bounds[] bounds) {
+        Bounds newBounds = new Bounds(-1, 1);
+        Bounds inputBounds = ((FunctionIA)children[0]).getBounds(bounds);
+        if(inputBounds.isInsideBounds()){
+            if(Math.abs(inputBounds.lowerBound - inputBounds.upperBound) < 2*Math.PI ){
+                double a = Math.sin(inputBounds.lowerBound);
+                double b = Math.sin(inputBounds.upperBound);
+                if(a > b)
+                    newBounds.setBounds(b, a);
+                else
+                    newBounds.setBounds(a, b);
+            }
+        }
+        return newBounds;
     }
 }

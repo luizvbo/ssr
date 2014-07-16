@@ -16,6 +16,7 @@ import ec.ssr.core.ParallelVersions.SSR2.NormalizationParameters;
 import ec.ssr.core.ParallelVersions.SSR2.NormalizedFunction;
 import ec.ssr.functions.Function;
 import ec.ssr.problems.Regression;
+import ec.ssr.problems.RegressionIA;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
@@ -58,7 +59,7 @@ public class SSR4 extends SSR3{
                 result = mainState.evolve();
                 // Store the best fitness of generation
                 stats.updateBestOfGeneration(mainState);
-            }                                                        
+            }     
             GPIndividual bestSoFar = (GPIndividual)((SimpleStatistics)mainState.statistics).getBestSoFar()[0];
             KozaFitness fitness = (KozaFitness)bestSoFar.fitness;
             Function bestFunction =  (Function)bestSoFar.trees[0].child;
@@ -73,8 +74,9 @@ public class SSR4 extends SSR3{
                 output = getNewOutput(trainingSet, normalizedOutput, tr);
             }
             
+           stats.updateNumberOverflowEval(((RegressionIA)mainState.evaluator.p_problem).nOverflow, ((RegressionIA)mainState.evaluator.p_problem).nEval);
             
-            stats.updateOnIteration(solution);
+            stats.updateOnIteration(solution, normalizedOutput);
 //            stats.updatePontualError(bestFunction, lastOutput);
 //            stats.updateIterativeErrors(solution);
 //            stats.updateOutputVectors(lastOutput);

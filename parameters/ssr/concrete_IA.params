@@ -1,0 +1,22 @@
+parent.0 = ../concrete.params
+
+gp.fs.0.func.9 = ec.ssr.functions.MulIA
+gp.fs.0.func.9.nc = nc2
+gp.fs.0.func.10 = ec.ssr.functions.SubIA
+gp.fs.0.func.10.nc = nc2
+gp.fs.0.func.11 = ec.ssr.functions.AddIA
+gp.fs.0.func.11.nc = nc2
+gp.fs.0.func.12 = ec.ssr.functions.DivIA
+gp.fs.0.func.12.nc = nc2
+#gp.fs.0.func.12 = ec.ssr.functions.DivKeijzer
+#gp.fs.0.func.12.nc = nc1
+
+# Necessary to use Arithmetic Interval
+eval.problem = 					ec.ssr.problems.RegressionIA
+
+# Default = 1024
+generations =					25
+pop.subpop.0.size =				400
+
+# 1024/7, 800/6, 500/5, 200/4, 100/3
+elect.tournament.size =			5

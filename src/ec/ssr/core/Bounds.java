@@ -40,4 +40,9 @@ public class Bounds {
         if(!(Math.abs(lowerBound) < Double.MAX_VALUE)) return false;
         return true;
     }
+    
+    public void setBounds(double lowerBound, double upperBound){
+        this.upperBound = upperBound;
+        this.lowerBound = lowerBound;
+    }
 }

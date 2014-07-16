@@ -1,13 +1,4 @@
-# Copyright 2006 by Sean Luke and George Mason University
-# Licensed under the Academic Free License version 3.0
-# See the file "LICENSE" for more information
 parent.0 = ssr.params
-
-
-# Stolen from koza/params -- overwriting just
-# a little for readability
-# You need to create at least one function set, 
-# called "f0", which your first tree will use.  
 
 gp.fs.size = 1
 gp.fs.0.name = f0
@@ -495,25 +486,20 @@ gp.fs.0.func.239 = ec.ssr.functions.X240
 gp.fs.0.func.239.nc = nc0
 gp.fs.0.func.240 = ec.ssr.functions.X241
 gp.fs.0.func.240.nc = nc0
-gp.fs.0.func.241 = ec.ssr.functions.Add
-gp.fs.0.func.241.nc = nc2
+gp.fs.0.func.241 = ec.ssr.functions.RegERC
+gp.fs.0.func.241.nc = nc0
 gp.fs.0.func.242 = ec.ssr.functions.Mul
 gp.fs.0.func.242.nc = nc2
 gp.fs.0.func.243 = ec.ssr.functions.Sub
 gp.fs.0.func.243.nc = nc2
 gp.fs.0.func.244 = ec.ssr.functions.Div
 gp.fs.0.func.244.nc = nc2
-gp.fs.0.func.245 = ec.ssr.functions.RegERC
-gp.fs.0.func.245.nc = nc0
-
-# Max depth during mutation and crossover operations
-gp.koza.mutate.maxdepth = 30
-gp.koza.xover.maxdepth = 30
+gp.fs.0.func.245 = ec.ssr.functions.Add
+gp.fs.0.func.245.nc = nc2
 
 # Default = 1024
-generations =							100
-pop.subpop.0.size =                     100
+generations =					200
+pop.subpop.0.size =				200
 
-# Default = 7 
-# 1024/7, 500/5
-elect.tournament.size =					3
+# 1024/7, 500/5, 200/4, 100/3
+elect.tournament.size =			4
