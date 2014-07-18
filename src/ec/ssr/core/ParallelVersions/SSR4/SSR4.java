@@ -73,9 +73,7 @@ public class SSR4 extends SSR3{
                 addFunctionToSolution(bestFunction, tr, normParameters);
                 output = getNewOutput(trainingSet, normalizedOutput, tr);
             }
-            
-           stats.updateNumberOverflowEval(((RegressionIA)mainState.evaluator.p_problem).nOverflow, ((RegressionIA)mainState.evaluator.p_problem).nEval);
-            
+                        
             stats.updateOnIteration(solution, normalizedOutput);
 //            stats.updatePontualError(bestFunction, lastOutput);
 //            stats.updateIterativeErrors(solution);

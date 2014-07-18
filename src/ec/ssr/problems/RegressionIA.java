@@ -20,26 +20,11 @@ import ec.ssr.functions.FunctionIA;
  * @author luiz
  */
 public class RegressionIA extends Regression{
-    public int nOverflow;
-    public int nEval;
     
     @Override
     public void setOutput(double[] output){
         this.output = output;
-        
-        nOverflow = 0;
-        nEval = 0;
-    }
-
-    @Override
-    public Object clone() {
-        Object o = super.clone();
-        ((RegressionIA)o).nEval = nEval;
-        ((RegressionIA)o).nOverflow = nOverflow;
-        return o;
-    }
-    
-    
+    }   
     
     @Override
     public void evaluate(final EvolutionState state, final Individual ind, final int subpopulation, final int threadnum){
@@ -88,13 +73,7 @@ public class RegressionIA extends Regression{
             }
             else{
                 overflow = true;
-                
-                nOverflow++;
-              
-            }
-            
-            nEval++;
-            
+            }            
             // the fitness better be KozaFitness!
             KozaFitness f = ((KozaFitness)ind.fitness);
             if(overflow)

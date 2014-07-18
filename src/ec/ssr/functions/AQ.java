@@ -42,18 +42,17 @@ public class AQ extends GPNode implements Function{
 
         // evaluate children[1] first to determine if the demoniator is 0
         children[0].eval(state,thread,input,stack,individual,problem);
-        double result;
-        result = rd.x;
+        double denominator = rd.x;
 
         children[1].eval(state,thread,input,stack,individual,problem);
-        rd.x = result / Math.sqrt(1+(rd.x*rd.x));
+        rd.x = denominator / Math.sqrt(1+(rd.x*rd.x));
     }
 
     @Override
     public double eval(double val[]) {
         // evaluate children[1] first to determine if the demoniator is 0
-        double den = ((Function)children[1]).eval(val);        
-        return ((Function)children[0]).eval(val) / Math.sqrt(1+(den*den));
+        double denominator = ((Function)children[1]).eval(val);        
+        return ((Function)children[0]).eval(val) / Math.sqrt(1+(denominator*denominator));
     }
 
     @Override

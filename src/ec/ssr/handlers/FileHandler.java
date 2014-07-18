@@ -291,13 +291,6 @@ public class FileHandler {
         bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + "trErrorPerGeneration.csv"));
         bw.write(getErrorBestOfGeneration(threadsSSR));
         bw.close();
-        
-        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + "nOverflow.csv"));
-        bw.write(getNumberOverflowEval(threadsSSR, true));
-        bw.close();
-        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + "nEval.csv"));
-        bw.write(getNumberOverflowEval(threadsSSR, false));
-        bw.close();
 //        
 //        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ "/" + "trErrorPointPerIt.csv"));
 //        bw.write(getErrorPointPerIteration(threadsSSR));
@@ -505,22 +498,6 @@ public class FileHandler {
         StringBuilder outputStr = new StringBuilder("Number of nodes (per execution) \n");
         for(SSR algorithm : threadsSSR){
             outputStr.append(algorithm.getStatistics().getSolutionSizeAsString());
-            outputStr.append("\n");
-        }
-        return outputStr.toString();
-    }
-
-    private static String getNumberOverflowEval(SSR[] threadsSSR, boolean isOverflow) {
-        StringBuilder outputStr = new StringBuilder("Number of eval/overflow \n");
-        for(SSR algorithm : threadsSSR){
-            String sep = "";
-            for(int i = 0; i < algorithm.getStatistics().nOverFlow.length; i++){
-                if(isOverflow)
-                    outputStr.append(sep + algorithm.getStatistics().nOverFlow[i]);
-                else
-                    outputStr.append(sep + algorithm.getStatistics().nEval[i]);
-                sep = ",";
-            }
             outputStr.append("\n");
         }
         return outputStr.toString();
