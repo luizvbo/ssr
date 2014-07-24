@@ -17,6 +17,7 @@ import ec.ssr.handlers.statistics.ExecutionStatistics;
 import ec.util.Output;
 import ec.util.ParameterDatabase;
 import java.io.File;
+import java.util.ArrayList;
 
 /**
  *
@@ -43,7 +44,8 @@ public abstract class SSR extends Thread{
                int numIterations, 
                int numExecutions,
                double hitLevel, 
-               String parameterFilePath) throws Exception{
+               String parameterFilePath,
+               ArrayList inputParameters) throws Exception{
         this.trainingSet = trainingSet;
         this.testSet = testSet;
         this.outputPath = outputPath;
@@ -56,10 +58,22 @@ public abstract class SSR extends Thread{
         mainOutput.getLog(0).appendOnRestart = true;
         
         File parameterFile = new File(parameterFilePath);
-        ParameterDatabase dbase = new ParameterDatabase(parameterFile);
+        String[] args = getParameterArgsFromArray(inputParameters);
+        ParameterDatabase dbase = new ParameterDatabase(parameterFile, args);
         mainState = Evolve.initialize(dbase, 0, mainOutput);
         
+        
         stats = new ExecutionStatistics(trainingSet, testSet, numIterations);
+    }
+    
+    private String[] getParameterArgsFromArray(ArrayList<String> inputParameters){
+        String[] args = new String[inputParameters.size() * 2];
+        int i = 0;
+        for(String parameter : inputParameters){
+            args[i++] = "-p";
+            args[i++] = parameter;
+        }
+        return args;
     }
     
     @Override

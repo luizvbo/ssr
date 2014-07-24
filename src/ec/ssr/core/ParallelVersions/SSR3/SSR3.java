@@ -18,6 +18,7 @@ import ec.ssr.functions.Function;
 import ec.ssr.problems.Regression;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
@@ -25,8 +26,19 @@ import java.util.Arrays;
  * @author luiz
  */
 public class SSR3 extends SSR2{
-    public SSR3(Dataset trainingSet, Dataset testSet, String outputPath, String outputPrefix, int numIterations, int numExecutions, double hitLevel, String parameterFilePath) throws NullPointerException, FileNotFoundException, IOException, Exception {
-        super(trainingSet, testSet, outputPath, outputPrefix, numIterations, numExecutions, hitLevel, parameterFilePath);
+    public SSR3(Dataset trainingSet, 
+                Dataset testSet, 
+                String outputPath, 
+                String outputPrefix, 
+                int numIterations, 
+                int numExecutions, 
+                double hitLevel, 
+                String parameterFilePath,
+                ArrayList inputParameters) 
+                       throws NullPointerException, FileNotFoundException, IOException, Exception {
+        super(trainingSet, testSet, outputPath, 
+              outputPrefix, numIterations, numExecutions, 
+              hitLevel, parameterFilePath, inputParameters);
     }
     
     @Override

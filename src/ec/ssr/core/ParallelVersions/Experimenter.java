@@ -25,6 +25,7 @@ import ec.ssr.handlers.StatisticsHandler;
 import ec.util.MersenneTwisterFast;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -47,6 +48,7 @@ public class Experimenter {
     protected int numExecutions = 1;
     protected int numThreads = 1;
     protected boolean shuffle = true;
+    protected ArrayList<String> inputParameters;
     
     protected StatisticsHandler stats;
     protected EvolutionState mainState;
@@ -87,25 +89,25 @@ public class Experimenter {
         SSR algorithm;
         switch(version){
             case 1:
-                algorithm = new SSR1(trainingSet, testSet, outputPath, outputPrefix, numIterations, numExecutions, hitLevel, parameterFilePath);
+                algorithm = new SSR1(trainingSet, testSet, outputPath, outputPrefix, numIterations, numExecutions, hitLevel, parameterFilePath, inputParameters);
                 break;
             case 2:
-                algorithm = new SSR2(trainingSet, testSet, outputPath, outputPrefix, numIterations, numExecutions, hitLevel, parameterFilePath);
+                algorithm = new SSR2(trainingSet, testSet, outputPath, outputPrefix, numIterations, numExecutions, hitLevel, parameterFilePath, inputParameters);
                 break;
             case 3:
-                algorithm = new SSR3(trainingSet, testSet, outputPath, outputPrefix, numIterations, numExecutions, hitLevel, parameterFilePath);
+                algorithm = new SSR3(trainingSet, testSet, outputPath, outputPrefix, numIterations, numExecutions, hitLevel, parameterFilePath, inputParameters);
                 break;
             case 4:
-                algorithm = new SSR4(trainingSet, testSet, outputPath, outputPrefix, numIterations, numExecutions, hitLevel, parameterFilePath);
+                algorithm = new SSR4(trainingSet, testSet, outputPath, outputPrefix, numIterations, numExecutions, hitLevel, parameterFilePath, inputParameters);
                 break;
             case 6:
-                algorithm = new SSR6(trainingSet, testSet, outputPath, outputPrefix, numIterations, numExecutions, hitLevel, parameterFilePath);
+                algorithm = new SSR6(trainingSet, testSet, outputPath, outputPrefix, numIterations, numExecutions, hitLevel, parameterFilePath, inputParameters);
                 break;
             case 7:
-                algorithm = new SSR7(trainingSet, testSet, outputPath, outputPrefix, numIterations, numExecutions, hitLevel, parameterFilePath);
+                algorithm = new SSR7(trainingSet, testSet, outputPath, outputPrefix, numIterations, numExecutions, hitLevel, parameterFilePath, inputParameters);
                 break;
             default:
-                algorithm = new SSR4(trainingSet, testSet, outputPath, outputPrefix, numIterations, numExecutions, hitLevel, parameterFilePath);
+                algorithm = new SSR4(trainingSet, testSet, outputPath, outputPrefix, numIterations, numExecutions, hitLevel, parameterFilePath, inputParameters);
                 break;
         }
         return algorithm;
@@ -132,6 +134,13 @@ public class Experimenter {
             String inputString = FileHandler.readOption("p", args);
             if(!inputString.equals("")){
                 parameterFilePath = inputString;
+            }
+            inputString = FileHandler.readOption("P", args);
+            while(!inputString.equals("")){
+                if(inputParameters == null)
+                    inputParameters = new ArrayList<String>();
+                inputParameters.add(inputString);
+                inputString = FileHandler.readOption("P", args);
             }
             inputString = FileHandler.readOption("i", args);
             if(!inputString.equals("")){

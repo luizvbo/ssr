@@ -16,9 +16,9 @@ import ec.ssr.core.ParallelVersions.SSR2.NormalizationParameters;
 import ec.ssr.core.ParallelVersions.SSR2.NormalizedFunction;
 import ec.ssr.functions.Function;
 import ec.ssr.problems.Regression;
-import ec.ssr.problems.RegressionIA;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
@@ -33,9 +33,12 @@ public class SSR4 extends SSR3{
                 int numIterations, 
                 int numExecutions, 
                 double hitLevel, 
-                String parameterFilePath) throws NullPointerException, FileNotFoundException, IOException, Exception {
-        
-        super(trainingSet, testSet, outputPath, outputPrefix, numIterations, numExecutions, hitLevel, parameterFilePath);
+                String parameterFilePath,
+                ArrayList inputParameters) 
+                       throws NullPointerException, FileNotFoundException, IOException, Exception {
+        super(trainingSet, testSet, outputPath, 
+              outputPrefix, numIterations, numExecutions, 
+              hitLevel, parameterFilePath, inputParameters);
     }
  
     @Override
@@ -69,7 +72,7 @@ public class SSR4 extends SSR3{
                 canStop = true;
             }
             else{
-                double tr = mainState.random[0].nextDouble();
+                double tr = mainState.random[0].nextDouble(); // it ensures (1-r) != 0
                 addFunctionToSolution(bestFunction, tr, normParameters);
                 output = getNewOutput(trainingSet, normalizedOutput, tr);
             }
