@@ -68,7 +68,8 @@ public abstract class X extends GPNode implements Function, FunctionIA{
     
     @Override
     public int getNumNodes() {
-        return numNodes(GPNode.NODESEARCH_ALL);
+//        return numNodes(GPNode.NODESEARCH_ALL);
+        return 1;
     }
 }
 

@@ -19,10 +19,11 @@ public interface DataProducer {
     public Dataset[] getTrainintTestData();
     
     /**
-     * Sets a dataset
-     * @param dataset Dataset used
+     * Sets a dataset path
+     * @param dataPath Path for the dataset used
+     * @throws java.lang.Exception Exception caused when reading dataset file(s)
      */
-    public void setDataset(Dataset dataset);
+    public void setDataset(String dataPath) throws Exception;
     
     /**
      * Sets the random number generator

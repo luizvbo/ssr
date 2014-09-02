@@ -6,6 +6,7 @@
 
 package ec.ssr.core.ParallelVersions.SSR4;
 
+import ec.ssr.core.ParallelVersions.SSR1.SolutionSSR1;
 import ec.ssr.core.ParallelVersions.SSR2.NormalizationParameters;
 import ec.ssr.functions.Function;
 
@@ -13,26 +14,26 @@ import ec.ssr.functions.Function;
  *
  * @author luiz
  */
-public class Solution extends ec.ssr.core.ParallelVersions.SSR1.Solution{
+public class SolutionSSR4 extends SolutionSSR1{
     protected NormalizationParameters parameters;
     
-    private Solution(Function t1, double tr) {
+    private SolutionSSR4(Function t1, double tr) {
         super(t1, tr);
     }
     
-    public static ec.ssr.core.ParallelVersions.SSR1.Solution createSolution(Function t1, double tr, NormalizationParameters parameters){
-        ec.ssr.core.ParallelVersions.SSR1.Solution newSolution;
+    public static SolutionSSR1 createSolution(Function t1, double tr, NormalizationParameters parameters){
+        SolutionSSR1 newSolution;
         if(parameters == null){
-            newSolution = new ec.ssr.core.ParallelVersions.SSR1.Solution(t1, tr);
+            newSolution = new SolutionSSR1(t1, tr);
         }
         else{
-            newSolution = new Solution(t1, tr);
-            ((Solution)newSolution).parameters = parameters;
+            newSolution = new SolutionSSR4(t1, tr);
+            ((SolutionSSR4)newSolution).parameters = parameters;
         }
         return newSolution;
     }
     
-    public static ec.ssr.core.ParallelVersions.SSR1.Solution createSolution(Function t1, NormalizationParameters parameters){
+    public static SolutionSSR1 createSolution(Function t1, NormalizationParameters parameters){
         return createSolution(t1, 1, parameters);
     }
     

@@ -13,17 +13,17 @@ import ec.ssr.handlers.StatisticsHandler;
  * Solution.java
  * Copyright (C) 20014, Federal University of Minas Gerais, Belo Horizonte, Brazil
  */
-public class Solution implements Function{
+public class SolutionSSR1 implements Function{
     protected Function t1;
     protected Function t2;
     protected double tr;
     
-    public Solution(Function t1, double tr) {
+    public SolutionSSR1(Function t1, double tr) {
         this.tr = tr;
         this.t1 = t1;
     }
     
-    public Solution(Function t){
+    public SolutionSSR1(Function t){
         this.t1 = t;
     }
 

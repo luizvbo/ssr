@@ -15,17 +15,19 @@ import ec.EvolutionState;
 import ec.ssr.core.Dataset;
 import ec.ssr.core.Instance;
 import ec.ssr.core.ParallelVersions.SSR7.SSR7;
-import ec.ssr.core.ParallelVersions.SSR1.Solution;
+import ec.ssr.core.ParallelVersions.SSR1.SolutionSSR1;
+import ec.ssr.core.ParallelVersions.SSR8.SSR8;
 import ec.ssr.handlers.CrossvalidationHandler;
 import ec.ssr.handlers.DataProducer;
 import ec.ssr.handlers.FileHandler;
-import ec.ssr.handlers.GesecException;
+import ec.ssr.handlers.SSRException;
 import ec.ssr.handlers.HoldoutHandler;
 import ec.ssr.handlers.StatisticsHandler;
 import ec.util.MersenneTwisterFast;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -35,16 +37,19 @@ import java.util.concurrent.TimeUnit;
  * @author luiz
  */
 public class Experimenter {
-    protected Solution currentSolution;
-    protected Solution solution;
+    protected SolutionSSR1 currentSolution;
+    protected SolutionSSR1 solution;
     
     protected int version = 1;
     protected String parameterFilePath;
     protected String inputDataFilePath; 
+    protected String seedPath = ""; 
     protected String outputPath = "";
     protected String outputPrefix = "";
     protected int numIterations = 10;
-    protected double hitLevel = 0.01;
+    protected double hitLevel = 0.0;
+    protected double validationPercentage = 0.0;
+    protected int[] seed;
     protected int numExecutions = 1;
     protected int numThreads = 1;
     protected boolean shuffle = true;
@@ -69,11 +74,16 @@ public class Experimenter {
     private void execute(){
         try {
             SSR[] threadsSSR = new SSR[numExecutions];
+            int currentSeed;
             ExecutorService executor = Executors.newFixedThreadPool(numThreads);
             // Run the algorithm for a defined number of repetitions
             for(int execution = 0; execution < numExecutions; execution++){
-                Dataset[] data = dataProducer.getTrainintTestData();
-                threadsSSR[execution] = getNewSSR(data[0], data[1]);
+                // If we have a list of seeds, we use it
+                if(seed != null) currentSeed = seed[execution];
+                // Else, we use a random seed
+                else currentSeed = (int)System.currentTimeMillis();
+                Dataset[] data = partitionatedData();
+                threadsSSR[execution] = getNewSSR(data[0], data[1], data[2], currentSeed);
                 executor.execute(threadsSSR[execution]);    
             }
             executor.shutdown();
@@ -85,29 +95,41 @@ public class Experimenter {
         }
     }
     
-    public SSR getNewSSR(Dataset trainingSet, Dataset testSet) throws Exception{
+    public SSR getNewSSR(Dataset trainingSet, Dataset validationSet, 
+                         Dataset testSet, long seed) throws Exception{
         SSR algorithm;
         switch(version){
             case 1:
-                algorithm = new SSR1(trainingSet, testSet, outputPath, outputPrefix, numIterations, numExecutions, hitLevel, parameterFilePath, inputParameters);
+                algorithm = new SSR1(trainingSet, validationSet, testSet, outputPath, outputPrefix, numIterations, 
+                                     numExecutions, seed, hitLevel, parameterFilePath, inputParameters);
                 break;
             case 2:
-                algorithm = new SSR2(trainingSet, testSet, outputPath, outputPrefix, numIterations, numExecutions, hitLevel, parameterFilePath, inputParameters);
+                algorithm = new SSR2(trainingSet, validationSet, testSet, outputPath, outputPrefix, numIterations, 
+                                     numExecutions, seed, hitLevel, parameterFilePath, inputParameters);
                 break;
             case 3:
-                algorithm = new SSR3(trainingSet, testSet, outputPath, outputPrefix, numIterations, numExecutions, hitLevel, parameterFilePath, inputParameters);
+                algorithm = new SSR3(trainingSet, validationSet, testSet, outputPath, outputPrefix, numIterations, 
+                                     numExecutions, seed, hitLevel, parameterFilePath, inputParameters);
                 break;
             case 4:
-                algorithm = new SSR4(trainingSet, testSet, outputPath, outputPrefix, numIterations, numExecutions, hitLevel, parameterFilePath, inputParameters);
+                algorithm = new SSR4(trainingSet, validationSet, testSet, outputPath, outputPrefix, numIterations, 
+                                     numExecutions, seed, hitLevel, parameterFilePath, inputParameters);
                 break;
             case 6:
-                algorithm = new SSR6(trainingSet, testSet, outputPath, outputPrefix, numIterations, numExecutions, hitLevel, parameterFilePath, inputParameters);
+                algorithm = new SSR6(trainingSet, validationSet, testSet, outputPath, outputPrefix, numIterations, 
+                                     numExecutions, seed, hitLevel, parameterFilePath, inputParameters);
                 break;
             case 7:
-                algorithm = new SSR7(trainingSet, testSet, outputPath, outputPrefix, numIterations, numExecutions, hitLevel, parameterFilePath, inputParameters);
+                algorithm = new SSR7(trainingSet, validationSet, testSet, outputPath, outputPrefix, numIterations, 
+                                     numExecutions, seed, hitLevel, parameterFilePath, inputParameters);
+                break;
+            case 8:
+                algorithm = new SSR8(trainingSet, validationSet, testSet, outputPath, outputPrefix, numIterations, 
+                                     numExecutions, seed, hitLevel, parameterFilePath, inputParameters);
                 break;
             default:
-                algorithm = new SSR4(trainingSet, testSet, outputPath, outputPrefix, numIterations, numExecutions, hitLevel, parameterFilePath, inputParameters);
+                algorithm = new SSR4(trainingSet, validationSet, testSet, outputPath, outputPrefix, numIterations, 
+                                     numExecutions, seed, hitLevel, parameterFilePath, inputParameters);
                 break;
         }
         return algorithm;
@@ -131,7 +153,11 @@ public class Experimenter {
             if(FileHandler.getOptPosition("i", args) == -1){
                 throw new FileNotFoundException("There is no input file path. Select a valid one.");
             }
-            String inputString = FileHandler.readOption("p", args);
+            String inputString = FileHandler.readOption("s", args);
+            if(!inputString.equals("")){
+                seedPath = inputString;
+            }
+            inputString = FileHandler.readOption("p", args);
             if(!inputString.equals("")){
                 parameterFilePath = inputString;
             }
@@ -174,6 +200,10 @@ public class Experimenter {
             if(!inputString.equals("")){
                 hitLevel = Double.parseDouble(inputString);
             }
+            inputString = FileHandler.readOption("V", args);
+            if(!inputString.equals("")){
+                validationPercentage = Double.parseDouble(inputString);
+            }
             inputString = FileHandler.readOption("k", args);
             if(!inputString.equals("")){
                 dataProducer = new CrossvalidationHandler(Integer.parseInt(inputString));
@@ -181,6 +211,12 @@ public class Experimenter {
             inputString = FileHandler.readOption("b", args);
             if(!inputString.equals("")){
                 dataProducer= new HoldoutHandler(Double.parseDouble(inputString));
+            }
+            if(FileHandler.getFlag("C", args)){
+                dataProducer= new CrossvalidationHandler();
+            }
+            if(FileHandler.getFlag("B", args)){
+                dataProducer= new HoldoutHandler();
             }
             // Uses unshuffled data
             if(FileHandler.getFlag("u", args)){
@@ -209,7 +245,7 @@ public class Experimenter {
             System.out.println("Incorrect number format. Try -h to see help.");
             e.printStackTrace();
         }
-        catch(GesecException e){
+        catch(SSRException e){
             e.printStackTrace();
         }
         catch(Exception e){
@@ -221,10 +257,10 @@ public class Experimenter {
      * Validate and instantiate data objects
      * @throws IOException 
      * @throws NullPointerException
-     * @throws GesecException
+     * @throws SSRException
      * @throws Exception 
      */
-    protected void initInputs() throws IOException, NullPointerException, GesecException, Exception{
+    protected void initInputs() throws IOException, NullPointerException, SSRException, Exception{
         inputValidation();
         
 //        Output mainOutput = Evolve.buildOutput();
@@ -234,8 +270,8 @@ public class Experimenter {
 //        ParameterDatabase dbase = new ParameterDatabase(parameterFile);
 //        mainState = Evolve.initialize(dbase, 0, mainOutput);
         
-        Dataset data = FileHandler.readInputDataFile(inputDataFilePath);
-        dataProducer.setDataset(data);
+        
+        dataProducer.setDataset(inputDataFilePath);
         if(shuffle)
             dataProducer.setRandomGenerator(new MersenneTwisterFast(System.currentTimeMillis()));
     }
@@ -253,6 +289,8 @@ public class Experimenter {
                 + "     * Path to the training file.\n"
                 + "  -o <file path>\n"
                 + "     Path to the output files.\n"
+                + "  -s <file path>\n"
+                + "     Path to a file with a list of seeds to use during iterations.\n"
                 + "  -a <prefix string>\n"
                 + "     Identifier prefix for files.\n"
                 + "  -t <int>\n"
@@ -262,12 +300,23 @@ public class Experimenter {
                 + "  -n <int>\n"
                 + "     Number of repetitions of the algorithm (default = 1).\n"
                 + "  -k <int>\n"
-                + "     Number of folds (cross validation).\n"
+                + "     Number of folds (cross-validation).\n"
                 + "  -b <double>\n"
                 + "     If the value is in [0,1], defines percentage used for test in holdout validation.\n"
                 + "     If the value is bigger than 1, defines absolute quatity used for test in holdout validation.\n"
                 + "  -e <int>\n"
                 + "     Minimun error to compute a hit (default = 0.01).\n"
+                + "  -C\n"
+                + "     Uses splited data from files for cross-validation. Use a path to the files in the form\n"
+                + "     /pathToFile/repeatedName#repeatedName, where # indicates where the fold index is placed\n"
+                + "     (a number from 0 to k-1), e.g. /home/iris-#.dat, with 3 folds in the path will look for\n"
+                + "     iris-0.dat, iris-1.dat and iris-2.dat\n"
+                + "  -B\n"
+                + "     Uses sampled data from files for holdout. Use a path to the files in the form\n"
+                + "     /pathToFile/repeatedName#repeatedName, where # is composed by the pattern "
+                + "     (train|test)-i with i=0,1,...,n-1, where n is the number of experiment files,\n"
+                + "     e.g. /home/iris-#.dat, with 4 files (2x(train+test)) in the path will look for\n"
+                + "     iris-train-0.dat, iris-test-0.dat, iris-train-1.dat and iris-test-0.dat\n"
                 + "  -u\n"
                 + "    Uses unshuffled data.\n");
     }
@@ -283,12 +332,12 @@ public class Experimenter {
             System.exit(0);
         }
         // ==== Check for validation method =====
-        if(dataProducer instanceof HoldoutHandler && !dataProducer.isValid()){
-            throw new Exception("Test percentage/quantity must be bigger than 0 for holdout validation.");
-        }
-        if(dataProducer instanceof CrossvalidationHandler && !dataProducer.isValid()){
-            throw new Exception("Number of folds must be greater than 1 for cross validation.");
-        }
+//        if(dataProducer instanceof HoldoutHandler && !dataProducer.isValid()){
+//            throw new Exception("Test percentage/quantity must be bigger than 0 for holdout validation.");
+//        }
+//        if(dataProducer instanceof CrossvalidationHandler && !dataProducer.isValid()){
+//            throw new Exception("Number of folds must be greater than 1 for cross validation.");
+//        }
     }
     
     /**
@@ -303,5 +352,33 @@ public class Experimenter {
             output[i++] = instance.output;
         }
         return output;
+    }
+
+    /**
+     * Partitionate the dataset in training, validation and test sets (in this order)
+     * @return An array with the training, validation and test sets (in this order)
+     */
+    private Dataset[] partitionatedData() {
+        Dataset data[] = new Dataset[3];
+        Dataset testTraining[] = dataProducer.getTrainintTestData();
+        data[2] = testTraining[1];
+        if(validationPercentage <= 0 || validationPercentage >= 1){
+            data[0] = testTraining[0];
+            return data;
+        }
+        int trainingSize = (int)Math.round((1-validationPercentage) * testTraining[0].size());
+        ArrayList<Instance> dataCopy = new ArrayList<Instance>(testTraining[0].data);
+        Iterator<Instance> it = dataCopy.iterator();
+        data[0] = new Dataset();
+        data[1] = new Dataset();
+        for(int i = 0; i < trainingSize; i++){
+            data[0].add(it.next());
+            it.remove();
+        }
+        while(it.hasNext()){
+            data[1].add(it.next());
+            it.remove();
+        }
+        return data;
     }
 }

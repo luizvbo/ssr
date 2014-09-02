@@ -10,8 +10,8 @@ package ec.ssr.handlers;
  *
  * @author luiz
  */
-public class GesecException extends Exception{
-    public GesecException(String msg) {
+public class SSRException extends Exception{
+    public SSRException(String msg) {
         super(msg);
     }
 }

@@ -4,33 +4,30 @@
  * and open the template in the editor.
  */
 
-package ec.ssr.core.ParallelVersions.SSR4;
+package ec.ssr.core.ParallelVersions.SSR8;
 
-import ec.ssr.core.ParallelVersions.SSR3.SSR3;
-import ec.EvolutionState;
+import ec.ssr.core.ParallelVersions.SSR4.*;
 import ec.gp.GPIndividual;
-import ec.gp.koza.KozaFitness;
 import ec.simple.SimpleStatistics;
 import ec.ssr.core.Dataset;
+import ec.ssr.core.Instance;
 import ec.ssr.core.ParallelVersions.SSR1.SolutionSSR1;
 import ec.ssr.core.ParallelVersions.SSR2.NormalizationParameters;
-import ec.ssr.core.ParallelVersions.SSR2.NormalizedFunction;
-import ec.ssr.core.Utils;
 import ec.ssr.functions.Function;
 import ec.ssr.problems.Regression;
 import ec.ssr.problems.fitness.FitnessInterface;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Version with range normalization (student-t) and internal crossover
- * New outputs are calculated over the normalized output. 
+ * - New outputs are calculated over the normalized output.
+ * - Utilizes only 50% of the training data at each new Iteration.
  * @author luiz
  */
-public class SSR4 extends SSR3{
-    public SSR4(Dataset trainingSet,
+public class SSR8 extends SSR4{
+    public SSR8(Dataset trainingSet,
                 Dataset validationSet,
                 Dataset testSet, 
                 String outputPath, 
@@ -51,18 +48,20 @@ public class SSR4 extends SSR3{
     @Override
     public void runAlgorithm() {
         boolean canStop = false;
-        // The original expected output
-        double output[] = Utils.getDatasetOutputs(trainingSet);
+        resetNormalizedOutputs();
+        
         int currentIteration = 0;
         while(!canStop){
             System.out.println("\nIteration: " + (currentIteration+1));
             mainState.startFresh();
             
-            double normalizedOutput[] = Arrays.copyOf(output, output.length);
-            NormalizationParameters normParameters = normalizeData(normalizedOutput);
+            NormalizationParameters normParameters = normalizeData();
+            Dataset sampledData = getResampledData();
+            // The original expected output
+            double normalizedOutput[] = getDatasetNormOutputs(sampledData);
             
             // Load new inputs on the proble Object
-            ((Regression)mainState.evaluator.p_problem).setDataset(trainingSet);
+            ((Regression)mainState.evaluator.p_problem).setDataset(sampledData);
             ((Regression)mainState.evaluator.p_problem).setHitLevel(hitLevel);
             ((Regression)mainState.evaluator.p_problem).setOutput(normalizedOutput);
             
@@ -76,19 +75,19 @@ public class SSR4 extends SSR3{
 //                stats.updateBestOfGeneration(mainState);
 //            }     
             
-            GPIndividual bestSoFar = Utils.getBestIndividual(mainState);
-//                    (GPIndividual)((SimpleStatistics)mainState.statistics).getBestSoFar()[0];
+            GPIndividual bestSoFar = (GPIndividual)((SimpleStatistics)mainState.statistics).getBestSoFar()[0];
             FitnessInterface fitness = (FitnessInterface)bestSoFar.fitness;
             Function bestFunction =  (Function)bestSoFar.trees[0].child;
             
-            if(currentIteration == maxIterations - 1 || fitness.isPerfectFitness(trainingSet.size())){
+            if(currentIteration == maxIterations - 1 || fitness.isPerfectFitness(sampledData.size())){
                 addLastFunctionToSolution(bestFunction, normParameters);
                 canStop = true;
             }
             else{
                 double tr = mainState.random[0].nextDouble(); // it ensures (1-r) != 0
                 addFunctionToSolution(bestFunction, tr, normParameters);
-                output = getNewOutput(trainingSet, normalizedOutput, tr);
+                
+                setNewOutput(sampledData, tr);
             }
                         
             stats.updateOnIteration(solution, normalizedOutput);
@@ -103,26 +102,67 @@ public class SSR4 extends SSR3{
         }
     }
     
-    protected void addFunctionToSolution(Function generatedFunction, double tr, NormalizationParameters parameters) {
-        if(solution == null){
-            solution = SolutionSSR4.createSolution(generatedFunction, tr, parameters);
-            currentSolution = solution;
+    /**
+     * Generates dataset composed by 50% of the training dataset, sampled uniformly
+     * @return The new sampled dataset
+     */
+    protected Dataset getResampledData(){
+        int n = (int)Math.round(0*trainingSet.size());
+//        int n = (int)Math.round(.5*trainingSet.size());
+        Dataset dataCopy = trainingSet.softClone();
+        for(int i = 0; i < n; i++){
+            dataCopy.data.remove(mainState.random[0].nextInt(dataCopy.size()));
         }
-        else{
-            // Add a new level of normalization
-            ((SolutionSSR1)currentSolution).setT2(SolutionSSR4.createSolution(generatedFunction, tr, parameters));
-            currentSolution = ((SolutionSSR1)currentSolution).getT2();
+        return dataCopy;
+    }
+    
+    protected NormalizationParameters normalizeData() {
+        // Calculates the mean
+        double mean = 0;
+        for(int i = 0; i < trainingSet.size(); i++){
+            mean += trainingSet.get(i).normOutput;
+        }       
+        mean = mean/trainingSet.size();
+        // Calculates the std. dev.
+        double std = 0;
+        for(int i = 0; i < trainingSet.size(); i++){
+            double aux = trainingSet.get(i).normOutput - mean;
+            std += aux * aux;
+        }
+        std /= trainingSet.size()-1;
+        std = Math.sqrt(std);
+        
+        for(int i = 0; i < trainingSet.size(); i++){
+            trainingSet.get(i).normOutput = (trainingSet.get(i).normOutput-mean)/std;
+        }
+        return new NormalizationParameters(mean, std);
+    }
+
+    private void resetNormalizedOutputs() {
+        for(int i = 0; i < trainingSet.size(); i++){
+            trainingSet.get(i).resetNormalizedOutput();
+        } 
+    }
+    
+    protected void setNewOutput(Dataset dataset, double tr){
+        for(int i = 0; i < dataset.size(); i++){
+            Instance instance = dataset.get(i);
+            double output = ((SolutionSSR1)currentSolution).getT1().eval(instance.input);
+            instance.normOutput = (instance.normOutput - tr*output)/(1-tr);
         }
     }
     
-    protected void addLastFunctionToSolution(Function lastFunction, NormalizationParameters parameters){
-        if(solution == null){
-            solution = SolutionSSR4.createSolution(lastFunction, parameters);
+    /**
+     * Generates a array with the expected normalized outputs of a dataset, respecting the order
+     * @param dataset Input dataset
+     * @return Double array with the outputs with the same order of the dataset
+     */
+    protected final double[] getDatasetNormOutputs(Dataset dataset) {
+        double[] output = new double[dataset.size()];
+        int i = 0;
+        for(Instance instance : dataset.data){
+            output[i++] = instance.normOutput;
         }
-        else{
-            // Add a new level of normalization
-            Function normalizedT2 = new NormalizedFunction(lastFunction, parameters);
-            ((SolutionSSR1)currentSolution).setT2(normalizedT2);
-        }
+        return output;
     }
 }

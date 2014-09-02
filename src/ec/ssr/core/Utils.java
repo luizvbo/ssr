@@ -6,6 +6,10 @@
 
 package ec.ssr.core;
 
+import ec.EvolutionState;
+import ec.Individual;
+import ec.gp.GPIndividual;
+import ec.ssr.functions.Function;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
@@ -108,5 +112,49 @@ public class Utils {
         if(auxBounds.lowerBound < bounds.lowerBound)
             bounds.lowerBound = auxBounds.lowerBound;
         return bounds;
+    }
+    
+    /**
+     * Calculate the MSE, given a solution object and a datase
+     * @param solution Solution objetc
+     * @param dataset Dataset used to calculate the error
+     * @return Total error
+     */
+    public static final double getRMSE(Function solution, Dataset dataset) {
+        double totalError = 0;
+        for(Instance instance : dataset.data){
+            double evaluated = solution.eval(instance.input);
+            double error = evaluated - instance.output;
+            totalError += error * error;
+        }
+        return Math.sqrt(totalError/dataset.data.size());
+    }
+    
+    /**
+     * Generates a array with the expected outputs of a dataset, respecting the order
+     * @param dataset Input dataset
+     * @return Double array with the outputs with the same order of the dataset
+     */
+    public static final double[] getDatasetOutputs(Dataset dataset) {
+        double[] output = new double[dataset.size()];
+        int i = 0;
+        for(Instance instance : dataset.data){
+            output[i++] = instance.output;
+        }
+        return output;
+    }
+    
+    /**
+     * Find the best individual from the last population of an EvolutionState
+     * @param state EvolutionState
+     * @return The best GPIndividual (casted)
+     */
+    public static final GPIndividual getBestIndividual(EvolutionState state){
+        Individual best_i = state.population.subpops[0].individuals[0];
+        for(int i = 1; i < state.population.subpops[0].individuals.length; i++){
+            if (state.population.subpops[0].individuals[i].fitness.betterThan(best_i.fitness))
+                best_i = state.population.subpops[0].individuals[i];
+        }
+        return (GPIndividual)best_i;
     }
 }

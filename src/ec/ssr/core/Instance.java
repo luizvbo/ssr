@@ -15,6 +15,9 @@ public class Instance {
     /** Instance output (only one). */
     public double output;
     
+    /** Normalized output. */
+    public double normOutput;
+    
     /** Instance identifier. */
     public int id;
 
@@ -27,6 +30,7 @@ public class Instance {
     public Instance(double[] input, double output, int IDCounter) {
         this.input = input;
         this.output = output;
+        normOutput = output;
         id = IDCounter;
     }
 
@@ -37,5 +41,9 @@ public class Instance {
             out.append(input[i]).append(",");
         }
         return out.toString() + output;
+    }
+
+    public void resetNormalizedOutput() {
+        normOutput = output;
     }
 }

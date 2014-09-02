@@ -4,8 +4,9 @@
  * and open the template in the editor.
  */
 
-package ec.ssr.core.ParallelVersions.SSR4;
+package ec.ssr.core.ParallelVersions.SSR9;
 
+import ec.ssr.core.ParallelVersions.SSR4.*;
 import ec.ssr.core.ParallelVersions.SSR3.SSR3;
 import ec.EvolutionState;
 import ec.gp.GPIndividual;
@@ -18,6 +19,7 @@ import ec.ssr.core.ParallelVersions.SSR2.NormalizedFunction;
 import ec.ssr.core.Utils;
 import ec.ssr.functions.Function;
 import ec.ssr.problems.Regression;
+import ec.ssr.problems.RegressionResampling;
 import ec.ssr.problems.fitness.FitnessInterface;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -29,8 +31,8 @@ import java.util.Arrays;
  * New outputs are calculated over the normalized output. 
  * @author luiz
  */
-public class SSR4 extends SSR3{
-    public SSR4(Dataset trainingSet,
+public class SSR9 extends SSR4{
+    public SSR9(Dataset trainingSet,
                 Dataset validationSet,
                 Dataset testSet, 
                 String outputPath, 
@@ -66,18 +68,9 @@ public class SSR4 extends SSR3{
             ((Regression)mainState.evaluator.p_problem).setHitLevel(hitLevel);
             ((Regression)mainState.evaluator.p_problem).setOutput(normalizedOutput);
             
-            evolve();
-            
-//            int result = EvolutionState.R_NOTDONE;
-//            // Generations
-//            while(result == EvolutionState.R_NOTDONE ){
-//                result = mainState.evolve();
-//                // Store the best fitness of generation
-//                stats.updateBestOfGeneration(mainState);
-//            }     
+            evolve();   
             
             GPIndividual bestSoFar = Utils.getBestIndividual(mainState);
-//                    (GPIndividual)((SimpleStatistics)mainState.statistics).getBestSoFar()[0];
             FitnessInterface fitness = (FitnessInterface)bestSoFar.fitness;
             Function bestFunction =  (Function)bestSoFar.trees[0].child;
             
@@ -92,37 +85,29 @@ public class SSR4 extends SSR3{
             }
                         
             stats.updateOnIteration(solution, normalizedOutput);
-//            stats.updatePontualError(bestFunction, lastOutput);
-//            stats.updateIterativeErrors(solution);
-//            stats.updateOutputVectors(lastOutput);
-//            stats.updateSolutionSize(solution);
-
-//            stats.finishIteration();
+            
             currentIteration++;
             mainState.output.close();
         }
     }
     
-    protected void addFunctionToSolution(Function generatedFunction, double tr, NormalizationParameters parameters) {
-        if(solution == null){
-            solution = SolutionSSR4.createSolution(generatedFunction, tr, parameters);
-            currentSolution = solution;
-        }
-        else{
-            // Add a new level of normalization
-            ((SolutionSSR1)currentSolution).setT2(SolutionSSR4.createSolution(generatedFunction, tr, parameters));
-            currentSolution = ((SolutionSSR1)currentSolution).getT2();
-        }
-    }
-    
-    protected void addLastFunctionToSolution(Function lastFunction, NormalizationParameters parameters){
-        if(solution == null){
-            solution = SolutionSSR4.createSolution(lastFunction, parameters);
-        }
-        else{
-            // Add a new level of normalization
-            Function normalizedT2 = new NormalizedFunction(lastFunction, parameters);
-            ((SolutionSSR1)currentSolution).setT2(normalizedT2);
-        }
+    protected void evolve(){
+        long initTime = System.currentTimeMillis();
+        int result = EvolutionState.R_NOTDONE;
+        
+        boolean canResample = true;
+        
+        // Generations
+        while(result == EvolutionState.R_NOTDONE ){
+            canResample = mainState.generation > 0 && mainState.generation < mainState.numGenerations - 1 ? true : false;
+            ((RegressionResampling)(mainState.evaluator.p_problem)).resample(mainState, canResample);
+            
+            result = mainState.evolve();
+//            if(result == EvolutionState.R_SUCCESS) result = EvolutionState.R_NOTDONE;
+            // Store the best fitness of generation
+            stats.updateBestOfGeneration(mainState);
+        }    
+
+        System.out.println("Tempo: " + ((System.currentTimeMillis() - initTime)/1000.0) + " seg.");
     }
 }

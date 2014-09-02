@@ -8,12 +8,15 @@ package ec.ssr.handlers.statistics;
 
 import ec.EvolutionState;
 import ec.Individual;
+import ec.gp.GPIndividual;
 import ec.gp.koza.KozaFitness;
+import ec.simple.SimpleStatistics;
 import ec.ssr.core.Dataset;
 import ec.ssr.core.Instance;
 import ec.ssr.core.Utils;
 import ec.ssr.functions.Div;
 import ec.ssr.functions.Function;
+import ec.ssr.problems.fitness.FitnessInterface;
 import java.util.ArrayList;
 
 /**
@@ -62,14 +65,17 @@ public class ExecutionStatistics {
     }
     
     private void updateIterationRMSE(Function solution){
-        trainRMSEperIteration[currentIteration] = getRMSE(solution, trainingSet);
+        trainRMSEperIteration[currentIteration] = Utils.getRMSE(solution, trainingSet);
         Div.numZeroDiv = 0;
-        testRMSEperIteration[currentIteration] = getRMSE(solution, testSet);
+        testRMSEperIteration[currentIteration] = Utils.getRMSE(solution, testSet);
         numZeroDiv[currentIteration] = Div.numZeroDiv;
     }
     
     public void updateBestOfGeneration(final EvolutionState state){
         generationBestFitness.add(getGenerationBestFitness(state));
+        
+        // Só para testes
+        GPIndividual gp = (GPIndividual)((SimpleStatistics)state.statistics).getBestSoFar()[0];
     }
     
     private void finishIteration(){
@@ -98,22 +104,6 @@ public class ExecutionStatistics {
     }
     
     /**
-     * Calculate the MSE, given a solution object and a datase
-     * @param solution Solution objetc
-     * @param dataset Dataset used to calculate the error
-     * @return Total error
-     */
-    protected final double getRMSE(Function solution, Dataset dataset) {
-        double totalError = 0;
-        for(Instance instance : dataset.data){
-            double evaluated = solution.eval(instance.input);
-            double error = evaluated - instance.output;
-            totalError += error * error;
-        }
-        return Math.sqrt(totalError/dataset.data.size());
-    }
-    
-    /**
      * Returns the RMSE of the best individual of the current generation
      * @param state Evolution state from ECJ
      * @return The best fitness from this generation
@@ -123,8 +113,8 @@ public class ExecutionStatistics {
         for(int y=1;y<state.population.subpops[0].individuals.length;y++){
             if (state.population.subpops[0].individuals[y].fitness.betterThan(ind.fitness))
                 ind = state.population.subpops[0].individuals[y];
-        }
-        return ((KozaFitness)ind.fitness).standardizedFitness();
+        }        
+        return ((FitnessInterface)ind.fitness).getError();
     }
     
     /**
@@ -236,5 +226,9 @@ public class ExecutionStatistics {
 
     public String getIterativeSolution() {
         return iterativeSolutions.toString();
+    }
+
+    public ArrayList<Double> getGenerationBestFitness() {
+        return generationBestFitness;
     }
 }

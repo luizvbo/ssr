@@ -124,7 +124,8 @@ public class RegERC extends ERC implements Function, FunctionIA {
     
     @Override
     public int getNumNodes() {
-        return numNodes(GPNode.NODESEARCH_ALL);
+//        return numNodes(GPNode.NODESEARCH_ALL);
+        return 1;
     }
 
     @Override

@@ -13,7 +13,8 @@ import ec.simple.SimpleStatistics;
 import ec.ssr.core.Dataset;
 import ec.ssr.core.Instance;
 import ec.ssr.core.ParallelVersions.SSR;
-import ec.ssr.core.ParallelVersions.SSR1.Solution;
+import ec.ssr.core.ParallelVersions.SSR1.SolutionSSR1;
+import ec.ssr.core.Utils;
 import ec.ssr.functions.Function;
 import ec.ssr.problems.Regression;
 import java.io.FileNotFoundException;
@@ -27,26 +28,29 @@ import java.util.Arrays;
  */
 public class SSR6 extends SSR{
 
-    public SSR6(Dataset trainingSet, 
-               Dataset testSet, 
-               String outputPath, 
-               String outputPrefix, 
-               int numIterations, 
-               int numExecutions,
-               double hitLevel, 
-               String parameterFilePath,
-               ArrayList inputParameters) 
-                       throws NullPointerException, FileNotFoundException, IOException, Exception {
-        super(trainingSet, testSet, outputPath, 
-              outputPrefix, numIterations, numExecutions, 
-              hitLevel, parameterFilePath, inputParameters);
+    public SSR6(Dataset trainingSet,
+                Dataset validationSet,
+                Dataset testSet, 
+                String outputPath, 
+                String outputPrefix, 
+                int numIterations, 
+                int numExecutions,
+                long seed,
+                double hitLevel, 
+                String parameterFilePath,
+                ArrayList inputParameters) throws NullPointerException, 
+                                                  FileNotFoundException, 
+                                                  IOException, Exception {
+        super(trainingSet, validationSet, testSet, outputPath, outputPrefix, 
+              numIterations, numExecutions, seed, hitLevel, parameterFilePath, 
+              inputParameters);
     }
     
     @Override
     public void runAlgorithm() {
         boolean canStop = false;
         // The original expected output
-        double output[] = getFirstRunOutput(trainingSet);
+        double output[] = Utils.getDatasetOutputs(trainingSet);
         double newOutput[] = Arrays.copyOf(output, output.length);
         int currentIteration = 0;
         while(!canStop){
@@ -91,20 +95,20 @@ public class SSR6 extends SSR{
     
     protected void addFunctionToSolution(Function generatedFunction, double tr) {
         if(solution == null){
-            solution = new Solution(generatedFunction, tr);
+            solution = new SolutionSSR1(generatedFunction, tr);
         }
         else{
-            ((Solution)solution).setT2(generatedFunction);
-            solution = new Solution(solution, tr);
+            ((SolutionSSR1)solution).setT2(generatedFunction);
+            solution = new SolutionSSR1(solution, tr);
         }
     }
     
     protected void addLastFunctionToSolution(Function generatedFunction, double tr){
         if(solution == null){
-            solution = new Solution(generatedFunction, 1);
+            solution = new SolutionSSR1(generatedFunction, 1);
         }
         else{
-            ((Solution)solution).setT2(generatedFunction);
+            ((SolutionSSR1)solution).setT2(generatedFunction);
         }
     }
     
@@ -112,7 +116,7 @@ public class SSR6 extends SSR{
         double[] newOutput = new double[dataset.size()];
         for(int i = 0; i < dataset.size(); i++){
             Instance instance = dataset.get(i);
-            double output = ((Solution)solution).getT1().eval(instance.input);
+            double output = ((SolutionSSR1)solution).getT1().eval(instance.input);
             newOutput[i] = (oldOutput[i] - tr*output)/(1-tr);
         }
         return newOutput;

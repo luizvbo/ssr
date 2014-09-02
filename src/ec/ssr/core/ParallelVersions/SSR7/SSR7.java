@@ -12,6 +12,7 @@ import ec.gp.koza.KozaFitness;
 import ec.simple.SimpleStatistics;
 import ec.ssr.core.Dataset;
 import ec.ssr.core.ParallelVersions.SSR;
+import ec.ssr.core.Utils;
 import ec.ssr.functions.Function;
 import ec.ssr.problems.Regression;
 import java.io.FileNotFoundException;
@@ -25,26 +26,29 @@ import java.util.Arrays;
  */
 public class SSR7 extends SSR{
 
-    public SSR7(Dataset trainingSet, 
-               Dataset testSet, 
-               String outputPath, 
-               String outputPrefix, 
-               int numIterations, 
-               int numExecutions,
-               double hitLevel, 
-               String parameterFilePath,
-               ArrayList inputParameters) 
-                       throws NullPointerException, FileNotFoundException, IOException, Exception {
-        super(trainingSet, testSet, outputPath, 
-              outputPrefix, numIterations, numExecutions, 
-              hitLevel, parameterFilePath, inputParameters);
+    public SSR7(Dataset trainingSet,
+                Dataset validationSet,
+                Dataset testSet, 
+                String outputPath, 
+                String outputPrefix, 
+                int numIterations, 
+                int numExecutions,
+                long seed,
+                double hitLevel, 
+                String parameterFilePath,
+                ArrayList inputParameters) throws NullPointerException, 
+                                                  FileNotFoundException, 
+                                                  IOException, Exception {
+        super(trainingSet, validationSet, testSet, outputPath, outputPrefix, 
+              numIterations, numExecutions, seed, hitLevel, parameterFilePath, 
+              inputParameters);
     }
     
     @Override
     public void runAlgorithm() {
         boolean canStop = false;
         // The original expected output
-        double output[] = getFirstRunOutput(trainingSet);
+        double output[] = Utils.getDatasetOutputs(trainingSet);
         double newOutput[] = Arrays.copyOf(output, output.length);
         int currentIteration = 0;
         while(!canStop){

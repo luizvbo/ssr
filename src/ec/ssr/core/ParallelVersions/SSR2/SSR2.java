@@ -12,6 +12,7 @@ import ec.gp.GPIndividual;
 import ec.gp.koza.KozaFitness;
 import ec.simple.SimpleStatistics;
 import ec.ssr.core.Dataset;
+import ec.ssr.core.Utils;
 import ec.ssr.functions.Function;
 import ec.ssr.problems.Regression;
 import java.io.FileNotFoundException;
@@ -20,36 +21,41 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
- *
+ * Version with range normalization ([0,1]) and internal crossover
  * @author luiz
  */
 public class SSR2 extends SSR1{
     public SSR2(Dataset trainingSet,
-                Dataset testSet,
-                String outputPath,
-                String outputPrefix,
+                Dataset validationSet,
+                Dataset testSet, 
+                String outputPath, 
+                String outputPrefix, 
                 int numIterations, 
-                int numExecutions, 
+                int numExecutions,
+                long seed,
                 double hitLevel, 
                 String parameterFilePath,
-                ArrayList inputParameters) 
-                          throws NullPointerException, FileNotFoundException, IOException, Exception {
-        super(trainingSet, testSet, outputPath, outputPrefix, 
-              numIterations, numExecutions, hitLevel, 
-              parameterFilePath, inputParameters);
+                ArrayList inputParameters) throws NullPointerException, 
+                                                  FileNotFoundException, 
+                                                  IOException, Exception {
+        super(trainingSet, validationSet, testSet, outputPath, outputPrefix, 
+              numIterations, numExecutions, seed, hitLevel, parameterFilePath, 
+              inputParameters);
     }
 
     @Override
     public void runAlgorithm() {
         boolean canStop = false;
         // The original expected output
-        double output[] = getFirstRunOutput(trainingSet);
+        double output[] = Utils.getDatasetOutputs(trainingSet);
         int currentIteration = 0;
         while(!canStop){
             System.out.println("\nIteration: " + (currentIteration+1));
             mainState.startFresh();
+            
             double normalizedOutput[] = Arrays.copyOf(output, output.length);
             NormalizationParameters normParameters = normalizeData(normalizedOutput);
+            
             // Load new inputs on the proble Object
             ((Regression)mainState.evaluator.p_problem).setDataset(trainingSet);
             ((Regression)mainState.evaluator.p_problem).setHitLevel(hitLevel);
@@ -65,7 +71,7 @@ public class SSR2 extends SSR1{
             KozaFitness fitness = (KozaFitness)bestSoFar.fitness;
             NormalizedFunction bestFunction =  new NormalizedFunction((Function)bestSoFar.trees[0].child, normParameters);
 
-            if(currentIteration == maxIterations - 1 || fitness.hits == trainingSet.size()){
+            if(currentIteration == maxIterations - 1 || fitness.hits == trainingSet.size() || fitness.isIdealFitness()){
                 addLastFunctionToSolution(bestFunction);
                 canStop = true;
             }

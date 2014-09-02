@@ -23,7 +23,9 @@ import ec.gp.*;
  * @version 1.0 
  */
 
-public class AQ extends GPNode implements Function{
+public class AQ2 extends GPNode implements Function{
+    private final double a = 0.0001;
+    
     public String toString() { 
         return "%"; 
     }
@@ -45,14 +47,16 @@ public class AQ extends GPNode implements Function{
         double numerator = rd.x;
 
         children[1].eval(state,thread,input,stack,individual,problem);
-        rd.x = numerator / Math.sqrt(1+(rd.x*rd.x));
+        rd.x = numerator / Math.sqrt(a+(rd.x*rd.x));
+//        rd.x = sign(rd.x) * numerator / Math.sqrt(1+(rd.x*rd.x));
     }
     
     @Override
     public double eval(double val[]) {
         // evaluate children[1] first to determine if the demoniator is 0
         double denominator = ((Function)children[1]).eval(val);        
-        return ((Function)children[0]).eval(val) / Math.sqrt(1+(denominator*denominator));
+        return ((Function)children[0]).eval(val) / Math.sqrt(a+(denominator*denominator));
+//        return sign(denominator) * ((Function)children[0]).eval(val) / Math.sqrt(a+(denominator*denominator));
     }
 
     @Override
@@ -63,6 +67,11 @@ public class AQ extends GPNode implements Function{
     @Override
     public int getNumNodes() {
         return numNodes(GPNode.NODESEARCH_ALL);
+    }
+    
+    private double sign(double n){
+        if(n < 0) return -1.0;
+        return 1;
     }
 }
 

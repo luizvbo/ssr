@@ -7,6 +7,7 @@ package ec.ssr.handlers;
 import ec.ssr.core.Dataset;
 import ec.ssr.core.Instance;
 import ec.util.MersenneTwisterFast;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -30,25 +31,18 @@ public class CrossvalidationHandler implements DataProducer{
     /** Input dataset. */
     private Dataset dataset;
     
-    /**
-     * Constructor declaration.
-     * @param dataset Input dataset
-     * @param numFolds Number of folds (k)
-     * @param rnd Random number generator used to shuffle data.
-     */
-//    public CrossvalidationHandler(Dataset dataset, int numFolds, MersenneTwisterFast rnd) {
-//        this.rnd = rnd;
-//        this.dataset = dataset;
-//        this.numFolds = numFolds;
-//        
-//        this.currentFold = 0;
-//    }
+    /** Boolean to indicates if we should sample or read the folds from files **/
+    private boolean useFiles = false;
 
     public CrossvalidationHandler(int numFolds) {
         this.numFolds = numFolds;
-        this.currentFold = 0;
+        currentFold = 0;
     }
     
+    public CrossvalidationHandler(){
+        useFiles = true;
+        currentFold = 0;
+    }
     
     /**
      * Sample partitions for cross validation. Not stratified.
@@ -85,7 +79,7 @@ public class CrossvalidationHandler implements DataProducer{
      */
     @Override
     public Dataset[] getTrainintTestData(){
-        if(currentFold == 0){
+        if(currentFold == 0 && !useFiles){
             resampleFolds();
         }
         Dataset[] data = new Dataset[2];
@@ -106,8 +100,14 @@ public class CrossvalidationHandler implements DataProducer{
     }
 
     @Override
-    public void setDataset(Dataset dataset) {
-        this.dataset = dataset;
+    public void setDataset(String dataPath) throws Exception{
+        if(!useFiles){
+            Dataset data = FileHandler.readInputDataFile(dataPath);
+            this.dataset = data;
+        }
+        else{
+            getFoldsFromFile(dataPath);
+        }
     }
 
     @Override
@@ -120,5 +120,36 @@ public class CrossvalidationHandler implements DataProducer{
         if(numFolds > 1)
             return true;
         return false;
+    }
+
+    /**
+     * Get the folds from a list of files named prename#posname, where # is the 
+     * index for the fold inside the file. 
+     * @param dataPath Full path to the file with the pattern prename#posname.
+     * @throws Exception Error while reading the dataset within a file.
+     * @throws SSRException Error in the file path/pattern.
+     */
+    private void getFoldsFromFile(String dataPath) throws Exception, SSRException{
+        int lastFileSeparator = dataPath.lastIndexOf(File.separator);
+        String filePattern = dataPath.substring(lastFileSeparator + 1);
+        String folderName = dataPath.substring(0, lastFileSeparator);
+        String[] aux = filePattern.split("#");
+        if(aux.length != 2)
+            throw new SSRException("The file patter must have one and only one # symbol as fold index.");
+        ArrayList<File> files = new ArrayList<File>();
+        int index = 0;
+        File newFold = new File(folderName + File.separator + aux[0] + index + aux[1]);
+        while(newFold.isFile()){
+            files.add(newFold);
+            index++;
+            newFold = new File(folderName + File.separator + aux[0] + index + aux[1]);
+        }
+        if(files.isEmpty()) 
+            throw new SSRException("No files found for this file pattern/path.");
+        numFolds = files.size();
+        folds = new Dataset[numFolds];
+        for(int i = 0; i < numFolds; i++){
+            folds[i] = FileHandler.readInputDataFile(files.get(i));
+        }
     }
 }

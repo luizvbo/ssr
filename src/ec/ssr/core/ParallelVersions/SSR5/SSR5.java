@@ -14,7 +14,8 @@ import ec.simple.SimpleStatistics;
 import ec.ssr.core.Dataset;
 import ec.ssr.core.ParallelVersions.SSR2.NormalizationParameters;
 import ec.ssr.core.ParallelVersions.SSR2.NormalizedFunction;
-import ec.ssr.core.ParallelVersions.SSR4.Solution;
+import ec.ssr.core.ParallelVersions.SSR4.SolutionSSR4;
+import ec.ssr.core.Utils;
 import ec.ssr.functions.Function;
 import ec.ssr.problems.Regression;
 import java.io.FileNotFoundException;
@@ -27,26 +28,29 @@ import java.util.Arrays;
  * @author luiz
  */
 public class SSR5 extends SSR3{
-    public SSR5(Dataset trainingSet, 
+    public SSR5(Dataset trainingSet,
+                Dataset validationSet,
                 Dataset testSet, 
                 String outputPath, 
                 String outputPrefix, 
                 int numIterations, 
-                int numExecutions, 
+                int numExecutions,
+                long seed,
                 double hitLevel, 
                 String parameterFilePath,
-                ArrayList inputParameters) 
-                       throws NullPointerException, FileNotFoundException, IOException, Exception {
-        super(trainingSet, testSet, outputPath, 
-              outputPrefix, numIterations, numExecutions, 
-              hitLevel, parameterFilePath, inputParameters);
+                ArrayList inputParameters) throws NullPointerException, 
+                                                  FileNotFoundException, 
+                                                  IOException, Exception {
+        super(trainingSet, validationSet, testSet, outputPath, outputPrefix, 
+              numIterations, numExecutions, seed, hitLevel, parameterFilePath, 
+              inputParameters);
     }
  
     @Override
     public void runAlgorithm() {
         boolean canStop = false;
         // The original expected output
-        double output[] = getFirstRunOutput(trainingSet);
+        double output[] = Utils.getDatasetOutputs(trainingSet);
         int currentIteration = 0;
         NormalizationParameters normParameters = null;
         while(!canStop){
@@ -95,24 +99,24 @@ public class SSR5 extends SSR3{
     
     protected void addFunctionToSolution(Function generatedFunction, double tr, NormalizationParameters parameters) {
         if(solution == null){
-            solution = Solution.createSolution(generatedFunction, tr, parameters);
+            solution = SolutionSSR4.createSolution(generatedFunction, tr, parameters);
             currentSolution = solution;
         }
         else{
             // Add a new level of normalization
-            ((ec.ssr.core.ParallelVersions.SSR1.Solution)currentSolution).setT2(Solution.createSolution(generatedFunction, tr, parameters));
-            currentSolution = ((ec.ssr.core.ParallelVersions.SSR1.Solution)currentSolution).getT2();
+            ((ec.ssr.core.ParallelVersions.SSR1.SolutionSSR1)currentSolution).setT2(SolutionSSR4.createSolution(generatedFunction, tr, parameters));
+            currentSolution = ((ec.ssr.core.ParallelVersions.SSR1.SolutionSSR1)currentSolution).getT2();
         }
     }
     
     protected void addLastFunctionToSolution(Function lastFunction, NormalizationParameters parameters){
         if(solution == null){
-            solution = Solution.createSolution(lastFunction, parameters);
+            solution = SolutionSSR4.createSolution(lastFunction, parameters);
         }
         else{
             // Add a new level of normalization
             Function normalizedT2 = new NormalizedFunction(lastFunction, parameters);
-            ((Solution)currentSolution).setT2(normalizedT2);
+            ((SolutionSSR4)currentSolution).setT2(normalizedT2);
         }
     }
 }

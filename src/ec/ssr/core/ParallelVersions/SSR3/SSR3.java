@@ -14,6 +14,7 @@ import ec.simple.SimpleStatistics;
 import ec.ssr.core.Dataset;
 import ec.ssr.core.ParallelVersions.SSR2.NormalizationParameters;
 import ec.ssr.core.ParallelVersions.SSR2.NormalizedFunction;
+import ec.ssr.core.Utils;
 import ec.ssr.functions.Function;
 import ec.ssr.problems.Regression;
 import java.io.FileNotFoundException;
@@ -22,30 +23,34 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
- *
+ * Version with Student's t-statistic normalization and internal crossover
+ * New outputs are calculated over the non-normalized outputs.   
  * @author luiz
  */
 public class SSR3 extends SSR2{
-    public SSR3(Dataset trainingSet, 
+    public SSR3(Dataset trainingSet,
+                Dataset validationSet,
                 Dataset testSet, 
                 String outputPath, 
                 String outputPrefix, 
                 int numIterations, 
-                int numExecutions, 
+                int numExecutions,
+                long seed,
                 double hitLevel, 
                 String parameterFilePath,
-                ArrayList inputParameters) 
-                       throws NullPointerException, FileNotFoundException, IOException, Exception {
-        super(trainingSet, testSet, outputPath, 
-              outputPrefix, numIterations, numExecutions, 
-              hitLevel, parameterFilePath, inputParameters);
+                ArrayList inputParameters) throws NullPointerException, 
+                                                  FileNotFoundException, 
+                                                  IOException, Exception {
+        super(trainingSet, validationSet, testSet, outputPath, outputPrefix, 
+              numIterations, numExecutions, seed, hitLevel, parameterFilePath, 
+              inputParameters);
     }
     
     @Override
     public void runAlgorithm() {
         boolean canStop = false;
         // The original expected output
-        double output[] = getFirstRunOutput(trainingSet);
+        double output[] = Utils.getDatasetOutputs(trainingSet);
         int currentIteration = 0;
         while(!canStop){
             System.out.println("\nIteration: " + (currentIteration+1));

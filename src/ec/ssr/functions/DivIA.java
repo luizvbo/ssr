@@ -48,7 +48,9 @@ public class DivIA extends Div implements FunctionIA{
     @Override
     public double eval(double val[]) {
         double denominator = ((Function)children[1]).eval(val);      
-        if(denominator == 0) numZeroDiv++;
+        if(denominator == 0){
+            numZeroDiv++;
+        }
         return ((Function)children[0]).eval(val) / denominator;
     }
 
