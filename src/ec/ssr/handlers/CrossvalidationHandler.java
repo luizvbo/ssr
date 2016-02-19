@@ -6,6 +6,7 @@ package ec.ssr.handlers;
 
 import ec.ssr.core.Dataset;
 import ec.ssr.core.Instance;
+import ec.ssr.core.Utils;
 import ec.util.MersenneTwisterFast;
 import java.io.File;
 import java.util.ArrayList;
@@ -48,29 +49,30 @@ public class CrossvalidationHandler implements DataProducer{
      * Sample partitions for cross validation. Not stratified.
      */
     private void resampleFolds() {
-        folds = new Dataset[numFolds];
-        ArrayList<Instance> dataCopy = new ArrayList<Instance>(dataset.data);
-        int foldIndex = 0;
-        if(rnd == null){
-            Iterator<Instance> it = dataCopy.iterator();
-            while(it.hasNext()){
-                if(folds[foldIndex] == null)
-                    folds[foldIndex] = new Dataset();
-                folds[foldIndex].add(it.next());
-                it.remove();
-                if(foldIndex < numFolds - 1) foldIndex++;
-                else foldIndex = 0;
-            }
-        }
-        else{
-            while(!dataCopy.isEmpty()){
-                if(folds[foldIndex] == null)
-                    folds[foldIndex] = new Dataset();
-                folds[foldIndex].add(dataCopy.remove(rnd.nextInt(dataCopy.size())));
-                if(foldIndex < numFolds - 1) foldIndex++;
-                else foldIndex = 0;
-            }
-        }
+        folds = Utils.getFoldSampling(numFolds, dataset, rnd);
+//        folds = new Dataset[numFolds];
+//        ArrayList<Instance> dataCopy = new ArrayList<Instance>(dataset.data);
+//        int foldIndex = 0;
+//        if(rnd == null){
+//            Iterator<Instance> it = dataCopy.iterator();
+//            while(it.hasNext()){
+//                if(folds[foldIndex] == null)
+//                    folds[foldIndex] = new Dataset();
+//                folds[foldIndex].add(it.next());
+//                it.remove();
+//                if(foldIndex < numFolds - 1) foldIndex++;
+//                else foldIndex = 0;
+//            }
+//        }
+//        else{
+//            while(!dataCopy.isEmpty()){
+//                if(folds[foldIndex] == null)
+//                    folds[foldIndex] = new Dataset();
+//                folds[foldIndex].add(dataCopy.remove(rnd.nextInt(dataCopy.size())));
+//                if(foldIndex < numFolds - 1) foldIndex++;
+//                else foldIndex = 0;
+//            }
+//        }
     }
     
     /**
@@ -135,7 +137,7 @@ public class CrossvalidationHandler implements DataProducer{
         String folderName = dataPath.substring(0, lastFileSeparator);
         String[] aux = filePattern.split("#");
         if(aux.length != 2)
-            throw new SSRException("The file patter must have one and only one # symbol as fold index.");
+            throw new SSRException("The file pattern must have one and only one # symbol as fold index.");
         ArrayList<File> files = new ArrayList<File>();
         int index = 0;
         File newFold = new File(folderName + File.separator + aux[0] + index + aux[1]);

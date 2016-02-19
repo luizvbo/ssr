@@ -12,7 +12,7 @@ import java.util.ArrayList;
  */
 public class Dataset {
     /** ID conouter. Used to generate exclusive IDs. */
-    private int IDCounter;
+//    private int IDCounter;
     
     /** Lower and upper bounds of each input variable. */
     private Bounds[] bounds;
@@ -25,7 +25,7 @@ public class Dataset {
      */
     public Dataset() {
         data = new ArrayList<Instance>();
-        IDCounter = 0;
+//        IDCounter = 0;
     }
 
     /**
@@ -33,7 +33,7 @@ public class Dataset {
      * @param dataset Dataset copied to the new one.
      */
     public Dataset(Dataset dataset) {
-        IDCounter = dataset.IDCounter;
+//        IDCounter = dataset.IDCounter;
         data = new ArrayList<Instance>(dataset.data);
     }
 
@@ -52,7 +52,8 @@ public class Dataset {
      * @param output Instance output
      */
     public void add(double[] input, Double output){
-        Instance newInstance = new Instance(input, output, IDCounter++);
+//        Instance newInstance = new Instance(input, output, IDCounter++);
+        Instance newInstance = new Instance(input, output);
         data.add(newInstance);
     }
     
@@ -88,7 +89,7 @@ public class Dataset {
     public Dataset softClone() {
         Dataset newDataset = new Dataset();
         newDataset.data.addAll(data);
-        newDataset.IDCounter = this.IDCounter;
+//        newDataset.IDCounter = this.IDCounter;
         return newDataset;
     }
 

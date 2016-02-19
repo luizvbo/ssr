@@ -106,12 +106,12 @@ public class SSR4 extends SSR3{
     protected void addFunctionToSolution(Function generatedFunction, double tr, NormalizationParameters parameters) {
         if(solution == null){
             solution = SolutionSSR4.createSolution(generatedFunction, tr, parameters);
-            currentSolution = solution;
+            currentFunction = solution;
         }
         else{
             // Add a new level of normalization
-            ((SolutionSSR1)currentSolution).setT2(SolutionSSR4.createSolution(generatedFunction, tr, parameters));
-            currentSolution = ((SolutionSSR1)currentSolution).getT2();
+            ((SolutionSSR1)currentFunction).setT2(SolutionSSR4.createSolution(generatedFunction, tr, parameters));
+            currentFunction = ((SolutionSSR1)currentFunction).getT2();
         }
     }
     
@@ -122,7 +122,7 @@ public class SSR4 extends SSR3{
         else{
             // Add a new level of normalization
             Function normalizedT2 = new NormalizedFunction(lastFunction, parameters);
-            ((SolutionSSR1)currentSolution).setT2(normalizedT2);
+            ((SolutionSSR1)currentFunction).setT2(normalizedT2);
         }
     }
 }

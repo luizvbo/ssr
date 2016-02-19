@@ -10,10 +10,12 @@ import ec.EvolutionState;
 import ec.Individual;
 import ec.gp.GPIndividual;
 import ec.ssr.functions.Function;
+import ec.util.MersenneTwisterFast;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Locale;
 
 /**
@@ -131,7 +133,7 @@ public class Utils {
     }
     
     /**
-     * Generates a array with the expected outputs of a dataset, respecting the order
+     * Generates an array with the expected outputs of a dataset, respecting the order
      * @param dataset Input dataset
      * @return Double array with the outputs with the same order of the dataset
      */
@@ -156,5 +158,40 @@ public class Utils {
                 best_i = state.population.subpops[0].individuals[i];
         }
         return (GPIndividual)best_i;
+    }
+    
+    /**
+     * Generates an array with a number of folds defined by the user
+     * @param numFolds Number of folds
+     * @param dataset Input datase
+     * @param rnd Random number generator
+     * @return An array of folds
+     */
+    public static Dataset[] getFoldSampling(int numFolds, Dataset dataset, MersenneTwisterFast rnd){
+        Dataset[] folds = new Dataset[numFolds];
+        ArrayList<Instance> dataCopy = new ArrayList<Instance>(dataset.data);
+        int foldIndex = 0;
+        // If rnd is null we don't shuffle the data
+        if(rnd == null){
+            Iterator<Instance> it = dataCopy.iterator();
+            while(it.hasNext()){
+                if(folds[foldIndex] == null)
+                    folds[foldIndex] = new Dataset();
+                folds[foldIndex].add(it.next());
+                it.remove();
+                if(foldIndex < numFolds - 1) foldIndex++;
+                else foldIndex = 0;
+            }
+        }
+        else{
+            while(!dataCopy.isEmpty()){
+                if(folds[foldIndex] == null)
+                    folds[foldIndex] = new Dataset();
+                folds[foldIndex].add(dataCopy.remove(rnd.nextInt(dataCopy.size())));
+                if(foldIndex < numFolds - 1) foldIndex++;
+                else foldIndex = 0;
+            }
+        }
+        return folds;
     }
 }

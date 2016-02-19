@@ -63,7 +63,7 @@ public class SSR8 extends SSR4{
             // Load new inputs on the proble Object
             ((Regression)mainState.evaluator.p_problem).setDataset(sampledData);
             ((Regression)mainState.evaluator.p_problem).setHitLevel(hitLevel);
-            ((Regression)mainState.evaluator.p_problem).setOutput(normalizedOutput);
+//            ((Regression)mainState.evaluator.p_problem).setOutput(normalizedOutput);
             
             evolve();
             

@@ -25,7 +25,8 @@ import java.util.ArrayList;
  * @author luiz
  */
 public class SSR1 extends SSR{
-    protected Function currentSolution;
+    // Last function added to the main solution
+    protected Function currentFunction;
     
     public SSR1(Dataset trainingSet,
                 Dataset validationSet,
@@ -105,11 +106,11 @@ public class SSR1 extends SSR{
     protected void addFunctionToSolution(Function generatedFunction, double tr) {
         if(solution == null){
             solution = new SolutionSSR1(generatedFunction, tr);
-            currentSolution = solution;
+            currentFunction = solution;
         }
         else{
-            ((SolutionSSR1)currentSolution).setT2(new SolutionSSR1(generatedFunction, tr));
-            currentSolution = ((SolutionSSR1)currentSolution).getT2();
+            ((SolutionSSR1)currentFunction).setT2(new SolutionSSR1(generatedFunction, tr));
+            currentFunction = ((SolutionSSR1)currentFunction).getT2();
         }
     }
     
@@ -118,7 +119,7 @@ public class SSR1 extends SSR{
             solution = new SolutionSSR1(generatedFunction, 1);
         }
         else{
-            ((SolutionSSR1)currentSolution).setT2(generatedFunction);
+            ((SolutionSSR1)currentFunction).setT2(generatedFunction);
         }
     }
     
@@ -126,7 +127,7 @@ public class SSR1 extends SSR{
         double[] newOutput = new double[dataset.size()];
         for(int i = 0; i < dataset.size(); i++){
             Instance instance = dataset.get(i);
-            double output = ((SolutionSSR1)currentSolution).getT1().eval(instance.input);
+            double output = ((SolutionSSR1)currentFunction).getT1().eval(instance.input);
             newOutput[i] = (oldOutput[i] - tr*output)/(1-tr);
         }
         return newOutput;

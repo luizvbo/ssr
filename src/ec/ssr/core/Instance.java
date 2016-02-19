@@ -9,6 +9,8 @@ package ec.ssr.core;
  * Copyright (C) 20014, Federal University of Minas Gerais, Belo Horizonte, Brazil
  */
 public class Instance {
+    private static int IDCounter = 0;
+    
     /** Instance input (one or more). */
     public double[] input;
     
@@ -16,7 +18,7 @@ public class Instance {
     public double output;
     
     /** Normalized output. */
-    public double normOutput;
+//    public double normOutput;
     
     /** Instance identifier. */
     public int id;
@@ -25,13 +27,13 @@ public class Instance {
      * Constructor declaration
      * @param input Instance input 
      * @param output Instance output
-     * @param IDCounter Instance identifier
      */
-    public Instance(double[] input, double output, int IDCounter) {
+//    public Instance(double[] input, double output, int IDCounter) {
+    public Instance(double[] input, double output) {
         this.input = input;
         this.output = output;
-        normOutput = output;
-        id = IDCounter;
+//        normOutput = output;
+        id = IDCounter++;
     }
 
     @Override
@@ -43,7 +45,7 @@ public class Instance {
         return out.toString() + output;
     }
 
-    public void resetNormalizedOutput() {
-        normOutput = output;
-    }
+//    public void resetNormalizedOutput() {
+//        normOutput = output;
+//    }
 }

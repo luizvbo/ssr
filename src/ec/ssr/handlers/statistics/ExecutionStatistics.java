@@ -9,7 +9,6 @@ package ec.ssr.handlers.statistics;
 import ec.EvolutionState;
 import ec.Individual;
 import ec.gp.GPIndividual;
-import ec.gp.koza.KozaFitness;
 import ec.simple.SimpleStatistics;
 import ec.ssr.core.Dataset;
 import ec.ssr.core.Instance;
@@ -28,8 +27,8 @@ public class ExecutionStatistics {
     public static final int TEST = 1;
     public static final int PRECISION = 5;
     
-    private final double trainError[][];
-    private final double testError[][];
+    private final double trainOutput[][];
+    private final double testOutput[][];
     
     private final Dataset trainingSet;
     private final Dataset testSet;
@@ -46,10 +45,11 @@ public class ExecutionStatistics {
     private StringBuilder iterativeSolutions;
     
     private int currentIteration;
+    private long executionTime;
     
     public ExecutionStatistics(Dataset trainingSet, Dataset testSet, int numIterations) {  
-        trainError = new double[trainingSet.size()][];
-        testError = new double[testSet.size()][];
+        trainOutput = new double[trainingSet.size()][];
+        testOutput = new double[testSet.size()][];
         trainRMSEperIteration = new double[numIterations];
         outputVectors = new double[numIterations][];
         testRMSEperIteration = new double[numIterations];
@@ -136,20 +136,23 @@ public class ExecutionStatistics {
     }
     
     /**
-     * Tests a solution with a training and a testSolution set, storing the results
+     * Tests a solution with a training and a testSolution set, storing the results.
+     * The results are stored in a matrix where each line corresponds to an instance
+     * and each instance is composed by the inputs, the target output and solution
+     * output.
      * @param solution Solution being teste
      */
     public void testSolution(Function solution) {
         int index = 0;
         for(Instance instance : trainingSet.data){
             double output = solution.eval(instance.input);
-            trainError[index] = formatInstanceError(instance.input, instance.output, output);
+            trainOutput[index] = formatInstanceError(instance.input, instance.output, output);
             index++;
         }    
         index = 0;
         for(Instance instance : testSet.data){
             double output = solution.eval(instance.input);
-            testError[index] = formatInstanceError(instance.input, instance.output, output);
+            testOutput[index] = formatInstanceError(instance.input, instance.output, output);
             index++;
         }
     }
@@ -171,11 +174,11 @@ public class ExecutionStatistics {
         return testResult;
     }
 
-    public double[][] getErrorPerInstance(int type) {
+    public double[][] getOutputsPerInstance(int type) {
         if(type == TEST)
-            return testError;
+            return testOutput;
         else
-            return trainError;
+            return trainOutput;
     }
 
     public double[] getErrorPerIterarion(int type) {
@@ -230,5 +233,13 @@ public class ExecutionStatistics {
 
     public ArrayList<Double> getGenerationBestFitness() {
         return generationBestFitness;
+    }
+
+    public void updateTime(long executionTime) {
+        this.executionTime = executionTime;
+    }
+    
+    public long getExecutionTime() {
+        return executionTime;
     }
 }

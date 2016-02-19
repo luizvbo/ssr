@@ -13,7 +13,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 
 /**
  * FileHandler.java
@@ -52,7 +51,7 @@ public class FileHandler {
             }
         } 
         catch (NumberFormatException e){
-            throw new SSRException("Some tokens in the input file were not numbers.");
+            throw new SSRException("Some tokens in the input file " + inputFile.getName() + " were not numbers.");
         }
         catch(ArrayIndexOutOfBoundsException e){
             throw new SSRException("Not enough data points in file.");
@@ -150,48 +149,48 @@ public class FileHandler {
         return -1;
     }
         
-    public static void writeResults(String outputPath,
-                     String outputPrefix, 
-                     StatisticsHandler stats,
-                     double hitLevel) throws Exception{
-        File outputDir = getOutputDir(outputPath);
-        outputDir = new File(outputDir.getAbsolutePath()+ File.separator + outputPrefix);
-        outputDir.mkdirs();
-        // Object to write results on file
-        BufferedWriter bw;
-        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "trFinalPoinError.csv"));
-        bw.write(stats.getFinalPointError(StatisticsHandler.TRAIN, hitLevel));
-        bw.close();
-        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "tsFinalPoinError.csv"));
-        bw.write(stats.getFinalPointError(StatisticsHandler.TEST, hitLevel));
-        bw.close();
-        
-        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "trRMSEperIteration.csv"));
-        bw.write(stats.getRMSEperIteration(StatisticsHandler.TRAIN));
-        bw.close();
-        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "tsRMSEperIteration.csv"));
-        bw.write(stats.getRMSEperIteration(StatisticsHandler.TEST));
-        bw.close();
-        
-        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "trErrorBestOfGen.csv"));
-        bw.write(stats.getErrorBestOfGeneration());
-        bw.close();
-        
-        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "trErrorPerGeneration.csv"));
-        bw.write(stats.getErrorBestOfGeneration());
-        bw.close();
-        
-        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "trErrorPointPerIt.csv"));
-        bw.write(stats.getErrorPointPerIteration());
-        bw.close();
-        
-//        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + outputPrefix + "testError.csv"));
-//        stats.writeTestErrorToFile(bw, hitLevel);
+//    public static void writeResults(String outputPath,
+//                     String outputPrefix, 
+//                     StatisticsHandler stats,
+//                     double hitLevel) throws Exception{
+//        File outputDir = getOutputDir(outputPath);
+//        outputDir = new File(outputDir.getAbsolutePath()+ File.separator + outputPrefix);
+//        outputDir.mkdirs();
+//        // Object to write results on file
+//        BufferedWriter bw;
+//        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "trFinalPoinError.csv"));
+//        bw.write(stats.getFinalPointError(StatisticsHandler.TRAIN, hitLevel));
 //        bw.close();
-//        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + outputPrefix + "trainingError.csv"));
-//        stats.writeTrainingErrorToFile(bw, hitLevel);
+//        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "tsFinalPoinError.csv"));
+//        bw.write(stats.getFinalPointError(StatisticsHandler.TEST, hitLevel));
 //        bw.close();
-    }
+//        
+//        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "trRMSEperIteration.csv"));
+//        bw.write(stats.getRMSEperIteration(StatisticsHandler.TRAIN));
+//        bw.close();
+//        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "tsRMSEperIteration.csv"));
+//        bw.write(stats.getRMSEperIteration(StatisticsHandler.TEST));
+//        bw.close();
+//        
+//        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "trErrorBestOfGen.csv"));
+//        bw.write(stats.getErrorBestOfGeneration());
+//        bw.close();
+//        
+//        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "trErrorPerGeneration.csv"));
+//        bw.write(stats.getErrorBestOfGeneration());
+//        bw.close();
+//        
+//        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "trErrorPointPerIt.csv"));
+//        bw.write(stats.getErrorPointPerIteration());
+//        bw.close();
+//        
+////        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + outputPrefix + "testError.csv"));
+////        stats.writeTestErrorToFile(bw, hitLevel);
+////        bw.close();
+////        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + outputPrefix + "trainingError.csv"));
+////        stats.writeTrainingErrorToFile(bw, hitLevel);
+////        bw.close();
+//    }
     
     public static void writeSolution(String outputPath,
                                      String outputPrefix,
@@ -223,48 +222,48 @@ public class FileHandler {
         return outputDir;
     }
 
-    public static void writeOutputDist(String outputPath, String outputPrefix, ArrayList<double[]>[] rawOutputHistory, ArrayList<double[]>[] normOutputHistory) throws Exception{
-        File outputDir = getOutputDir(outputPath);
-        outputDir = new File(outputDir.getAbsolutePath()+ File.separator + outputPrefix);
-        outputDir.mkdirs();
-        
-        BufferedWriter bw;
-        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "rawOutput.txt"));
-        for(ArrayList<double[]> execOutput : rawOutputHistory){
-            for(double[] output : execOutput){
-                for(int i = 0; i < output.length; i++){
-                    bw.write(output[i] + ",");
-                }
-                bw.write("\n");
-            }
-        }
-        bw.close();
-        
-        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "normOutput.txt"));
-        for(ArrayList<double[]> execOutput : normOutputHistory){
-            for(double[] output : execOutput){
-                for(int i = 0; i < output.length; i++){
-                    bw.write(output[i] + ",");
-                }
-                bw.write("\n");
-            }
-        }
-        bw.close();
-    }
+//    public static void writeOutputDist(String outputPath, String outputPrefix, ArrayList<double[]>[] rawOutputHistory, ArrayList<double[]>[] normOutputHistory) throws Exception{
+//        File outputDir = getOutputDir(outputPath);
+//        outputDir = new File(outputDir.getAbsolutePath()+ File.separator + outputPrefix);
+//        outputDir.mkdirs();
+//        
+//        BufferedWriter bw;
+//        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "rawOutput.txt"));
+//        for(ArrayList<double[]> execOutput : rawOutputHistory){
+//            for(double[] output : execOutput){
+//                for(int i = 0; i < output.length; i++){
+//                    bw.write(output[i] + ",");
+//                }
+//                bw.write("\n");
+//            }
+//        }
+//        bw.close();
+//        
+//        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "normOutput.txt"));
+//        for(ArrayList<double[]> execOutput : normOutputHistory){
+//            for(double[] output : execOutput){
+//                for(int i = 0; i < output.length; i++){
+//                    bw.write(output[i] + ",");
+//                }
+//                bw.write("\n");
+//            }
+//        }
+//        bw.close();
+//    }
 
-    public static void writeTrainingIds(String outputPath, 
-                                      String outputPrefix, 
-                                      String stringIds) throws Exception{
-        File outputDir = getOutputDir(outputPath);
-        outputDir = new File(outputDir.getAbsolutePath()+ File.separator + outputPrefix);
-        outputDir.mkdirs();
-        
-        // Object to write results on file
-        BufferedWriter bw;
-        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "trainingIds.txt"));
-        bw.write(stringIds);
-        bw.close();
-    }
+//    public static void writeTrainingIds(String outputPath, 
+//                                      String outputPrefix, 
+//                                      String stringIds) throws Exception{
+//        File outputDir = getOutputDir(outputPath);
+//        outputDir = new File(outputDir.getAbsolutePath()+ File.separator + outputPrefix);
+//        outputDir.mkdirs();
+//        
+//        // Object to write results on file
+//        BufferedWriter bw;
+//        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "trainingIds.txt"));
+//        bw.write(stringIds);
+//        bw.close();
+//    }
 
     public static void writeResults(SSR[] threadsSSR, 
                                    String outputPath, 
@@ -282,10 +281,10 @@ public class FileHandler {
 //        bw.write(getFinalPointError(threadsSSR, ExecutionStatistics.TEST, hitLevel));
 //        bw.close();
         
-        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "trRMSEperIteration.csv"));
+        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "trFitness.csv"));
         bw.write(getRMSEperIteration(threadsSSR, ExecutionStatistics.TRAIN));
         bw.close();
-        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "tsRMSEperIteration.csv"));
+        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "tsFitness.csv"));
         bw.write(getRMSEperIteration(threadsSSR, ExecutionStatistics.TEST));
         bw.close();
         
@@ -293,21 +292,29 @@ public class FileHandler {
 //        bw.write(stats.getErrorBestOfGeneration());
 //        bw.close();
         
-        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "trErrorPerGeneration.csv"));
-        bw.write(getErrorBestOfGeneration(threadsSSR));
+//        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "trErrorPerGeneration.csv"));
+//        bw.write(getErrorBestOfGeneration(threadsSSR));
+//        bw.close();
+        
+        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "executionTime.csv"));
+        bw.write(getExectuionTime(threadsSSR));
+        bw.close();
+        
+        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "outputs.csv"));
+        bw.write(getSolutionOutputs(threadsSSR));
         bw.close();
 //        
 //        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "trErrorPointPerIt.csv"));
 //        bw.write(getErrorPointPerIteration(threadsSSR));
 //        bw.close();
         
-        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "outputVectors.csv"));
-        bw.write(getOutputVectors(threadsSSR));
-        bw.close();
+//        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "outputVectors.csv"));
+//        bw.write(getOutputVectors(threadsSSR));
+//        bw.close();
         
-        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "numZeroDiv.csv"));
-        bw.write(getNumZeroDivIteration(threadsSSR));
-        bw.close();
+//        bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "numZeroDiv.csv"));
+//        bw.write(getNumZeroDivIteration(threadsSSR));
+//        bw.close();
         
         bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "numNodes.csv"));
         bw.write(getNumNodes(threadsSSR));
@@ -316,6 +323,36 @@ public class FileHandler {
         bw = new BufferedWriter(new FileWriter(outputDir.getAbsolutePath()+ File.separator + "seeds.txt"));
         bw.write(getSeeds(threadsSSR));
         bw.close();     
+    }
+    
+    private static String getSolutionOutputs(SSR[] threadsSSR) {
+        StringBuilder outputStr = new StringBuilder();
+        double outputs[][] = threadsSSR[0].getStatistics().getOutputsPerInstance(ExecutionStatistics.TRAIN);
+        String delimiter = "";
+        for(double instance[] : outputs){
+            outputStr.append(delimiter+Utils.printDouble(instance[instance.length-2], PRECISION));
+            delimiter = ",";
+        }
+        outputs = threadsSSR[0].getStatistics().getOutputsPerInstance(ExecutionStatistics.TEST);
+        for(double instance[] : outputs){
+            outputStr.append(delimiter+Utils.printDouble(instance[instance.length-2], PRECISION));
+        }
+        outputStr.append("\n");
+        
+        for(SSR exec : threadsSSR){
+            outputs = exec.getStatistics().getOutputsPerInstance(ExecutionStatistics.TRAIN);
+            delimiter = "";
+            for(double instance[] : outputs){
+                outputStr.append(delimiter+Utils.printDouble(instance[instance.length-1], PRECISION));
+                delimiter = ",";
+            }
+            outputs = exec.getStatistics().getOutputsPerInstance(ExecutionStatistics.TEST);
+            for(double instance[] : outputs){
+                outputStr.append(delimiter+Utils.printDouble(instance[instance.length-1], PRECISION));
+            }
+            outputStr.append("\n");
+        }
+        return outputStr.toString();
     }
 
     public static void writeSolution(SSR[] threadsSSR, 
@@ -343,7 +380,7 @@ public class FileHandler {
         for(int exec = 0; exec < threadsSSR.length; exec ++){            
             outputStr.append("Execution " + (exec+1) + "\n");
             outputStr.append("input,output,evaluated,error\n");
-            double[][] data = threadsSSR[exec].getStatistics().getErrorPerInstance(type);
+            double[][] data = threadsSSR[exec].getStatistics().getOutputsPerInstance(type);
             for(int j = 0; j < data.length; j++){
                 int inputSize = data[j].length;
                 double error = Math.abs(data[j][inputSize-1]-data[j][inputSize-2]);
@@ -368,7 +405,7 @@ public class FileHandler {
         
         double mae[] = new double[threadsSSR.length];
         for(int exec = 0; exec < threadsSSR.length; exec++){
-            double[][] data = threadsSSR[exec].getStatistics().getErrorPerInstance(type);
+            double[][] data = threadsSSR[exec].getStatistics().getOutputsPerInstance(type);
             rmse[exec] /= data.length;
             rmse[exec] = Math.sqrt(rmse[exec]);
             mae[exec] = totalError[exec] / data.length;
@@ -518,6 +555,15 @@ public class FileHandler {
         StringBuilder outputStr = new StringBuilder();
         for(SSR algorithm : threadsSSR){
             outputStr.append(algorithm.getSeed());
+            outputStr.append("\n");
+        }
+        return outputStr.toString();
+    }
+
+    private static String getExectuionTime(SSR[] threadsSSR) {
+        StringBuilder outputStr = new StringBuilder("Execution Time (per execution) \n");
+        for(SSR algorithm : threadsSSR){
+            outputStr.append(algorithm.getStatistics().getExecutionTime());
             outputStr.append("\n");
         }
         return outputStr.toString();

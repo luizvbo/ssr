@@ -4,17 +4,16 @@
  * and open the template in the editor.
  */
 
-package ec.ssr.core.ParallelVersions.SSR5;
+package ec.ssr.core.ParallelVersions.SSR6;
 
-import ec.ssr.core.ParallelVersions.SSR3.SSR3;
 import ec.EvolutionState;
 import ec.gp.GPIndividual;
 import ec.gp.koza.KozaFitness;
 import ec.simple.SimpleStatistics;
 import ec.ssr.core.Dataset;
-import ec.ssr.core.ParallelVersions.SSR2.NormalizationParameters;
-import ec.ssr.core.ParallelVersions.SSR2.NormalizedFunction;
-import ec.ssr.core.ParallelVersions.SSR4.SolutionSSR4;
+import ec.ssr.core.Instance;
+import ec.ssr.core.ParallelVersions.SSR;
+import ec.ssr.core.ParallelVersions.SSR1.SolutionSSR1;
 import ec.ssr.core.Utils;
 import ec.ssr.functions.Function;
 import ec.ssr.problems.Regression;
@@ -24,11 +23,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
- * The same as SSR4 but with no normalization on the first run
+ * In this version functions are concatenated externaly
  * @author luiz
  */
-public class SSR5 extends SSR3{
-    public SSR5(Dataset trainingSet,
+public class SSR6 extends SSR{
+
+    public SSR6(Dataset trainingSet,
                 Dataset validationSet,
                 Dataset testSet, 
                 String outputPath, 
@@ -45,27 +45,23 @@ public class SSR5 extends SSR3{
               numIterations, numExecutions, seed, hitLevel, parameterFilePath, 
               inputParameters);
     }
- 
+    
     @Override
     public void runAlgorithm() {
         boolean canStop = false;
         // The original expected output
         double output[] = Utils.getDatasetOutputs(trainingSet);
+        double newOutput[] = Arrays.copyOf(output, output.length);
         int currentIteration = 0;
-        NormalizationParameters normParameters = null;
         while(!canStop){
             System.out.println("\nIteration: " + (currentIteration+1));
             mainState.startFresh();
-            double normalizedOutput[] = Arrays.copyOf(output, output.length);
-            // No normalization on the first iteration
-            if(currentIteration != 0){
-                normParameters = normalizeData(normalizedOutput);
-            }
             // Load new inputs on the proble Object
             ((Regression)mainState.evaluator.p_problem).setDataset(trainingSet);
             ((Regression)mainState.evaluator.p_problem).setHitLevel(hitLevel);
-            ((Regression)mainState.evaluator.p_problem).setOutput(normalizedOutput);
+//            ((Regression)mainState.evaluator.p_problem).setOutput(newOutput);
             int result = EvolutionState.R_NOTDONE;
+            double[] lastOutput = output; 
             // Generations
             while(result == EvolutionState.R_NOTDONE ){
                 result = mainState.evolve();
@@ -74,21 +70,21 @@ public class SSR5 extends SSR3{
             }                                                        
             GPIndividual bestSoFar = (GPIndividual)((SimpleStatistics)mainState.statistics).getBestSoFar()[0];
             KozaFitness fitness = (KozaFitness)bestSoFar.fitness;
-            Function bestFunction =  (Function)bestSoFar.trees[0].child;
-            
+            Function bestFunction = (Function)bestSoFar.trees[0].child;
+
             if(currentIteration == maxIterations - 1 || fitness.hits == trainingSet.size()){
-                addLastFunctionToSolution(bestFunction, normParameters);
+                double tr = mainState.random[0].nextDouble();
+                addLastFunctionToSolution(bestFunction, tr);
                 canStop = true;
             }
             else{
                 double tr = mainState.random[0].nextDouble();
-                addFunctionToSolution(bestFunction, tr, normParameters);
-                output = getNewOutput(trainingSet, normalizedOutput, tr);
+                addFunctionToSolution(bestFunction, tr);
+                newOutput = getNewOutput(trainingSet, output, tr);
             }
 
             stats.updateOnIteration(solution);
-            
-//            stats.updatePontualError(bestFunction, output);
+//            stats.updatePontualError(bestFunction, lastOutput);
 //            stats.updateIterativeErrors(solution);
 //
 //            stats.finishIteration();
@@ -97,26 +93,32 @@ public class SSR5 extends SSR3{
         }
     }
     
-    protected void addFunctionToSolution(Function generatedFunction, double tr, NormalizationParameters parameters) {
+    protected void addFunctionToSolution(Function generatedFunction, double tr) {
         if(solution == null){
-            solution = SolutionSSR4.createSolution(generatedFunction, tr, parameters);
-            currentFunction = solution;
+            solution = new SolutionSSR1(generatedFunction, tr);
         }
         else{
-            // Add a new level of normalization
-            ((ec.ssr.core.ParallelVersions.SSR1.SolutionSSR1)currentFunction).setT2(SolutionSSR4.createSolution(generatedFunction, tr, parameters));
-            currentFunction = ((ec.ssr.core.ParallelVersions.SSR1.SolutionSSR1)currentFunction).getT2();
+            ((SolutionSSR1)solution).setT2(generatedFunction);
+            solution = new SolutionSSR1(solution, tr);
         }
     }
     
-    protected void addLastFunctionToSolution(Function lastFunction, NormalizationParameters parameters){
+    protected void addLastFunctionToSolution(Function generatedFunction, double tr){
         if(solution == null){
-            solution = SolutionSSR4.createSolution(lastFunction, parameters);
+            solution = new SolutionSSR1(generatedFunction, 1);
         }
         else{
-            // Add a new level of normalization
-            Function normalizedT2 = new NormalizedFunction(lastFunction, parameters);
-            ((SolutionSSR4)currentFunction).setT2(normalizedT2);
+            ((SolutionSSR1)solution).setT2(generatedFunction);
         }
+    }
+    
+    protected double[] getNewOutput(Dataset dataset, double[] oldOutput, double tr){
+        double[] newOutput = new double[dataset.size()];
+        for(int i = 0; i < dataset.size(); i++){
+            Instance instance = dataset.get(i);
+            double output = ((SolutionSSR1)solution).getT1().eval(instance.input);
+            newOutput[i] = (oldOutput[i] - tr*output)/(1-tr);
+        }
+        return newOutput;
     }
 }

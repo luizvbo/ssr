@@ -22,6 +22,7 @@ import java.util.Arrays;
 
 /**
  * In this version functions are concatenated externaly
+ * Similar to GRR (Genetic Recursive Regression)
  * @author luiz
  */
 public class SSR7 extends SSR{

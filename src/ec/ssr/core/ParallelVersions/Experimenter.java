@@ -6,17 +6,23 @@
 
 package ec.ssr.core.ParallelVersions;
 
-import ec.ssr.core.ParallelVersions.SSR6.SSR6;
-import ec.ssr.core.ParallelVersions.SSR4.SSR4;
-import ec.ssr.core.ParallelVersions.SSR3.SSR3;
+
+
+
+import ec.ssr.core.ParallelVersions.SSR1.*;
 import ec.ssr.core.ParallelVersions.SSR2.SSR2;
-import ec.ssr.core.ParallelVersions.SSR1.SSR1;
+import ec.ssr.core.ParallelVersions.SSR3.SSR3;
+import ec.ssr.core.ParallelVersions.SSR4.SSR4;
+import ec.ssr.core.ParallelVersions.SSR6.SSR6;
+import ec.ssr.core.ParallelVersions.SSR7.SSR7;
+import ec.ssr.core.ParallelVersions.SSR8.SSR8;
+import ec.ssr.core.ParallelVersions.SSR9.SSR9;
+
 import ec.EvolutionState;
 import ec.ssr.core.Dataset;
 import ec.ssr.core.Instance;
-import ec.ssr.core.ParallelVersions.SSR7.SSR7;
-import ec.ssr.core.ParallelVersions.SSR1.SolutionSSR1;
-import ec.ssr.core.ParallelVersions.SSR8.SSR8;
+import ec.ssr.core.ParallelVersions.GP11.GP;
+import ec.ssr.core.ParallelVersions.SSR10.SSR10;
 import ec.ssr.handlers.CrossvalidationHandler;
 import ec.ssr.handlers.DataProducer;
 import ec.ssr.handlers.FileHandler;
@@ -39,6 +45,9 @@ import java.util.concurrent.TimeUnit;
 public class Experimenter {
     protected SolutionSSR1 currentSolution;
     protected SolutionSSR1 solution;
+    
+    protected int numFoldsSSR10 = 5;
+    protected int stripSizeSSR10 = -1;
     
     protected int version = 1;
     protected String parameterFilePath;
@@ -127,9 +136,22 @@ public class Experimenter {
                 algorithm = new SSR8(trainingSet, validationSet, testSet, outputPath, outputPrefix, numIterations, 
                                      numExecutions, seed, hitLevel, parameterFilePath, inputParameters);
                 break;
-            default:
-                algorithm = new SSR4(trainingSet, validationSet, testSet, outputPath, outputPrefix, numIterations, 
+            case 9:
+                algorithm = new SSR9(trainingSet, validationSet, testSet, outputPath, outputPrefix, numIterations, 
                                      numExecutions, seed, hitLevel, parameterFilePath, inputParameters);
+                break;
+            case 10:
+                algorithm = new SSR10(trainingSet, validationSet, testSet, outputPath, outputPrefix, numIterations, 
+                                     numExecutions, seed, hitLevel, parameterFilePath, inputParameters, 
+                                     stripSizeSSR10, numFoldsSSR10);
+                break;
+            case 11:
+                algorithm = new GP(trainingSet, validationSet, testSet, outputPath, outputPrefix, numIterations, 
+                                    numExecutions, seed, hitLevel, parameterFilePath, inputParameters, 
+                                    stripSizeSSR10, numFoldsSSR10);
+                break;
+            default:
+                algorithm = null;
                 break;
         }
         return algorithm;
@@ -200,6 +222,16 @@ public class Experimenter {
             if(!inputString.equals("")){
                 hitLevel = Double.parseDouble(inputString);
             }
+            
+            inputString = FileHandler.readOption("ss", args);
+            if(!inputString.equals("")){
+                stripSizeSSR10 = Integer.parseInt(inputString);
+            }
+            inputString = FileHandler.readOption("nf", args);
+            if(!inputString.equals("")){
+                numFoldsSSR10 = Integer.parseInt(inputString);
+            }
+            
             inputString = FileHandler.readOption("V", args);
             if(!inputString.equals("")){
                 validationPercentage = Double.parseDouble(inputString);
@@ -305,7 +337,11 @@ public class Experimenter {
                 + "     If the value is in [0,1], defines percentage used for test in holdout validation.\n"
                 + "     If the value is bigger than 1, defines absolute quatity used for test in holdout validation.\n"
                 + "  -e <int>\n"
-                + "     Minimun error to compute a hit (default = 0.01).\n"
+                + "     Minimun error to compute a hit (default = 0.0).\n"
+                + "  -ss <int>\n"
+                + "     Strip size for version 10.\n"
+                + "  -nf <int>\n"
+                + "     Number of folds for version 10.\n"
                 + "  -C\n"
                 + "     Uses splited data from files for cross-validation. Use a path to the files in the form\n"
                 + "     /pathToFile/repeatedName#repeatedName, where # indicates where the fold index is placed\n"

@@ -9,15 +9,11 @@ package ec.ssr.core.ParallelVersions;
 import ec.EvolutionState;
 import ec.Evolve;
 import ec.Individual;
-import ec.gp.GPIndividual;
 import ec.gp.koza.KozaFitness;
-import ec.simple.SimpleStatistics;
 import ec.ssr.core.Dataset;
 import ec.ssr.core.Instance;
-import ec.ssr.core.Utils;
 import ec.ssr.functions.Function;
 import ec.ssr.handlers.statistics.ExecutionStatistics;
-import ec.ssr.problems.RegressionResampling;
 import ec.util.Output;
 import ec.util.Parameter;
 import ec.util.ParameterDatabase;
@@ -54,7 +50,7 @@ public abstract class SSR extends Thread{
                long seed,
                double hitLevel, 
                String parameterFilePath,
-               ArrayList inputParameters) throws Exception{
+               ArrayList<String> inputParameters) throws Exception{
         this.trainingSet = trainingSet;
         this.validationSet = validationSet;
         this.testSet = testSet;
@@ -90,7 +86,9 @@ public abstract class SSR extends Thread{
     
     @Override
     public void run() {
+        long startTime = System.currentTimeMillis();
         runAlgorithm();
+        stats.updateTime((System.currentTimeMillis() - startTime)/1000);
         stats.testSolution(solution);
     }
     
