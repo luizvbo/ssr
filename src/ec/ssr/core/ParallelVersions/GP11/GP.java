@@ -80,7 +80,7 @@ public class GP extends SSR{
         // Generations
         while(result == EvolutionState.R_NOTDONE ){
             if(stripSize < 0){
-                // Use the whole training data (no random sample technique)
+                // Use the whole training data (no random sample technique)gi
                 ((Regression)mainState.evaluator.p_problem).setDataset(trainingSet);
             }
             else{

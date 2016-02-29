@@ -51,7 +51,8 @@ public class Experimenter {
     
     protected int version = 1;
     protected String parameterFilePath;
-    protected String inputDataFilePath; 
+    protected String trainingPath; 
+    protected String testPath; 
     protected String seedPath = ""; 
     protected String outputPath = "";
     protected String outputPrefix = "";
@@ -192,7 +193,11 @@ public class Experimenter {
             }
             inputString = FileHandler.readOption("i", args);
             if(!inputString.equals("")){
-                inputDataFilePath = inputString;
+                trainingPath = inputString;
+            }
+            inputString = FileHandler.readOption("I", args);
+            if(!inputString.equals("")){
+                testPath = inputString;
             }
             inputString = FileHandler.readOption("o", args);
             if(!inputString.equals("")){
@@ -303,7 +308,7 @@ public class Experimenter {
 //        mainState = Evolve.initialize(dbase, 0, mainOutput);
         
         
-        dataProducer.setDataset(inputDataFilePath);
+        dataProducer.setDataset(trainingPath, testPath);
         if(shuffle)
             dataProducer.setRandomGenerator(new MersenneTwisterFast(System.currentTimeMillis()));
     }
@@ -319,6 +324,8 @@ public class Experimenter {
                 + "     * Path to the parameter file.\n"
                 + "  -i <file path>\n"
                 + "     * Path to the training file.\n"
+                + "  -T <file path>\n"
+                + "     * Path to the test file (optional).\n"
                 + "  -o <file path>\n"
                 + "     Path to the output files.\n"
                 + "  -s <file path>\n"
@@ -363,7 +370,7 @@ public class Experimenter {
      */
     private void inputValidation() throws Exception{
         // Check whether the input files was set
-        if(inputDataFilePath == null || parameterFilePath == null || dataProducer == null){
+        if(trainingPath == null || parameterFilePath == null || dataProducer == null){
             showHelp();
             System.exit(0);
         }

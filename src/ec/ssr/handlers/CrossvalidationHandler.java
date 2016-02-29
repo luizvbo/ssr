@@ -5,12 +5,10 @@
 package ec.ssr.handlers;
 
 import ec.ssr.core.Dataset;
-import ec.ssr.core.Instance;
 import ec.ssr.core.Utils;
 import ec.util.MersenneTwisterFast;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  * CrossvalidationHandler.java
@@ -102,7 +100,7 @@ public class CrossvalidationHandler implements DataProducer{
     }
 
     @Override
-    public void setDataset(String dataPath) throws Exception{
+    public void setDataset(String dataPath, String testPath) throws Exception{
         if(!useFiles){
             Dataset data = FileHandler.readInputDataFile(dataPath);
             this.dataset = data;
