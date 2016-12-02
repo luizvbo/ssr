@@ -7,10 +7,7 @@
 package ec.ssr.core.ParallelVersions.SSR4;
 
 import ec.ssr.core.ParallelVersions.SSR3.SSR3;
-import ec.EvolutionState;
 import ec.gp.GPIndividual;
-import ec.gp.koza.KozaFitness;
-import ec.simple.SimpleStatistics;
 import ec.ssr.core.Dataset;
 import ec.ssr.core.ParallelVersions.SSR1.SolutionSSR1;
 import ec.ssr.core.ParallelVersions.SSR2.NormalizationParameters;
@@ -68,16 +65,7 @@ public class SSR4 extends SSR3{
             
             evolve();
             
-//            int result = EvolutionState.R_NOTDONE;
-//            // Generations
-//            while(result == EvolutionState.R_NOTDONE ){
-//                result = mainState.evolve();
-//                // Store the best fitness of generation
-//                stats.updateBestOfGeneration(mainState);
-//            }     
-            
             GPIndividual bestSoFar = Utils.getBestIndividual(mainState);
-//                    (GPIndividual)((SimpleStatistics)mainState.statistics).getBestSoFar()[0];
             FitnessInterface fitness = (FitnessInterface)bestSoFar.fitness;
             Function bestFunction =  (Function)bestSoFar.trees[0].child;
             
@@ -92,12 +80,6 @@ public class SSR4 extends SSR3{
             }
                         
             stats.updateOnIteration(solution, normalizedOutput);
-//            stats.updatePontualError(bestFunction, lastOutput);
-//            stats.updateIterativeErrors(solution);
-//            stats.updateOutputVectors(lastOutput);
-//            stats.updateSolutionSize(solution);
-
-//            stats.finishIteration();
             currentIteration++;
             mainState.output.close();
         }
